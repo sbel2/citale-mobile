@@ -17,9 +17,7 @@ const Home = () => {
         try {
           fetching = true;
           document.getElementById("loader").style.display = "block";
-          const response = await fetch(
-            `https://dog.ceo/api/breeds/image/random/30`
-          );
+          const response = await fetch(`https://dog.ceo/api/breeds/image/random/30`);
           const data = await response.json();
           fetching = false;
           return data.message;
@@ -33,6 +31,11 @@ const Home = () => {
       const createCard = (image, col) => {
         const card = document.createElement("div");
         card.classList.add("card");
+      
+        const link = document.createElement("a");
+        link.href = `/post/${encodeURIComponent(image)}`; // Ensure this points to /post/[id]
+        link.classList.add("card-link");
+      
         const img = document.createElement("img");
         img.src = image;
         img.alt = "dog pics";
@@ -43,7 +46,9 @@ const Home = () => {
         img.onload = function () {
           document.getElementById("loader").style.display = "none";
         };
-        card.appendChild(img);
+      
+        link.appendChild(img);
+        card.appendChild(link);
         col.appendChild(card);
       };
 
