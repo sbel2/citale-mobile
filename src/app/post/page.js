@@ -7,9 +7,16 @@ const Post = () => {
   const [imageData, setImageData] = useState(null);
   const [error, setError] = useState(false);
   const [likes, setLikes] = useState(0);
-
+  const [comments, setComments] = useState([]);
+  const [favorites, setFavorites] = useState(0);
+  const [datePosted, setDatePosted] = useState("");
 
   useEffect(() => {
+    // Simulate fetching date posted. This could also be fetched from an API
+    setDatePosted(new Date().toLocaleDateString("en-US", {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    }));
+
     const fetchImage = async () => {
       try {
         const response = await fetch(`https://dog.ceo/api/breeds/image/random/1`);
@@ -43,7 +50,7 @@ const Post = () => {
         <title>Post Detail</title>
       </Head>
       <div className="post-container">
-        <div className={`card`}>
+        <div className="card">
           <div className="image-container">
             <img src={imageData} alt="Post Image" className="main-image" />
           </div>
@@ -79,8 +86,8 @@ const Post = () => {
                 <li style={{ marginBottom: '20px' }} >June 16th: </li>
                 <li>Vintage Cake Decorating Workshop, Long Live Boston</li>
                 <li style={{ marginBottom: '20px' }}>Pottery: Make A Mosaic Trivet, Newton MA</li>
-
             </ul>
+            <p style={{ fontSize: '12px', color: '#888' }}> {datePosted}</p>
             </div>
             <div className="footer">
               <button className="like-button" onClick={handleLike}>
@@ -90,26 +97,40 @@ const Post = () => {
           </div>
         </div>
       </div>
+      <style jsx global>{`
+        html, body {
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          height: 100%; // Ensures the full height is taken
+          width: 100%; // Ensures the full width is taken
+        }
+      `}</style>
       <style jsx>{`
         .post-container {
+          position: fixed; // Use fixed to ensure it covers the entire screen
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
           display: flex;
           justify-content: center;
           align-items: center;
-          background-color: #f0f0f0;
-          padding: 20px;
-          height: 120vh;
-          backdrop-filter: blur(10px);
-          overflow-y: hidden;
+          background: rgba(0,0,0,0.5); // Semi-transparent black background
+          backdrop-filter: blur(10px); // Blurred background
         }
+        .post-container .card:hover {
+      transform: none;
+      }
         .card {
           display: flex;
           background: white;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
           border-radius: 10px;
           overflow: hidden;
-          width: 100%;
-          max-width:1000px;
-          height: 80%;
+          width: 80%;
+          max-width: 975px; // Adjust max width as needed
+          max-height: 92.5vh; // Adjust min height as needed
         }
 
         .image-container {
@@ -147,7 +168,7 @@ const Post = () => {
           width: 40px;
           height: 40px;
           margin-right: 10px;
-          margin-bottom: 10px;
+          margin-bottom: 5px;
         }
         .profile-details {
           display: flex;
