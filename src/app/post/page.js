@@ -101,7 +101,7 @@ const Post = () => {
                 <li>Vintage Cake Decorating Workshop, Long Live Boston</li>
                 <li style={{ marginBottom: '20px' }}>Pottery: Make A Mosaic Trivet, Newton MA</li>
             </ul>
-            <p style={{ fontSize: '12px', color: '#888',marginBottom: '20px' }}> {datePosted}</p>
+            <p style={{ fontSize: '12px', color: '#888' }}> {datePosted}</p>
             </div>
             <div className="footer">
             <button className="icon-button" onClick={handleLike}>
