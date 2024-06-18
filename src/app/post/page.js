@@ -8,6 +8,7 @@ const Post = () => {
   const [error, setError] = useState(false);
   const [likes, setLikes] = useState(0);
 
+
   useEffect(() => {
     const fetchImage = async () => {
       try {
@@ -42,46 +43,44 @@ const Post = () => {
         <title>Post Detail</title>
       </Head>
       <div className="post-container">
-        <div className="card">
+        <div className={`card`}>
           <div className="image-container">
             <img src={imageData} alt="Post Image" className="main-image" />
           </div>
           <div className="text-container">
-            <div className="header">
+            <div className="profile-header">
               <img src="https://via.placeholder.com/50" alt="Profile" className="profile-pic" />
               <div className="profile-details">
-                <strong>hoamsy</strong>
-                <span>Boston, Massachusetts</span>
+                <p style={{ marginBottom: '5px' }}>hoamsy</p>
               </div>
             </div>
             <div className="content">
-              <p><strong>hoamsy</strong> 10 things to do in Boston and around Mass for this week! 🎉</p>
-              <p>If you're looking for things to do in Boston or around Mass, here are 10 unique experiences we have coming up to get yourself outdoors 🌸</p>
-              <p>P.S. All experiences have multiple dates. You can get more info and book tix on Hoamsy (via our bio).</p>
-              <ul>
-                <li>June 14th:
-                  <ul>
-                    <li>Cool Candle Making over Brews, Long Live Boston</li>
-                    <li>Learn Dumpling Making, Cambridge MA</li>
-                  </ul>
-                </li>
-                <li>June 15th:
-                  <ul>
-                    <li>Custom Perfume Making Workshop, Rooting For You, Cambridge MA</li>
-                    <li>Foraging Walk + Wild Food Picnic, Waltham MA</li>
-                    <li>Make A Candle Garden, Long Live Boston</li>
-                    <li>Summer Boating Trip, Marshfield MA</li>
-                    <li>Pottery Workshop: Make A Clay Serving Bowl, Newton MA</li>
-                    <li>Yoga On The Beach, Pleasure Bay Boston</li>
-                  </ul>
-                </li>
-                <li>June 16th:
-                  <ul>
-                    <li>Vintage Cake Decorating Workshop, Long Live Boston</li>
-                    <li>Pottery: Make A Mosaic Trivet, Newton MA</li>
-                  </ul>
-                </li>
-              </ul>
+            <h4 style={{ marginBottom: '20px', marginTop: '20px' }}><strong>10 Things to Do in Boston and Around Mass for This Week</strong></h4>
+            <p style={{ lineHeight: 1.4, marginBottom: '20px' }}>
+        If you're looking for things to do in Boston or around Mass, here are 10 unique experiences we have coming up to get yourself outdoors 🌸
+            </p>
+            <p style={{ lineHeight: 1.4, marginBottom: '20px' }}>
+                P.S. All experiences have multiple dates. You can get more info and book tix on Hoamsy (via our bio).
+            </p>
+            <ul style={{ lineHeight: 1.4 }}>
+                <li style={{ marginBottom: '20px' }}>June 14th: </li>
+                <li>Cool Candle Making over Brews, Long Live Boston</li>
+                <li style={{ marginBottom: '20px' }}>Learn Dumpling Making, Cambridge MA</li>
+
+                <li style={{ marginBottom: '20px' }}>June 15th: </li>
+
+                <li>Custom Perfume Making Workshop, Rooting For You, Cambridge MA</li>
+                <li>Foraging Walk + Wild Food Picnic, Waltham MA</li>
+                <li>Make A Candle Garden, Long Live Boston</li>
+                <li>Summer Boating Trip, Marshfield MA</li>
+                <li>Pottery Workshop: Make A Clay Serving Bowl, Newton MA</li>
+                <li style={{ marginBottom: '20px' }} >Yoga On The Beach, Pleasure Bay Boston</li>
+
+                <li style={{ marginBottom: '20px' }} >June 16th: </li>
+                <li>Vintage Cake Decorating Workshop, Long Live Boston</li>
+                <li style={{ marginBottom: '20px' }}>Pottery: Make A Mosaic Trivet, Newton MA</li>
+
+            </ul>
             </div>
             <div className="footer">
               <button className="like-button" onClick={handleLike}>
@@ -98,7 +97,9 @@ const Post = () => {
           align-items: center;
           background-color: #f0f0f0;
           padding: 20px;
-          height: 100vh;
+          height: 120vh;
+          backdrop-filter: blur(10px);
+          overflow-y: hidden;
         }
         .card {
           display: flex;
@@ -107,17 +108,17 @@ const Post = () => {
           border-radius: 10px;
           overflow: hidden;
           width: 100%;
-          max-width: 1200px;
+          max-width:1000px;
           height: 80%;
         }
+
         .image-container {
-          flex: 1;
-          max-height: 100%;
-          overflow-y: auto;
+          flex: 1.5;
           display: flex;
           justify-content: center;
           align-items: center;
         }
+
         .image-container img {
           max-width: 100%;
           max-height: 100%;
@@ -129,17 +130,24 @@ const Post = () => {
           display: flex;
           flex-direction: column;
           justify-content: space-between;
+          overflow-y: hidden;
+          max-height: 800px; /* Adjust this value based on your needs */
         }
-        .header {
+
+        .profile-header {
           display: flex;
           align-items: center;
-          margin-bottom: 10px;
+          justify-content: start;
+          width: 100%;
+          padding: 10px;
+          box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1); /* Adjusted shadow for bottom only */
         }
         .profile-pic {
-          border-radius: 50%;
-          width: 50px;
-          height: 50px;
+          border-radius: 30%;
+          width: 40px;
+          height: 40px;
           margin-right: 10px;
+          margin-bottom: 10px;
         }
         .profile-details {
           display: flex;
@@ -154,7 +162,15 @@ const Post = () => {
         }
         .content {
           flex: 1;
-          overflow-y: auto;
+          width: auto;
+          overflow-y: auto; // Allows scrolling
+          scrollbar-width: none; // For Firefox
+          -ms-overflow-style: none; // For Internet Explorer + Edge
+
+          /* Hiding the scrollbar in WebKit browsers */
+          &::-webkit-scrollbar {
+            display: none;
+          }
         }
         .content p {
           margin: 5px 0;
@@ -171,6 +187,7 @@ const Post = () => {
           display: flex;
           justify-content: flex-end;
           margin-top: 10px;
+          box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.1); 
         }
         .like-button {
           background: #007bff;
