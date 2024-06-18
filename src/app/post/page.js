@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 
 const Post = () => {
-  const [imageData, setImageData] = useState(null);
+  const [images, setImages] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [error, setError] = useState(false);
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
@@ -17,20 +18,38 @@ const Post = () => {
   setDatePosted(today);
 
 
-    const fetchImage = async () => {
-      try {
-        const response = await fetch(`https://dog.ceo/api/breeds/image/random/1`);
-        const data = await response.json();
-        setImageData(data.message[0]);
-        console.log("Fetched Image:", data.message[0]); // Log the fetched image
-      } catch (error) {
-        console.error("Error fetching image:", error);
-        setError(true);
-      }
-    };
+  const fetchImages = async () => {
+    try {
+      const response = await fetch(`https://dog.ceo/api/breeds/image/random/3`);  // Change the number of images to fetch
+      const data = await response.json();
+      setImages(data.message);  // Set an array of images
+      console.log("Fetched Images:", data.message);
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      setError(true);
+    }
+  };
 
-    fetchImage(); // Fetch the image when the component mounts
-  }, []);
+  fetchImages();
+}, []);
+
+  const handlePrevious = () => {
+    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : images.length - 1;
+    setCurrentImageIndex(newIndex);
+  };
+
+  const handleNext = () => {
+    const newIndex = currentImageIndex < images.length - 1 ? currentImageIndex + 1 : 0;
+    setCurrentImageIndex(newIndex);
+  };
+
+  if (error) {
+    return <div>Error loading post. Please try again later.</div>;
+  }
+
+  if (!images.length) {
+    return <div>Loading...</div>;
+  }
 
   const handleLike = () => {
     if (!liked) {
@@ -50,14 +69,6 @@ const Post = () => {
     setFavorited(!favorited);
   };
 
-  if (error) {
-    return <div>Error loading post. Please try again later.</div>;
-  }
-
-  if (!imageData) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <>
       <Head>
@@ -65,9 +76,14 @@ const Post = () => {
       </Head>
       <div className="post-container">
         <div className="card">
-          <div className="image-container">
-            <img src={imageData} alt="Post Image" className="main-image" />
+        <div className="image-container">
+          <img src={images[currentImageIndex]} alt="Post Image" className="main-image" />
+          <div className="navigation">
+            <button className="nav-button" onClick={handlePrevious} aria-label="Previous Image">&lt;</button>
+            <button className="nav-button" onClick={handleNext} aria-label="Next Image">&gt;</button>
           </div>
+          <span className="image-index">{`${currentImageIndex + 1}/${images.length}`}</span>
+        </div>
           <div className="text-container">
             <div className="profile-header">
               <img src="https://via.placeholder.com/50" alt="Profile" className="profile-pic" />
@@ -176,12 +192,44 @@ const Post = () => {
           display: flex;
           justify-content: center;
           align-items: center;
+          position: relative;
         }
 
-        .image-container img {
-          max-width: 100%;
-          max-height: 100%;
-          object-fit: cover;
+        .navigation {
+          display: none;
+          position: absolute;
+          top: 50%;
+          left: 10px; // Closer to the image sides
+          right: 10px;
+          justify-content: space-between;
+          align-items: center;
+          transform: translateY(-50%);
+        }
+        .image-container:hover .navigation {
+          display: flex;
+        }
+        .nav-button {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.75);
+          color: white;
+          font-size: 24px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+        }
+        .image-index {
+          position: absolute;
+          top: 20px;  // Adjusted from the top edge of the container
+          right: 20px;  // Adjusted from the right edge of the container
+          background: rgba(0, 0, 0, 0.5);
+          color: white;
+          padding: 5px 10px;
+          border-radius: 5px;
+          font-size: 12px;
+          z-index: 10;  // Ensure it stays on top of other elements
         }
         .text-container {
           flex: 1;
