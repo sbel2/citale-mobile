@@ -6,16 +6,16 @@ import Head from "next/head";
 const Post = () => {
   const [imageData, setImageData] = useState(null);
   const [error, setError] = useState(false);
-  const [likes, setLikes] = useState(0);
-  const [comments, setComments] = useState([]);
-  const [favorites, setFavorites] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [favoritesCount, setFavoritesCount] = useState(0);
   const [datePosted, setDatePosted] = useState("");
 
   useEffect(() => {
-    // Simulate fetching date posted. This could also be fetched from an API
-    setDatePosted(new Date().toLocaleDateString("en-US", {
-      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    }));
+    const today = new Date().toISOString().slice(0, 10); // Get only the date part
+  setDatePosted(today);
+
 
     const fetchImage = async () => {
       try {
@@ -33,7 +33,21 @@ const Post = () => {
   }, []);
 
   const handleLike = () => {
-    setLikes(likes + 1);
+    if (!liked) {
+      setLikesCount(likesCount + 1);
+    } else {
+      setLikesCount(likesCount - 1);
+    }
+    setLiked(!liked);
+  };
+
+  const handleFavorite = () => {
+    if (!favorited) {
+      setFavoritesCount(favoritesCount + 1);
+    } else {
+      setFavoritesCount(favoritesCount - 1);
+    }
+    setFavorited(!favorited);
   };
 
   if (error) {
@@ -87,12 +101,36 @@ const Post = () => {
                 <li>Vintage Cake Decorating Workshop, Long Live Boston</li>
                 <li style={{ marginBottom: '20px' }}>Pottery: Make A Mosaic Trivet, Newton MA</li>
             </ul>
-            <p style={{ fontSize: '12px', color: '#888' }}> {datePosted}</p>
+            <p style={{ fontSize: '12px', color: '#888',marginBottom: '20px' }}> {datePosted}</p>
             </div>
             <div className="footer">
-              <button className="like-button" onClick={handleLike}>
-                ❤️ Like {likes}
-              </button>
+            <button className="icon-button" onClick={handleLike}>
+              {/* Heart Icon */}
+              {liked ? (
+                <svg fill="red" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              ) : (
+                <svg fill="none" stroke="black" strokeWidth="1.25" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              )}
+              <span>{likesCount}</span>
+            </button>
+            <button className="icon-button" onClick={handleFavorite}>
+              {/* Star Icon */}
+              {favorited ? (
+                <svg fill="#FFD700" viewBox="2 2 20 20" style={{ transform: "scale(1.15)" }}> {/* Filled state with a consistent fill color and scaled up */}
+                  <path d="M12 17.27l5.5 3.23-1.47-6.17L21 9.54l-6.24-0.54L12 3l-2.76 6-6.24 0.54 4.71 4.79L6.5 20.5 12 17.27z"/>
+                </svg>
+              ) : (
+                <svg fill="none" stroke="black" strokeWidth="1.25" viewBox="0 0 24 24" style={{ transform: "scale(1.15)" }}> {/* Unfilled state with a black stroke */}
+                  <path d="M12 17.27l5.5 3.23-1.47-6.17L21 9.54l-6.24-0.54L12 3l-2.76 6-6.24 0.54 4.71 4.79L6.5 20.5 12 17.27z"/>
+                </svg>
+              )}
+              <span>{favoritesCount}</span>
+            </button>
+
             </div>
           </div>
         </div>
@@ -161,7 +199,8 @@ const Post = () => {
           justify-content: start;
           width: 100%;
           padding: 10px;
-          box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1); /* Adjusted shadow for bottom only */
+          box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1);
+          margin-bottom: 10px;
         }
         .profile-pic {
           border-radius: 30%;
@@ -205,23 +244,36 @@ const Post = () => {
           margin: 5px 0;
         }
         .footer {
-          display: flex;
-          justify-content: flex-end;
-          margin-top: 10px;
-          box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.1); 
-        }
-        .like-button {
-          background: #007bff;
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 16px;
-        }
-        .like-button:hover {
-          background: #0056b3;
-        }
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding-right: 20px;
+        gap: 15px;
+        width: 100%;
+        height: 40px;
+        margin-top: 10px;
+        box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.2);
+      }
+
+      .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+      }
+
+      .icon-button svg {
+        width: 25px;
+        height: 25px;
+      }
+
+      .icon-button span {
+        margin-left: 8px;
+        font-size: 18px;
+      }
+
       `}</style>
     </>
   );
