@@ -6,7 +6,7 @@ interface CardProps {
   id: number;
   title: string;
   description: string;
-  imageUrl: string; //string[] for supabase
+  imageUrl: string[];
 }
 
 const Card: React.FC<CardProps> = ({ id, title, description, imageUrl }) => {
@@ -16,7 +16,7 @@ const Card: React.FC<CardProps> = ({ id, title, description, imageUrl }) => {
         <div>
           <div className="relative h-96 bg-center">
             <Image
-              src={imageUrl} //imageUrl[0] for the supabase data. Just need the first image from the URL
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[0]}`}
               layout="fill"
               style={{ objectFit: "cover" }}
               alt={title}
