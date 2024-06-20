@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Head from "next/head";
 
 interface EventData {
@@ -75,10 +75,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
               <div className="relative w-full h-full">
                 <Image
                   src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${eventData.imageUrl[currentImageIndex]}`}
-                  layout="fill"
-                  objectFit="cover"
                   alt={eventData.title}
-                  className="rounded-t md:rounded-none md:rounded-l"
+                  className="rounded-t md:rounded-none md:rounded-l object-cover w-full h-full relative"
+                  layout="fill"
                 />
                 <div className="absolute inset-0 flex justify-between items-center">
                   <button

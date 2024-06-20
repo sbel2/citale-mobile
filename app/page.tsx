@@ -1,7 +1,7 @@
 import Card from "@/components/card";
 import { createClient } from "@/supabase/client";
 import { cookies } from "next/headers";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 export default async function Home() {
   const cookieStore = cookies();
