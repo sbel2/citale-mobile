@@ -39,44 +39,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// export async function getStaticPaths() {
-//   const supabase = createClient();
-//   const { data: events, error } = await supabase.from("cueup-events").select();
-
-//   if (error) {
-//     console.error("Error fetching event slugs:", error);
-//     return { paths: [], fallback: "blocking" };
-//   }
-
-//   const paths = events.map((event) => ({
-//     params: { slug: event.id },
-//   }));
-
-//   return { paths, fallback: "blocking" };
-// }
-
-// export async function getStaticProps({ params }: { params: { slug: string } }) {
-//   const supabase = createClient();
-//   const { slug } = params;
-//   const { data: eventData, error } = await supabase
-//     .from("cueup-events")
-//     .select()
-//     .match({ id: slug })
-//     .single();
-
-//   if (error) {
-//     console.error("Error fetching event data:", error);
-//     return { notFound: true };
-//   }
-
-//   return {
-//     props: {
-//       eventData,
-//     },
-//     revalidate: 3600, // Revalidate the page at most once every hour
-//   };
-// }
-
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const eventData = await fetchEventData(slug);
