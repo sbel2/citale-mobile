@@ -3,22 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 247, 237;
-  --background-end-rgb: 255, 247, 237;
+  --foreground-rgb: 0, 0, 0; /* Black text color */
+  --background-start-rgb: 255, 255, 255; /* White background */
+  --background-end-rgb: 255, 255, 255; /* Consistent white background */
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 30, 30, 30;
-    --background-end-rgb: 30, 30, 30;
+    --foreground-rgb: 0, 0, 0; /* Maintain black text for light mode */
+    --background-start-rgb: 255, 255, 255; /* White background for light mode */
+    --background-end-rgb: 255, 255, 255; /* Consistent white background for light mode */
   }
 }
 
+/* Ensure the body uses these variables */
 body {
   color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
+  background: linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
 }
 
 @layer utilities {

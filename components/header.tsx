@@ -9,12 +9,6 @@ export default function Header({ font }: { font?: string }) {
             Cue Up
           </h1>
         </Link>
-        <Link
-          href="/events"
-          className="uppercase text-green-951 text-xl py-2 Dhover: text-yellow-700"
-        >
-          Events {"🎭"}
-        </Link>
       </div>
     </header>
   );

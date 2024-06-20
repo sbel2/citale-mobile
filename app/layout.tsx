@@ -1,4 +1,3 @@
-import Footer from "@/components/footer";
 import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -21,7 +20,6 @@ export default function RootLayout({
       <body className={inter.className}>
         <Header />
         <div className="bg-gray-951 py-12">{children}</div>
-        <Footer />
       </body>
     </html>
   );
