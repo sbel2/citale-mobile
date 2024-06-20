@@ -113,8 +113,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <h4 className="text-lg font-bold mb-4">{eventData.title}</h4>
-              <p className="mb-4">{eventData.description}</p>
+            <h4 className="text-lg font-bold mb-4 text-black">{eventData.title}</h4>
+            <p className="mb-4 text-black">{eventData.description}</p>
               <p className="text-xs text-gray-500">{datePosted}</p>
             </div>
             <div className="flex justify-end items-center space-x-4 mt-4">
