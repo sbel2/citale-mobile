@@ -69,16 +69,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
         <title>Post Detail</title>
       </Head>
       <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 backdrop-blur-sm">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden w-11/12 max-w-4xl max-h-95vh flex flex-col md:flex-row">
-          <div className="relative flex-1 md:flex-1.5 flex justify-center items-center">
-            {eventData.imageUrl.length > 0 && (
-              <div className="relative w-full h-full">
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${eventData.imageUrl[currentImageIndex]}`}
-                  alt={eventData.title}
-                  className="rounded-t md:rounded-none md:rounded-l object-cover w-full h-full relative"
-                  layout="fill"
-                />
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden w-11/12 max-w-5xl max-h-120vh flex flex-col md:flex-row">
+        <div className="relative flex-1 md:flex-1.5 flex justify-center items-center">
+          {eventData.imageUrl.length > 0 && (
+            <div className="relative w-full h-full">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${eventData.imageUrl[currentImageIndex]}`}
+                alt={eventData.title}
+                className="rounded-t md:rounded-none md:rounded-l object-cover w-full h-full relative"
+                layout="fill"
+              />
+              {eventData.imageUrl.length > 1 && ( // Condition to check if there are more than one image
                 <div className="absolute inset-0 flex justify-between items-center">
                   <button
                     className="w-10 h-10 bg-black bg-opacity-75 text-white flex items-center justify-center rounded-full"
@@ -95,12 +96,14 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
                     &gt;
                   </button>
                 </div>
-                <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-                  {`${currentImageIndex + 1}/${eventData.imageUrl.length}`}
-                </span>
-              </div>
-            )}
-          </div>
+              )}
+              <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                {`${currentImageIndex + 1}/${eventData.imageUrl.length}`}
+              </span>
+            </div>
+          )}
+        </div>
+
           <div className="flex-1 p-4 flex flex-col justify-between">
             <div className="flex items-center mb-4">
               <img
@@ -114,7 +117,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
             </div>
             <div className="flex-1 overflow-y-auto">
             <h4 className="text-lg font-bold mb-4 text-black">{eventData.title}</h4>
-            <p className="mb-4 text-black">{eventData.description}</p>
+            <div className="preformatted-text">
+              {eventData.description}
+            </div>
               <p className="text-xs text-gray-500">{datePosted}</p>
             </div>
             <div className="flex justify-end items-center space-x-4 mt-4">
@@ -156,6 +161,14 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
               </button>
             </div>
           </div>
+          <button
+            className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center"
+            style={{ width: '30px', height: '30px', lineHeight: '30px' }}
+            onClick={() => window.history.back()}
+            aria-label="Close Post"
+          >
+            &#x2715;
+          </button>
         </div>
       </div>
       <style jsx global>{`
@@ -166,6 +179,41 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
           overflow: hidden;
           height: 100%;
           width: 100%;
+        }
+      `}</style>
+      <style jsx>{`
+        .navigation-button {
+          width: 40px;
+          height: 40px;
+          background: rgba(0, 0, 0, 0.75);
+          color: white;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+        .image-counter {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(0, 0, 0, 0.5);
+          color: white;
+          padding: 5px 10px;
+          border-radius: 5px;
+        }
+        .text-content {
+          padding: 20px;
+          overflow-y: auto;
+        }
+        .bg-white {
+          min-height: 90vh; /* Minimum height to ensure larger uniform size */
+          max-height: 95vh; /* Maximum height to maintain within viewport */
+          max-width: 1100px; /* Maximum width to maintain within viewport */
+          overflow-y: auto; /* Enables scrolling within the card if content exceeds height */
+        }
+        .preformatted-text {
+        white-space: pre-wrap; /* respects both spaces and line breaks */
         }
       `}</style>
     </>
