@@ -14,7 +14,7 @@ const Card: React.FC<CardProps> = ({ id, title, description, imageUrl }) => {
     <Link href={`/events/${id}`}>
       <div className='max-w-lg bg-white rounded-sm overflow-hidden shadow-lg h-full flex flex-col justify-between cursor-pointer'>
         <div>
-          <div className='relative h-96 bg-center'>
+          <div className="relative h-60 bg-center">
             <Image
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[0]}`}
               alt={title}
