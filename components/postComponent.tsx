@@ -1,7 +1,9 @@
 "use client";
+import React from "react";
 import { useEffect, useState } from "react";
 import Image from "next/legacy/image";
 import Head from "next/head";
+import Linkify from 'react-linkify';
 
 interface EventData {
   id: number;
@@ -12,6 +14,30 @@ interface EventData {
 
 interface PostComponentProps {
   eventData: EventData;
+}
+
+const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
+  // Validate the URL
+  if (!isValidUrl(href)) {
+    return <span key={key}>{text}</span>;  // Just return text if URL is invalid
+  }
+
+  return (
+    <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
+      {text}
+    </a>
+  );
+};
+
+// Simple URL validation function
+function isValidUrl(string: string): boolean {
+  try {
+    new URL(string);
+  } catch (_) {
+    return false;  // Malformed URL
+  }
+  // Add more sophisticated checks like domain whitelist, etc.
+  return true;
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
@@ -119,7 +145,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
               <h4 className='text-lg font-bold mb-4 text-black'>
                 {eventData.title}
               </h4>
-              <div className='preformatted-text'>{eventData.description}</div>
+              <div className='preformatted-text'>
+                <Linkify componentDecorator={linkDecorator}>{eventData.description}</Linkify>
+              </div>
               <p className='text-xs text-gray-500'>{datePosted}</p>
             </div>
             <div className='flex justify-end items-center space-x-4 mt-4'>
