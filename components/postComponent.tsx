@@ -180,7 +180,8 @@ const PostComponent: React.FC<PostComponentProps> = ({
                 )}
                 <span className='icon-text'>{likesCount}</span>
               </button>
-              <button className='icon-button' onClick={handleFavorite}>
+              {/* favourite button save for later */}
+              {/* <button className='icon-button' onClick={handleFavorite}>
                 {favorited ? (
                   <svg
                     viewBox='0 0 24 24'
@@ -205,7 +206,7 @@ const PostComponent: React.FC<PostComponentProps> = ({
                   </svg>
                 )}
                 <span className='icon-text'>{favoritesCount}</span>
-              </button>
+              </button> */}
             </div>
           </div>
           <button
@@ -250,7 +251,7 @@ const PostComponent: React.FC<PostComponentProps> = ({
           border-radius: 10px;
           overflow: hidden;
           width: 100%;
-          max-width: 980px; // Adjust max width as needed
+          max-width: 1200px; // Adjust max width as needed
           max-height: 90.5vh; // Adjust min height as needed
         }
 
