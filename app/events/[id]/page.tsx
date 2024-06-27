@@ -1,4 +1,4 @@
-import PostComponent from "@/components/postComponent";
+import PostComponent from "@/components/postComponent_new";
 import { createClient } from "@/supabase/client";
 import { notFound } from "next/navigation";
 

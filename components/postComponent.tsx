@@ -95,7 +95,6 @@ const PostComponent: React.FC<PostComponentProps> = ({
                 <img
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
                     alt={title}
-                    className='rounded-t md:rounded-none md:rounded-l object-contain w-full h-full relative'
                 />
             )}
             {imageUrl.length > 1 && (
@@ -195,20 +194,23 @@ const PostComponent: React.FC<PostComponentProps> = ({
           align-items: center;
           background-color: rgba(0, 0, 0, 0.1); /* Black with 50% opacity */
           backdrop-filter: blur(4px); /* Small blur - adjust blur value as needed */
-        }
-        .card {
-          display: flex;
-          background: white;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          border-radius: 10px;
-          overflow: hidden;
-          width: 100%;
-          max-width: 980px; // Adjust max width as needed
-          max-height: 90.5vh; // Adjust min height as needed
+          overflow-y: auto; /* Allows scrolling */
         }
         
         @media (min-width: 768px) {
-          .image-container {
+            .card {
+              display: flex;
+              background: white;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              border-radius: 10px;
+              overflow: hidden;
+              width: 100%;
+              max-width: 980px; // Adjust max width as needed
+              max-height: 90.5vh; // Adjust min height as needed
+            }
+      }
+        
+        .image-container {
               flex: 1.4;
               display: flex;
               justify-content: center;
@@ -216,15 +218,15 @@ const PostComponent: React.FC<PostComponentProps> = ({
               position: relative;
               width: 100%; /* Take up all available width */
               /* Height automatically adjusts to content */
+              overflow: auto; /* Prevents image overflow */
           }
 
-          .image-container img {
-              width: 100%; /* Image takes full width of the container */
+        .image-container img {
               height: auto; /* Height adjusts to maintain the aspect ratio */
               max-height: 100%; /* Ensure it doesn't exceed the container height */
-              object-fit: contain; /* Ensures the entire image is visible */
+              object-fit: cover; /* Ensures the entire image is visible */
           }
-      }
+      
       .navigation {
           display: none;
           position: absolute;
