@@ -4,15 +4,11 @@ import { useEffect, useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
 
-interface EventData {
-  id: number;
+interface PostComponentProps {
+  post_id: number;
   title: string;
   description: string;
   imageUrl: string[];
-}
-
-interface PostComponentProps {
-  eventData: EventData;
 }
 
 const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
@@ -39,7 +35,12 @@ function isValidUrl(string: string): boolean {
   return true;
 }
 
-const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
+const PostComponent: React.FC<PostComponentProps> = ({
+  post_id,
+  title,
+  description,
+  imageUrl,
+}) => {
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
@@ -54,17 +55,13 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
 
   const handlePrevious = () => {
     const newIndex =
-      currentImageIndex > 0
-        ? currentImageIndex - 1
-        : eventData.imageUrl.length - 1;
+      currentImageIndex > 0 ? currentImageIndex - 1 : imageUrl.length - 1;
     setCurrentImageIndex(newIndex);
   };
 
   const handleNext = () => {
     const newIndex =
-      currentImageIndex < eventData.imageUrl.length - 1
-        ? currentImageIndex + 1
-        : 0;
+      currentImageIndex < imageUrl.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
   };
 
@@ -86,12 +83,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
     setFavorited(!favorited);
   };
 
-  const nextImage = () => {
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex + 1) % eventData.imageUrl.length
-    );
-  };
-
   return (
     <>
       <Head>
@@ -100,21 +91,21 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
       <div className= 'post-container'>
         <div className = 'card'>
         <div className='image-container'>
-            {eventData.imageUrl.length > 0 && (
+            {imageUrl.length > 0 && (
                 <img
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${eventData.imageUrl[currentImageIndex]}`}
-                    alt={eventData.title}
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
+                    alt={title}
                     className='rounded-t md:rounded-none md:rounded-l object-contain w-full h-full relative'
                 />
             )}
-            {eventData.imageUrl.length > 1 && (
+            {imageUrl.length > 1 && (
                 <div className='navigation'>
                     <button className='nav-button' onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
                     <button className='nav-button' onClick={handleNext} aria-label='Next Image'>&gt;</button>
                 </div>
             )}
             <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-                {`${currentImageIndex + 1}/${eventData.imageUrl.length}`}
+                {`${currentImageIndex + 1}/${imageUrl.length}`}
             </span>
         </div>
 
@@ -131,10 +122,10 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
             </div>
             <div className='content'>
               <h4 className='text-lg font-bold mb-4 text-black'>
-                {eventData.title}
+                {title}
               </h4>
               <div className='preformatted-text'>
-                <Linkify componentDecorator={linkDecorator}>{eventData.description}</Linkify>
+                <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
               </div>
               <div className='text-xs text-gray-500'>{datePosted}</div>
             </div>
@@ -157,7 +148,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
                 )}
                 <span className='icon-text'>{likesCount}</span>
               </button>
-              <button className='icon-button' onClick={handleFavorite}>
+              {/* <button className='icon-button' onClick={handleFavorite}>
                   {favorited ? (
                       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#FFD700" stroke="#FFD700" stroke-width = "2" className='icon'>
                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -168,7 +159,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ eventData }) => {
                       </svg>
                   )}
                   <span className='icon-text'>{favoritesCount}</span>
-              </button>
+              </button> */}
             </div>
 
           </div>
