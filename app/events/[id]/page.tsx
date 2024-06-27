@@ -3,20 +3,20 @@ import { createClient } from "@/supabase/client";
 import { notFound } from "next/navigation";
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id: post_id } = params;
   const supabase = createClient();
-  const { data: eventData, error } = await supabase
-    .from("cueup-events")
+  const { data: postData, error } = await supabase
+    .from("posts")
     .select()
-    .match({ id })
+    .match({ post_id })
     .single();
 
-  if (!eventData) {
+  if (!postData) {
     notFound();
   }
   return (
     <div>
-      <PostComponent {...eventData} />
+      <PostComponent {...postData} />
     </div>
   );
 }
