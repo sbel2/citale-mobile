@@ -3,15 +3,15 @@ import Image from "next/legacy/image";
 import Link from "next/link";
 
 interface CardProps {
-  id: number;
+  post_id: number;
   title: string;
   description: string;
   imageUrl: string[];
 }
 
-const Card: React.FC<CardProps> = ({ id, title, description, imageUrl }) => {
+const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) => {
   return (
-    <Link href={`/events/${id}`}>
+    <Link href={`/events/${post_id}`}>
       <div className='max-w-lg bg-white rounded-sm overflow-hidden shadow-lg h-full flex flex-col justify-between cursor-pointer'>
         <div>
           <div className="relative h-60 bg-center">

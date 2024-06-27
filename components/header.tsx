@@ -7,7 +7,7 @@ export default function Header({ font }: { font?: string }) {
         <Link href="/">
           <h1 id="name" className={` uppercase text-3xl text-purple-500 text-center py-2 ${font}`}
           style={{ color: '#57356a' }}>
-            Cue Up
+            Cittale
           </h1>
         </Link>
       </div>

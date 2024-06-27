@@ -5,7 +5,7 @@ import Head from "next/head";
 import Linkify from "react-linkify";
 
 interface PostComponentProps {
-  id: number;
+  post_id: number;
   title: string;
   description: string;
   imageUrl: string[];
@@ -46,7 +46,7 @@ function isValidUrl(string: string): boolean {
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({
-  id,
+  post_id,
   title,
   description,
   imageUrl,
