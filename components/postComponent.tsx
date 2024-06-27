@@ -143,7 +143,7 @@ const PostComponent: React.FC<PostComponentProps> = ({
                 className='w-10 h-10 rounded-full mr-4'
               />
               <div>
-                <p className='text-sm font-medium mb-1'>hoamsy</p>
+                <p className='text-sm font-medium mb-1'>Citale</p>
               </div>
             </div>
             <div className='content'>
