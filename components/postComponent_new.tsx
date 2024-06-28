@@ -212,6 +212,12 @@ interface PostComponentProps {
             display: flex;
             }
 
+            img {
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+            }
+
             @media (min-width: 768px) {
             .image-container {
             display: flex;
