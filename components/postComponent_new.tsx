@@ -307,6 +307,9 @@ interface PostComponentProps {
             padding-right: 20px;
             padding-left: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            white-space: normal;
             scrollbar-width: none;
             -ms-overflow-style: none;
             &::-webkit-scrollbar {
