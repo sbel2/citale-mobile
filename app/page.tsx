@@ -15,9 +15,9 @@ export default async function Home() {
   }
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-      <div className="px-12 pt-1 pb-20">
+      <div className="px-12 pb-20">
         <div className="flex flex-col xl:flex-row xl:gap-40">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {post.map((post) => (
               <Card key={post.post_id} {...post} />
             ))}
