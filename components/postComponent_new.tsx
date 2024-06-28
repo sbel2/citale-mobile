@@ -180,16 +180,22 @@ interface PostComponentProps {
 
            @media (min-width: 768px) { /* Adjusts when the screen is wider than 768px */
             .card {
-                width: 65%;
+                width: 62%;
                 height: 88%;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 60% 40%;
                 margin: auto;
                 align-self: center;
             }}
 
             .image-container {
+            display: flex;
+            flex: 1.5;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             position: relative;
-            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.05);
             }
 
             .image-container:hover .navigation {
@@ -198,7 +204,7 @@ interface PostComponentProps {
 
             img {
             max-width: 100%;
-            max-height: 100vh;
+            max-height: 100%;
             object-fit: contain;
             }
 
@@ -211,6 +217,7 @@ interface PostComponentProps {
             align-items: center;
             overflow: hidden;
             position: relative;
+            background: rgba(0, 0, 0, 0.05);
             }}
 
             .navigation {
