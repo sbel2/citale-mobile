@@ -3,7 +3,6 @@ import React from "react";
 import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
-import {createClient} from "@/supabase/client";
 
 //reading in data from backend
 interface PostComponentProps {
@@ -53,7 +52,6 @@ interface PostComponentProps {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const supabase = createClient();
 
     const handlePrevious = () => {
       const newIndex =
@@ -109,7 +107,7 @@ interface PostComponentProps {
                   <div className="header">
                     <div className="profile-block">
                     <img
-                      src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/sign/profile-pic/citalelogo.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwcm9maWxlLXBpYy9jaXRhbGVsb2dvLmpwZyIsImlhdCI6MTcxOTYxMDAyNywiZXhwIjoxNzIyMjAyMDI3fQ.GDyD67qgCgC02O0pmHJbYtfQLKmkar15EhabmZnjc08&t=2024-06-28T21%3A27%3A07.666Z`}
+                      src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/profile-pic/citalelogo.jpg`}
                       alt="Profile"
                       className="w-10 h-10 rounded-full mr-5"
                     />
