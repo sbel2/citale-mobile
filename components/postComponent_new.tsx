@@ -113,43 +113,40 @@ interface PostComponentProps {
                     </span>
                 </div>
                 <div className = 'text-container p-4 md:p-10'>
-                    <div className = 'header'>
-                        <img
-                            src='https://via.placeholder.com/50'
-                            alt='Profile'
-                            className='profile-pic w-12 h-12 rounded-full mr-3 mb-6 p-1'
-                        />
-                        <div>
-                            <p className='profile-name mb-5'>Citale</p>
-                        </div>
+                  <div className="header">
+                    <div className="profile-block">
+                      <img
+                          src="https://via.placeholder.com/50"
+                          alt="Profile"
+                          className="w-10 h-10 rounded-full mr-5"
+                      />
+                      <p className="profile name">Citale</p>
                     </div>
-
-                    <div className = 'content mb-5'>
-                        <h4 className='text-lg font-bold mb-4 text-black'>
-                            {title}
-                        </h4>
-                        <div className='preformatted-text'>
-                            <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
-                        </div>
-                        <div className='text-xs text-gray-500 mt-5'>{datePosted}</div>
-                    </div>
-
-                    <div className = 'footer'>
-                        <button className = 'icon-button' onClick = {handleLike}>
-                            {liked ? (
-                                <svg fill='red' stroke = "red" stroke-width = '2' viewBox='0 0 24 24' className='icon'>
-                                    <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
-                                </svg>
-                                ) : (
-                                <svg fill='none' stroke='black' strokeWidth='2' viewBox='0 0 24 24' className='icon'>
-                                    <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
-                                </svg>
-                            )}
-                            <span className='icon-text'>{likesCount}</span>
-                        </button>
-                    </div>
+                  </div>
+                  <div className = 'content'>
+                      <h4 className='text-lg font-bold mb-4 text-black'>
+                          {title}
+                      </h4>
+                      <div className='preformatted-text'>
+                          <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
+                      </div>
+                      <div className='text-xs text-gray-500 mt-5'>{datePosted}</div>
+                  </div>
+                  <div className = 'footer'>
+                      <button className = 'icon-button' onClick = {handleLike}>
+                          {liked ? (
+                              <svg fill='red' stroke = "red" viewBox='0 0 24 24' className='icon'>
+                                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                              </svg>
+                              ) : (
+                              <svg fill='none' stroke='black' viewBox='0 0 24 24' className='icon'>
+                                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                              </svg>
+                          )}
+                          <span className='icon-text'>{likesCount}</span>
+                      </button>
+                  </div>
                 </div>
-
             </div>
         </div>
         <style jsx global>{`
@@ -170,7 +167,6 @@ interface PostComponentProps {
             bottom: 0;
             left: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: rgba(0, 0, 0, 0.1);
@@ -178,19 +174,37 @@ interface PostComponentProps {
             overflow-y: auto;            
             }
 
-            .card{
+            .card {
             display: grid;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            // grid-template-columns: 2fr 1fr;
-            width: 60%;
-            height: 80%;
-            align-self: center;
             overflow: hidden;
+            width: 100%; /* Default full width */
+            height: 100vh; /* Default full viewport height */
+            grid-template-columns: 1fr; /* Default single column */
+            position: relative;
             }
 
+           @media (min-width: 768px) { /* Adjusts when the screen is wider than 768px */
+            .card {
+                width: 65%;
+                height: 88%;
+                grid-template-columns: repeat(2, 1fr);
+                margin: auto;
+                align-self: center;
+            }}
+
             .image-container {
-            // grid-column: 1 / 2;
+            position: relative;
+            overflow-y: auto;
+            }
+
+            .image-container:hover .navigation {
+            display: flex;
+            }
+
+            @media (min-width: 768px) {
+            .image-container {
             display: flex;
             flex: 1.5;
             flex-direction: column;
@@ -198,18 +212,7 @@ interface PostComponentProps {
             align-items: center;
             overflow: hidden;
             position: relative;
-            }
-
-            // .image-container img {
-            // width: 100%;
-            // height: auto;
-            // max-height: 100%;
-            // object-fit: cover;
-            // }
-
-            .image-container:hover .navigation {
-            display: flex;
-            }
+            }}
 
             .navigation {
             display: none;
@@ -252,21 +255,29 @@ interface PostComponentProps {
             flex-direction: column;
             color: black;
             overflow-y: auto;
+            padding: 0px;
             }
 
             .header{
-            height: 35px;
+            height: 75px;
             display: flex;
             align-items: center;
             justify-content: flex-start;
             box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1);
-            margin-bottom: 10px;
             width: 100%;
+            }
+
+            .profile-block {
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
             }
 
             .content{
             flex: 1;
             width: auto;
+            padding-right: 20px;
+            padding-left: 20px;
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -277,23 +288,21 @@ interface PostComponentProps {
             .preformatted-text {
             white-space: pre-wrap; /* respects both spaces and line breaks */
             font-size: 15px;
-            margin-bottom: 10px;
             }
             
             .footer {
             display: flex;
             justify-content: flex-end;
             width: 100%;
-            height: 30px;
-            margin-top: 10px;
-            box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.2);
+            height: 65px;
+            box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
             }
 
             .icon-button {
             display: flex;
             align-items: center;
             padding: 5px; /* Padding on all sides */
-            padding-top: 24px; /* Specific top padding, overriding the general padding */
+            padding-right: 30px; /* Additional right padding */
             }
 
             .icon {
@@ -311,11 +320,6 @@ interface PostComponentProps {
             width: 15px;
             text-align: center;
             }
-
-
-
-    
-
     `}</style>
     </>
   );
