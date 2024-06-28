@@ -4,7 +4,9 @@ import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
 
+//reading in data from backend
 interface PostComponentProps {
+    post_id: number;
     title: string;
     description: string;
     imageUrl: string[];
@@ -12,7 +14,7 @@ interface PostComponentProps {
     created_at: string;
   }
   
-//   making the link in post clickable
+  // making the link in post clickable
   const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
     // Validate the URL
     if (!isValidUrl(href)) {
@@ -38,6 +40,7 @@ interface PostComponentProps {
   }
 
   const PostComponent: React.FC<PostComponentProps> = ({
+    post_id,
     title,
     description,
     imageUrl,
@@ -47,8 +50,7 @@ interface PostComponentProps {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-    // previous and next for image scrolling
+
     const handlePrevious = () => {
       const newIndex =
         currentImageIndex > 0 ? currentImageIndex - 1 : imageUrl.length - 1;
@@ -61,7 +63,6 @@ interface PostComponentProps {
       setCurrentImageIndex(newIndex);
     };
     
-    // like buttons logic
     const handleLike = () => {
       if (!liked) {
         setLikesCount(likesCount + 1);
@@ -77,8 +78,11 @@ interface PostComponentProps {
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title>{title}</title>
         </Head>
+        {/* element for the entire Page */}
         <div className = 'post-container flex flex-col md:flex-row'>
+            {/* element for the post card */}
             <div className='card w-full h-screen grid grid-cols-1 md:grid-cols-2'>
+                {/* element for the image */}
                 <div className= 'image-container'>
                     {imageUrl.length > 0 && (
                     <img
@@ -96,6 +100,7 @@ interface PostComponentProps {
                         {`${currentImageIndex + 1}/${imageUrl.length}`}
                     </span>
                 </div>
+                {/* element for the text, header, and footer */}
                 <div className = 'text-container p-4 md:p-10'>
                   <div className="header">
                     <div className="profile-block">
@@ -132,6 +137,7 @@ interface PostComponentProps {
                   </div>
                 </div>
             </div>
+            {/* close button */}
             <button
               className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
               style={{ width: "30px", height: "30px", lineHeight: "30px" }}
