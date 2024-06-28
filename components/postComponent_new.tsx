@@ -171,7 +171,7 @@ interface PostComponentProps {
             align-items: center;
             background-color: rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(4px);
-            overflow-y: auto;            
+            overflow: hidden;            
             }
 
             .card {
@@ -183,6 +183,7 @@ interface PostComponentProps {
             height: 100vh; /* Default full viewport height */
             grid-template-columns: 1fr; /* Default single column */
             position: relative;
+            overflow-y: auto;
             }
 
            @media (min-width: 768px) { /* Adjusts when the screen is wider than 768px */
@@ -266,6 +267,18 @@ interface PostComponentProps {
             box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1);
             width: 100%;
             }
+
+            @media (max-width: 768px) {
+            .header {
+                position: fixed; /* Fixed at the top */
+                top: 0; /* Align to the top */
+                left: 0; /* Stretch across the top */
+                background: white; /* White background */
+            }
+
+            .post-container {
+                padding-top: 75px; /* Space for the header */
+            }}
 
             .profile-block {
             display: flex;
