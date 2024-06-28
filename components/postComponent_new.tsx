@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
+import {createClient} from "@/supabase/client";
 
 //reading in data from backend
 interface PostComponentProps {
@@ -12,8 +13,9 @@ interface PostComponentProps {
     imageUrl: string[];
     like_count: number;
     created_at: string;
+    user_id: number;
   }
-  
+
   // making the link in post clickable
   const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
     // Validate the URL
@@ -27,7 +29,7 @@ interface PostComponentProps {
       </a>
     );
   };
-  
+
   // Simple URL validation function
   function isValidUrl(string: string): boolean {
     try {
@@ -46,10 +48,12 @@ interface PostComponentProps {
     imageUrl,
     like_count,
     created_at,
+    user_id,
   }) => {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const supabase = createClient();
 
     const handlePrevious = () => {
       const newIndex =
@@ -104,11 +108,11 @@ interface PostComponentProps {
                 <div className = 'text-container p-4 md:p-10'>
                   <div className="header">
                     <div className="profile-block">
-                      <img
-                          src="https://via.placeholder.com/50"
-                          alt="Profile"
-                          className="w-10 h-10 rounded-full mr-5"
-                      />
+                    <img
+                      src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/sign/profile-pic/citalelogo.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwcm9maWxlLXBpYy9jaXRhbGVsb2dvLmpwZyIsImlhdCI6MTcxOTYxMDAyNywiZXhwIjoxNzIyMjAyMDI3fQ.GDyD67qgCgC02O0pmHJbYtfQLKmkar15EhabmZnjc08&t=2024-06-28T21%3A27%3A07.666Z`}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full mr-5"
+                    />
                       <p className="profile name">Citale</p>
                     </div>
                   </div>
