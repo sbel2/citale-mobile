@@ -1,14 +1,15 @@
 "use client";
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
 
 interface PostComponentProps {
-    post_id: number;
     title: string;
     description: string;
     imageUrl: string[];
+    like_count: number;
+    created_at: string;
   }
   
 //   making the link in post clickable
@@ -37,23 +38,15 @@ interface PostComponentProps {
   }
 
   const PostComponent: React.FC<PostComponentProps> = ({
-    post_id,
     title,
     description,
     imageUrl,
+    like_count,
+    created_at,
   }) => {
     const [liked, setLiked] = useState(false);
-    const [favorited, setFavorited] = useState(false);
-    const [likesCount, setLikesCount] = useState(0);
-    const [favoritesCount, setFavoritesCount] = useState(0);
-    const [datePosted, setDatePosted] = useState("");
+    const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-    // get the current date to display
-    useEffect(() => {
-      const today = new Date().toISOString().slice(0, 10); // Get only the date part
-      setDatePosted(today);
-    }, []);
   
     // previous and next for image scrolling
     const handlePrevious = () => {
@@ -68,7 +61,7 @@ interface PostComponentProps {
       setCurrentImageIndex(newIndex);
     };
     
-    // like and favorite buttons
+    // like buttons logic
     const handleLike = () => {
       if (!liked) {
         setLikesCount(likesCount + 1);
@@ -78,15 +71,6 @@ interface PostComponentProps {
       setLiked(!liked);
     };
   
-    const handleFavorite = () => {
-      if (!favorited) {
-        setFavoritesCount(favoritesCount + 1);
-      } else {
-        setFavoritesCount(favoritesCount - 1);
-      }
-      setFavorited(!favorited);
-    };
-
     return (
     <>
         <Head>
@@ -130,7 +114,7 @@ interface PostComponentProps {
                       <div className='preformatted-text'>
                           <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
                       </div>
-                      <div className='text-xs text-gray-500 mt-5'>{datePosted}</div>
+                      <div className='text-xs text-gray-500 mt-5'>{created_at}</div>
                   </div>
                   <div className = 'footer'>
                       <button className = 'icon-button' onClick = {handleLike}>
