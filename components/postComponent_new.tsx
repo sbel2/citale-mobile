@@ -148,6 +148,14 @@ interface PostComponentProps {
                   </div>
                 </div>
             </div>
+            <button
+              className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+              style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+              onClick={() => window.history.back()}
+              aria-label='Close Post'
+            >
+              &#x2715;
+            </button>
         </div>
         <style jsx global>{`
             html, body {
