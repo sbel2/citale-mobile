@@ -7,11 +7,11 @@ export default async function Page({ params }: { params: { id: string } }) {
   const supabase = createClient();
   const { data: postData, error } = await supabase
     .from("posts")
-    .select()
+    .select("post_id, title, description, imageUrl, user_id, like_count, created_at")
     .match({ post_id })
     .single();
 
-  if (!postData) {
+  if (error || !postData) {
     notFound();
   }
   return (

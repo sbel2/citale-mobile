@@ -1,17 +1,22 @@
 "use client";
 import React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
+import {createClient} from "@/supabase/client";
 
+//reading in data from backend
 interface PostComponentProps {
     post_id: number;
     title: string;
     description: string;
     imageUrl: string[];
+    like_count: number;
+    created_at: string;
+    user_id: number;
   }
-  
-//   making the link in post clickable
+
+  // making the link in post clickable
   const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
     // Validate the URL
     if (!isValidUrl(href)) {
@@ -24,7 +29,7 @@ interface PostComponentProps {
       </a>
     );
   };
-  
+
   // Simple URL validation function
   function isValidUrl(string: string): boolean {
     try {
@@ -41,21 +46,15 @@ interface PostComponentProps {
     title,
     description,
     imageUrl,
+    like_count,
+    created_at,
+    user_id,
   }) => {
     const [liked, setLiked] = useState(false);
-    const [favorited, setFavorited] = useState(false);
-    const [likesCount, setLikesCount] = useState(0);
-    const [favoritesCount, setFavoritesCount] = useState(0);
-    const [datePosted, setDatePosted] = useState("");
+    const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-    // get the current date to display
-    useEffect(() => {
-      const today = new Date().toISOString().slice(0, 10); // Get only the date part
-      setDatePosted(today);
-    }, []);
-  
-    // previous and next for image scrolling
+    const supabase = createClient();
+
     const handlePrevious = () => {
       const newIndex =
         currentImageIndex > 0 ? currentImageIndex - 1 : imageUrl.length - 1;
@@ -68,7 +67,6 @@ interface PostComponentProps {
       setCurrentImageIndex(newIndex);
     };
     
-    // like and favorite buttons
     const handleLike = () => {
       if (!liked) {
         setLikesCount(likesCount + 1);
@@ -78,23 +76,17 @@ interface PostComponentProps {
       setLiked(!liked);
     };
   
-    const handleFavorite = () => {
-      if (!favorited) {
-        setFavoritesCount(favoritesCount + 1);
-      } else {
-        setFavoritesCount(favoritesCount - 1);
-      }
-      setFavorited(!favorited);
-    };
-
     return (
     <>
         <Head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title>{title}</title>
         </Head>
+        {/* element for the entire Page */}
         <div className = 'post-container flex flex-col md:flex-row'>
+            {/* element for the post card */}
             <div className='card w-full h-screen grid grid-cols-1 md:grid-cols-2'>
+                {/* element for the image */}
                 <div className= 'image-container'>
                     {imageUrl.length > 0 && (
                     <img
@@ -112,14 +104,15 @@ interface PostComponentProps {
                         {`${currentImageIndex + 1}/${imageUrl.length}`}
                     </span>
                 </div>
+                {/* element for the text, header, and footer */}
                 <div className = 'text-container p-4 md:p-10'>
                   <div className="header">
                     <div className="profile-block">
-                      <img
-                          src="https://via.placeholder.com/50"
-                          alt="Profile"
-                          className="w-10 h-10 rounded-full mr-5"
-                      />
+                    <img
+                      src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/sign/profile-pic/citalelogo.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJwcm9maWxlLXBpYy9jaXRhbGVsb2dvLmpwZyIsImlhdCI6MTcxOTYxMDAyNywiZXhwIjoxNzIyMjAyMDI3fQ.GDyD67qgCgC02O0pmHJbYtfQLKmkar15EhabmZnjc08&t=2024-06-28T21%3A27%3A07.666Z`}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full mr-5"
+                    />
                       <p className="profile name">Citale</p>
                     </div>
                   </div>
@@ -130,7 +123,7 @@ interface PostComponentProps {
                       <div className='preformatted-text'>
                           <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
                       </div>
-                      <div className='text-xs text-gray-500 mt-5'>{datePosted}</div>
+                      <div className='text-xs text-gray-500 mt-5'>{created_at}</div>
                   </div>
                   <div className = 'footer'>
                       <button className = 'icon-button' onClick = {handleLike}>
@@ -148,6 +141,7 @@ interface PostComponentProps {
                   </div>
                 </div>
             </div>
+            {/* close button */}
             <button
               className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
               style={{ width: "30px", height: "30px", lineHeight: "30px" }}
@@ -196,20 +190,32 @@ interface PostComponentProps {
 
            @media (min-width: 768px) { /* Adjusts when the screen is wider than 768px */
             .card {
-                width: 65%;
+                width: 62%;
                 height: 88%;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 60% 40%;
                 margin: auto;
                 align-self: center;
             }}
 
             .image-container {
+            display: flex;
+            flex: 1.5;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
             position: relative;
-            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.05);
             }
 
             .image-container:hover .navigation {
             display: flex;
+            }
+
+            img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             }
 
             @media (min-width: 768px) {
@@ -221,6 +227,7 @@ interface PostComponentProps {
             align-items: center;
             overflow: hidden;
             position: relative;
+            background: rgba(0, 0, 0, 0.05);
             }}
 
             .navigation {
