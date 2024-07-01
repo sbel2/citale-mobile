@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/legacy/image";
 import Link from "next/link";
+import styles from "./card.module.css";
 
 interface CardProps {
   post_id: number;
@@ -9,30 +10,23 @@ interface CardProps {
   imageUrl: string[];
 }
 
-const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) => {
+const Card: React.FC<CardProps> = ({ post_id, title, imageUrl }) => {
   return (
-    <Link href={`/events/${post_id}`}>
-      <div className='block overflow-hidden rounded-lg bg-white cursor-pointer hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between p-2'>
-        <div>
-          <div className="relative w-full">
-              <Image
+    <Link href={`/events/${post_id}`} className={styles['link-wrapper']}>
+        <div className={styles['image-wrapper']}>
+          <div className={styles['image-container']}>
+              <img
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[0]}`}
                 alt={title}
-                layout='responsive'
-                width={500}
-                height={600}
-                objectFit='cover'
                 className = 'transition-transform duration-500 ease-in-out transform'
               />
           </div>
           <div className='px-6 py-2'>
-            <div className='text-1xl mb-2 line-clamp-2 text-black'>
+            <div className='text-1xl mb-2 line-clamp-3 text-black'>
               {title}
             </div>{" "}
-
           </div>
         </div>
-      </div>
     </Link>
   );
 };
