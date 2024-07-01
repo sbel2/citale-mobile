@@ -7,7 +7,7 @@ export default function Header({ font }: { font?: string }) {
       <div className="max-w- [100rem] px-12 mx-auto flex justify-between">
         <Link href="/">
             <Image
-              src="https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/website%20logo/citale_logo.png" 
+              src="https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/website%20logo/citale_header.png?t=2024-07-01T18%3A48%3A14.610Z" 
               alt="Citale" 
               width={110}
               height={40}
