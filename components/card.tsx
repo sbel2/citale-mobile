@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/legacy/image";
 import Link from "next/link";
 import styles from "./card.module.css";
 
