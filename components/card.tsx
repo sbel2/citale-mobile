@@ -11,6 +11,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ post_id, title, imageUrl }) => {
   return (
+    <div className = {styles['main-container']}>
     <Link href={`/events/${post_id}`} className={styles['link-wrapper']}>
         <div className={styles['image-wrapper']}>
           <div className={styles['image-container']}>
@@ -27,6 +28,7 @@ const Card: React.FC<CardProps> = ({ post_id, title, imageUrl }) => {
           </div>
         </div>
     </Link>
+    </div>
   );
 };
 
