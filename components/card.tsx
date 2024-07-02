@@ -20,6 +20,7 @@ const Card: React.FC<CardProps> = ({ post_id, title, imageUrl }) => {
                 alt={title}
                 className = 'transition-transform duration-500 ease-in-out transform'
               />
+              <div className={styles['overlay']}></div>
           </div>
           <div className='px-6 py-2'>
             <div className='text-1xl mb-2 line-clamp-3 text-black'>
