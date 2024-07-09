@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.9.3",
+    "@hotjar/browser": "^1.0.9",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.44.2",
     "next": "^14.2.4",
