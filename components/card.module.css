@@ -58,3 +58,18 @@
 .image-container:hover .overlay {
   opacity: 1;
 }
+
+/* Media query for screens smaller than 640px */
+@media screen and (max-width: 640px) {
+  .link-wrapper {
+    height: auto; 
+    margin-bottom: 16px; 
+  }
+
+  .main-container {
+    padding-left: 5%; 
+    padding-right: 5%; 
+    padding-top: 3%;
+    padding-bottom: 3%;
+  }
+}
