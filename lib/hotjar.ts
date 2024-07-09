@@ -1,7 +1,10 @@
 import { hotjar } from '@hotjar/browser';
 
+let hotJarVersion = 6;
+let siteId = 5052807;
+
 export const initHotjar = () => {
   if (typeof window !== 'undefined') {
-    hotjar.initialize(5052807, 6);
+    hotjar.initialize(siteId, hotJarVersion);
   }
 };

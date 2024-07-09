@@ -5,6 +5,6 @@ export const initAmplitude = () => {
   if (apiKey) {
     amplitudeInit(apiKey);
   } else {
-    console.warn('Amplitude API key is not set');
+    console.warn('Amplitude API key');
   }
 };
