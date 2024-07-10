@@ -2,7 +2,6 @@ import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import HotjarInit from './HotjarInit';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +18,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <HotjarInit />
         <Header />
         <div className="bg-gray-951">{children}</div>
       </body>
