@@ -31,17 +31,6 @@ export default function RootLayout({
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
           `}
         </Script>
-        <Script src="https://cdn.amplitude.com/libs/analytics-browser-2.7.4-min.js.gz" strategy="afterInteractive" />
-        <Script src="https://cdn.amplitude.com/libs/plugin-session-replay-browser-1.4.1-min.js.gz" strategy="afterInteractive" />
-        <Script src="https://cdn.amplitude.com/libs/plugin-autocapture-browser-0.9.0-min.js.gz" strategy="afterInteractive" />
-        <Script id="amplitude-init" strategy="afterInteractive">
-          {`
-            window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1})).promise.then(function() {
-              window.amplitude.add(window.amplitudeAutocapturePlugin.plugin());
-              window.amplitude.init('25387996e11da39db54aad9c8bc6fd82');
-            });
-          `}
-        </Script>
       </head>
       <body className={inter.className}>
         <Header />
