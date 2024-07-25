@@ -1,34 +1,35 @@
 import React from "react";
 import Link from "next/link";
 import styles from "./card.module.css";
+import Image from "next/image";
 
 interface CardProps {
-  post_id: number;
+  post_id: string;
   title: string;
   description: string;
   imageUrl: string[];
 }
 
-const Card: React.FC<CardProps> = ({ post_id, title, imageUrl }) => {
+const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) => {
   return (
-    <div className = {styles['main-container']}>
-    <Link href={`/events/${post_id}`} className={styles['link-wrapper']}>
-        <div className={styles['image-wrapper']}>
-          <div className={styles['image-container']}>
-              <img
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[0]}`}
-                alt={title}
-                className = 'transition-transform duration-500 ease-in-out transform'
-              />
-              <div className={styles['overlay']}></div>
-          </div>
-          <div className='px-6 py-2'>
-            <div className='text-1xl mb-2 line-clamp-3 text-black'>
-              {title}
-            </div>{" "}
-          </div>
+    <div className={styles.card}>
+      <div className={styles['image-container']}>
+        <Link href={`/events/${post_id}`}>
+          <Image
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[0]}`}
+            alt={title}
+            width={300}
+            height={200}
+            className='transition-transform duration-500 ease-in-out transform'
+          />
+          <div className={styles['overlay']}></div>
+        </Link>
+      </div>
+      <div className='px-6 py-2'>
+        <div className='text-l mb-2 line-clamp-3 text-black'>
+          {title}
         </div>
-    </Link>
+      </div>
     </div>
   );
 };
