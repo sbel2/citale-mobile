@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
+import {useRouter} from 'next/navigation';
 
 //reading in data from backend
 interface PostComponentProps {
@@ -52,6 +53,7 @@ interface PostComponentProps {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const router = useRouter();
 
     const handlePrevious = () => {
       const newIndex =
@@ -73,6 +75,10 @@ interface PostComponentProps {
       }
       setLiked(!liked);
     };
+
+    const handleBack = () => {
+      router.push('/'); // Navigate to the home page
+    };
   
     return (
     <>
@@ -83,7 +89,7 @@ interface PostComponentProps {
         {/* element for the entire Page */}
         <div className = 'post-container flex flex-col md:flex-row'>
             {/* element for the post card */}
-            <div className='card w-full h-screen grid grid-cols-1 md:grid-cols-2'>
+            <div className='card'>
                 {/* element for the image */}
                 <div className= 'image-container'>
                     {imageUrl.length > 0 && (
@@ -141,13 +147,13 @@ interface PostComponentProps {
             </div>
             {/* close button */}
             <button
-              className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
-              style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-              onClick={() => window.history.back()}
-              aria-label='Close Post'
-            >
-              &#x2715;
-            </button>
+          className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+          onClick={handleBack} // Use handleBack instead of window.history.back()
+          aria-label='Close Post'
+        >
+          &#x2715;
+        </button>
         </div>
         <style jsx global>{`
             html, body {
@@ -175,29 +181,28 @@ interface PostComponentProps {
             }
 
             .card {
-            display: grid;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            overflow: auto;
             width: 100%; /* Default full width */
             height: 100vh; /* Default full viewport height */
-            grid-template-columns: 1fr; /* Default single column */
             position: relative;
-            overflow-y: auto;
             }
 
            @media (min-width: 768px) { /* Adjusts when the screen is wider than 768px */
             .card {
+                display: grid;
                 width: 62%;
                 height: 88%;
                 grid-template-columns: 60% 40%;
                 margin: auto;
                 align-self: center;
+                overflow: hidden;
             }}
 
             .image-container {
             display: flex;
-            flex: 1.5;
+            flex: 1;
             flex-direction: column;
             justify-content: center;
             align-items: center;
@@ -216,17 +221,12 @@ interface PostComponentProps {
             object-fit: contain;
             }
 
-            @media (min-width: 768px) {
-            .image-container {
-            display: flex;
-            flex: 1.5;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-            background: rgba(0, 0, 0, 0.05);
-            }}
+            @media (max-width: 768px) {
+              .image-container {
+                width: 100%;
+                height: 300px; /* Fixed height for small screens */
+              }
+            }
 
             .navigation {
             display: none;
@@ -320,11 +320,21 @@ interface PostComponentProps {
             }
             
             .footer {
-            display: flex;
-            justify-content: flex-end;
-            width: 100%;
-            height: 65px;
-            box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
+              display: flex;
+              justify-content: flex-end;
+              width: 100%;
+              height: 65px;
+              box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
+            }
+
+            @media (max-width: 768px) {
+              .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: white; /* Ensure the footer has a background color */
+              }
             }
 
             .icon-button {
