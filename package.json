@@ -18,7 +18,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hotjar": "^6.3.1",
-    "react-linkify": "^1.0.0-alpha"
+    "react-linkify": "^1.0.0-alpha",
+    "react-masonry-css": "^1.0.16"
   },
   "devDependencies": {
     "@types/node": "^20",
