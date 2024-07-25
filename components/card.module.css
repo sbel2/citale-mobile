@@ -1,23 +1,9 @@
-/* components/card.module.css */
-.main-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Center the content horizontally */
-  align-items: flex-start; /* Align items to the top */
-  width: 100%;
-  max-width: 1200px; /* Adjust as needed */
-  margin: 0 auto;
-  padding-left: 5%;
-  padding-right: 5%;
-  padding-top: 5%; /* Optional: Add some padding */
-  padding-bottom: 3%;
-  box-sizing: border-box; /* Ensure padding is included in the total width/height */
-}
+
 
 .link-wrapper {
   display: block;
   width: 100%; /* Ensure it takes the full width of the parent */
-  height: 425px;
+  height: 100%;
   position: relative;
 }
 
