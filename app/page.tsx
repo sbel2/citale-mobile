@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
-import SkeletonPost from '@/components/SkeletonPost';
+import SkeletonCardRow from '@/components/SkeletonPost';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -62,14 +62,13 @@ export default function Home() {
     // Display skeletons while loading
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-        <div className="px-2 pb-10 md:px-10 md:pb-20 space-y-4">
-          {[...Array(5)].map((_, index) => (
-            <SkeletonPost key={index} />
-          ))}
+        <div className="px-2 pb-10 md:px-10 md:pb-20">
+          <SkeletonCardRow />
         </div>
       </main>
     );
   }
+  
 
   if (error) {
     return <p>Error loading posts: {error}</p>;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import PostComponent from "@/components/postComponent_new";
+import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
 import { notFound } from "next/navigation";
 
