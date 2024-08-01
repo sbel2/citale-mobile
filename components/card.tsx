@@ -25,8 +25,8 @@ const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) =>
           <div className={styles['overlay']}></div>
         </Link>
       </div>
-      <div className='px-6 py-2'>
-        <div className='text-l mb-2 line-clamp-3 text-black'>
+      <div className="px-2 py-3">
+        <div className="text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 text-black">
           {title}
         </div>
       </div>
