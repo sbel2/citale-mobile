@@ -1,19 +1,81 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/legacy/image";
+import SearchBar from '@/components/SearchBar';
+import React, { useState, useEffect } from 'react';
+import { createClient } from "@/supabase/client";
+
+interface Post {
+  id: number;
+  title: string;
+  description: string;
+}
 
 export default function Header({ font }: { font?: string }) {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(false);  // Default to false until loading is required
+  const [searchResults, setSearchResults] = useState<Post[] | null>(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.from("posts").select();
+      if (error) {
+        console.error("Error loading posts:", error);
+        alert("Failed to load posts."); // Provide user feedback on error
+      } else {
+        setPosts(data || []);
+      }
+    } catch (error) {
+      console.error("Unexpected error loading posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = async (query: string) => {
+    console.log("Searching for:", query);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%`); // Search in both title and description
+  
+      if (error) {
+        console.error('Error fetching posts:', error);
+        alert("Failed to fetch search results."); // User feedback
+      } else {
+        setSearchResults(data);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };  
+
   return (
-    <header className="py-2 md:py-7 pt-7 md:pt-10 bg-gray-952">
+    <header className={`py-2 md:py-7 pt-7 md:pt-10 bg-gray-0 ${font}`}>
       <div className="max-w-[100rem] px-5 md:px-10 mx-auto flex justify-between items-center">
-        <Link href="/">
+      <Link href="/" legacyBehavior>
+        <a aria-label="Home">
           <Image
-            src="/citale_header.svg" // Use a relative path to the image in the public directory
-            alt="Citale"
+            src="/citale_header.svg"
+            alt="Citale Logo"
             width={110}
             height={40}
-            priority // Ensures the image is prioritized for loading
+            priority
           />
-        </Link>
+        </a>
+      </Link>
+        <SearchBar onSearch={handleSearch} />
         <a
           href="https://forms.gle/fr4anWBWRkeCEgSN6"
           target="_blank"
