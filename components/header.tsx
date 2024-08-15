@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { createClient } from "@/supabase/client";
 
 interface Post {
@@ -13,7 +13,7 @@ interface Post {
 }
 
 export default function Header({ font }: { font?: string }) {
-  const [loading, setLoading] = useState(false);  // Default to false until loading is required
+  const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Post[] | null>(null);
   const supabase = createClient();
 
@@ -24,35 +24,36 @@ export default function Header({ font }: { font?: string }) {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`); // Search in both title and description
-  
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+
       if (error) {
         console.error('Error fetching posts:', error);
         alert("Failed to fetch search results."); // User feedback
       } else {
-        setSearchResults(data);
+        setSearchResults(data || []); // Ensure searchResults is never null
       }
     } catch (error) {
       console.error('Unexpected error:', error);
+      alert("An unexpected error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <header className={`py-2 md:py-7 pt-7 md:pt-10 bg-gray-0 ${font}`}>
       <div className="max-w-[100rem] px-5 md:px-10 mx-auto flex justify-between items-center">
-      <Link href="/" legacyBehavior>
-        <a aria-label="Home">
-          <Image
-            src="/citale_header.svg"
-            alt="Citale Logo"
-            width={110}
-            height={40}
-            priority
-          />
-        </a>
-      </Link>
+        <Link href="/" legacyBehavior>
+          <a aria-label="Home">
+            <Image
+              src="/citale_header.svg"
+              alt="Citale Logo"
+              width={110}
+              height={40}
+              priority
+            />
+          </a>
+        </Link>
         <SearchBar onSearch={handleSearch} />
         <a
           href="https://forms.gle/fr4anWBWRkeCEgSN6"
