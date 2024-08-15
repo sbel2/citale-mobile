@@ -4,6 +4,7 @@ import { useState } from "react";
 import Head from "next/head";
 import Linkify from 'react-linkify';
 import {useRouter} from 'next/navigation';
+import Image from 'next/image';
 
 //reading in data from backend
 interface PostComponentProps {
@@ -77,7 +78,7 @@ interface PostComponentProps {
     };
 
     const handleBack = () => {
-      router.push('/'); // Navigate to the home page
+      router.back();
     };
   
     return (
@@ -93,10 +94,12 @@ interface PostComponentProps {
                 {/* element for the image */}
                 <div className= 'image-container'>
                     {imageUrl.length > 0 && (
-                    <img
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
-                        alt={title} 
-                    />
+                    <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
+                    alt={title}
+                    fill
+                    style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
+                  />
                     )}
                     {imageUrl.length > 1 && (
                         <div className='navigation'>
@@ -112,10 +115,12 @@ interface PostComponentProps {
                 <div className = 'text-container p-4 md:p-10'>
                   <div className="header">
                     <div className="profile-block">
-                    <img
+                    <Image
                       src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/profile-pic/citalelogo.jpg`}
                       alt="Profile"
-                      className="w-10 h-10 rounded-full mr-5"
+                      width={40}
+                      height={40}
+                      className="rounded-full mr-5"
                     />
                       <p className="profile name">Citale</p>
                     </div>
@@ -213,12 +218,6 @@ interface PostComponentProps {
 
             .image-container:hover .navigation {
             display: flex;
-            }
-
-            img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
             }
 
             @media (max-width: 768px) {
