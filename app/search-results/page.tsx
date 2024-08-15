@@ -31,6 +31,7 @@ const SearchResult = () => {
 
   useEffect(() => {
     if (query) {
+      document.title = `${query} - Citale Search`; // Dynamically set the page title
       handleSearch(query);
     }
   }, [query]);

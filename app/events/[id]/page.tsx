@@ -41,8 +41,15 @@ export default function Page({ params }: { params: { id: string } }) {
     fetchPostData();
   }, [post_id]);
 
+  // Set the document title based on the post title
+  useEffect(() => {
+    if (postData?.title) {
+      document.title = postData.title;  // This changes the browser tab title
+    }
+  }, [postData]);
+
   if (!postData) {
-    return null;
+    return null;  // Optionally, you can show a loading spinner here
   }
 
   return (
