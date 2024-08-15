@@ -71,7 +71,7 @@ const SearchResult = () => {
   }
 
   if (posts.length === 0) {
-    return <p>{`No posts found for "${query}"`}</p>;
+    return <p>{`No posts found for &quot;${query}&quot;`}</p>;
   }
 
   return (
