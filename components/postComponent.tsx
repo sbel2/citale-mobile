@@ -94,10 +94,12 @@ interface PostComponentProps {
                 {/* element for the image */}
                 <div className= 'image-container'>
                     {imageUrl.length > 0 && (
-                    <img
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
-                        alt={title} 
-                    />
+                    <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
+                    alt={title}
+                    fill
+                    style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
+                  />
                     )}
                     {imageUrl.length > 1 && (
                         <div className='navigation'>
@@ -216,12 +218,6 @@ interface PostComponentProps {
 
             .image-container:hover .navigation {
             display: flex;
-            }
-
-            img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
             }
 
             @media (max-width: 768px) {
