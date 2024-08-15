@@ -71,7 +71,7 @@ const SearchResult = () => {
     <Suspense fallback={<div>Loading search results...</div>}>
       <div className="px-2 pb-10 md:px-10 md:pb-20">
         {posts.length === 0 ? (
-          <p className = "text-center">No posts found for &quot;{query}&quot;</p>
+          <p className = "text-center">No posts found</p>
         ) : (
           <MasonryGrid posts={posts} />
         )}
