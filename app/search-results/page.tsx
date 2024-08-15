@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation'; // Correct hook for getting query params
+import React, { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
-import SearchBar from '@/components/SearchBar';
 
+// Dynamically import other components with Suspense handling
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
+const SearchBar = dynamic(() => import('@/components/SearchBar'), { suspense: true });
 
 interface Post {
   id: number;
@@ -26,12 +27,12 @@ const SearchResult = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const searchParams = useSearchParams(); // Hook to access query parameters
-  const query = searchParams.get('query'); // Get the 'query' parameter from the URL
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query');
 
   useEffect(() => {
     if (query) {
-      document.title = `${query} - Citale Search`; // Dynamically set the page title
+      document.title = `${query} - Citale Search`;
       handleSearch(query);
     }
   }, [query]);
@@ -59,25 +60,23 @@ const SearchResult = () => {
   };
 
   if (loading) {
-    return (
-      <main className="px-2 pb-10 md:px-10 md:pb-20">
-        <SkeletonCardRow />
-      </main>
-    );
+    return <SkeletonCardRow />;
   }
 
   if (error) {
     return <p>Error loading posts: {error}</p>;
   }
 
-  if (posts.length === 0) {
-    return <p>{`No posts found for &quot;${query}&quot;`}</p>;
-  }
-
   return (
-    <div className="px-2 pb-10 md:px-10 md:pb-20">
-      <MasonryGrid posts={posts} />
-    </div>
+    <Suspense fallback={<div>Loading search results...</div>}>
+      <div className="px-2 pb-10 md:px-10 md:pb-20">
+        {posts.length === 0 ? (
+          <p className = "text-center">No posts found for &quot;{query}&quot;</p>
+        ) : (
+          <MasonryGrid posts={posts} />
+        )}
+      </div>
+    </Suspense>
   );
 };
 
