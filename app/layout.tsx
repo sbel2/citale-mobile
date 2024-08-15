@@ -1,9 +1,8 @@
-// testing github deployment by triggering new commit
 import Header from "@/components/header";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Script from 'next/script'
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/favicon.ico" sizes = "any"/>
+        <meta name="theme-color" content="#ffffff" />
+
+        {/* Hotjar Script */}
         <Script id="hotjar-script" strategy="afterInteractive">
           {`
             (function(h,o,t,j,a,r){

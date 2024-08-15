@@ -77,7 +77,7 @@ interface PostComponentProps {
     };
 
     const handleBack = () => {
-      router.push('/'); // Navigate to the home page
+      router.back();
     };
   
     return (
