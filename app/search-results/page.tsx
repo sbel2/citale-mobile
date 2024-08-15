@@ -22,13 +22,13 @@ interface Post {
 
 const supabase = createClient();
 
-const SearchResult = () => {
+const Search = () => {
+  const searchParams = useSearchParams(); // Wrap this in a Suspense boundary
+  const query = searchParams.get('query');
+
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const searchParams = useSearchParams();
-  const query = searchParams.get('query');
 
   useEffect(() => {
     if (query) {
@@ -68,14 +68,20 @@ const SearchResult = () => {
   }
 
   return (
-    <Suspense fallback={<div>Loading search results...</div>}>
-      <div className="px-2 pb-10 md:px-10 md:pb-20">
-        {posts.length === 0 ? (
-          <p className = "text-center">No posts found</p>
-        ) : (
-          <MasonryGrid posts={posts} />
-        )}
-      </div>
+    <div className="px-2 pb-10 md:px-10 md:pb-20">
+      {posts.length === 0 ? (
+        <p className="text-center">No posts found</p>
+      ) : (
+        <MasonryGrid posts={posts} />
+      )}
+    </div>
+  );
+};
+
+const SearchResult = () => {
+  return (
+    <Suspense fallback={<div>Loading search parameters...</div>}>
+      <Search />
     </Suspense>
   );
 };
