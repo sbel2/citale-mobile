@@ -13,31 +13,9 @@ interface Post {
 }
 
 export default function Header({ font }: { font?: string }) {
-  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);  // Default to false until loading is required
   const [searchResults, setSearchResults] = useState<Post[] | null>(null);
   const supabase = createClient();
-
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.from("posts").select();
-      if (error) {
-        console.error("Error loading posts:", error);
-        alert("Failed to load posts."); // Provide user feedback on error
-      } else {
-        setPosts(data || []);
-      }
-    } catch (error) {
-      console.error("Unexpected error loading posts:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = async (query: string) => {
     console.log("Searching for:", query);

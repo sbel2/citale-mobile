@@ -71,12 +71,12 @@ const SearchResult = () => {
   }
 
   if (posts.length === 0) {
-    return <p>No posts found for "{query}"</p>;
+    return <p>No posts found for &quot;{query}&quot;</p>
   }
 
   return (
     <div className="px-2 pb-10 md:px-10 md:pb-20">
-      <h1 className="text-xl md:text-3xl font-bold mb-4 text-center">Search Results for "{query}"</h1>
+      <h1 className="text-xl md:text-3xl font-bold mb-4 text-center">Search Results for &quot;{query}&quot;</h1>
       <MasonryGrid posts={posts} />
     </div>
   );
