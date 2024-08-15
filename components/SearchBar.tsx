@@ -1,6 +1,6 @@
-"use client";
+
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Correctly import from next/navigation
+import { useRouter } from 'next/navigation'; 
 
 interface SearchBarProps {
   onSearch: (searchQuery: string) => Promise<void>;

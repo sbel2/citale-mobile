@@ -8,7 +8,6 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 
 // Dynamically import other components with Suspense handling
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
-const SearchBar = dynamic(() => import('@/components/SearchBar'), { suspense: true });
 
 interface Post {
   id: number;
@@ -70,7 +69,7 @@ const Search = () => {
   return (
     <div className="px-2 pb-10 md:px-10 md:pb-20">
       {posts.length === 0 ? (
-        <p className="text-center">No posts found</p>
+        <p className="text-center">No posts found :) </p>
       ) : (
         <MasonryGrid posts={posts} />
       )}
