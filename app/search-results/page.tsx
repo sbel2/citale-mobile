@@ -59,7 +59,7 @@ const SearchResult = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
+      <main className="px-2 pb-10 md:px-10 md:pb-20">
         <SkeletonCardRow />
       </main>
     );
@@ -74,9 +74,8 @@ const SearchResult = () => {
   }
 
   return (
-    <div className="flex flex-col justify-start items-center h-screen">
-      <h1 className="text-4xl font-bold mb-4">Search Results for "{query}"</h1>
-      <SearchBar onSearch={handleSearch} />
+    <div className="px-2 pb-10 md:px-10 md:pb-20">
+      <h1 className="text-xl md:text-3xl font-bold mb-4 text-center">Search Results for "{query}"</h1>
       <MasonryGrid posts={posts} />
     </div>
   );
