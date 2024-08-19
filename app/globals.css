@@ -30,11 +30,11 @@ body {
 
 .my-masonry-grid {
   display: flex;
-  margin-left: -15px; /* gutter size offset */
+  margin-left: -10px; /* gutter size offset */
   width: auto;
 }
 .my-masonry-grid_column {
-  padding-left: 15px; /* gutter size */
+  padding-left: 10px; /* gutter size */
   background-clip: padding-box;
 }
 
