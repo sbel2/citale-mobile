@@ -26,7 +26,7 @@ const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) =>
         </Link>
       </div>
       <div className="px-2 py-3">
-        <div className="text-sm sm:text-base mb-1 sm:mb-2 line-clamp-3 text-black">
+        <div className="text-sm sm:text-base mb-1 2xl:mb-2 line-clamp-3 text-black">
           {title}
         </div>
       </div>
