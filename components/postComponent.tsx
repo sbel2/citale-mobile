@@ -76,10 +76,6 @@ interface PostComponentProps {
       }
       setLiked(!liked);
     };
-
-    const handleBack = () => {
-      router.push('/');
-    };
   
     return (
     <>
@@ -87,8 +83,6 @@ interface PostComponentProps {
             <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
             <title>{title}</title>
         </Head>
-        {/* element for the entire Page */}
-        <div className = 'post-container flex flex-col md:flex-row'>
             {/* element for the post card */}
             <div className='card'>
                 {/* element for the image */}
@@ -150,16 +144,6 @@ interface PostComponentProps {
                   </div>
                 </div>
             </div>
-            {/* close button */}
-            <button
-          className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
-          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-          onClick={handleBack} 
-          aria-label='Close Post'
-        >
-          &#x2715;
-        </button>
-        </div>
         <style jsx global>{`
             html, body {
             margin: 0;
@@ -171,19 +155,6 @@ interface PostComponentProps {
       `}</style>
 
         <style jsx>{`
-            .post-container {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(4px);
-            overflow: hidden;            
-            }
 
             .card {
             background: white;
