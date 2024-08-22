@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
 import { useState } from "react";
-import Head from "next/head";
 import Linkify from 'react-linkify';
-import {useRouter} from 'next/navigation';
 import Image from 'next/image';
 
 //reading in data from backend
@@ -54,7 +52,6 @@ interface PostComponentProps {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const router = useRouter();
 
     const handlePrevious = () => {
       const newIndex =
@@ -79,10 +76,6 @@ interface PostComponentProps {
   
     return (
     <>
-        <Head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-            <title>{title}</title>
-        </Head>
             {/* element for the post card */}
             <div className='card'>
                 {/* element for the image */}
