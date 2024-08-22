@@ -13,7 +13,6 @@ interface Post {
   content: string;
   created_at: string;
   like_count: number;
-  // Add any other fields your posts have
 }
 
 export default function Home() {

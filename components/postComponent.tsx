@@ -78,7 +78,7 @@ interface PostComponentProps {
     };
 
     const handleBack = () => {
-      router.back();
+      router.push('/');
     };
   
     return (
@@ -154,7 +154,7 @@ interface PostComponentProps {
             <button
           className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
           style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-          onClick={handleBack} // Use handleBack instead of window.history.back()
+          onClick={handleBack} 
           aria-label='Close Post'
         >
           &#x2715;

@@ -1,5 +1,3 @@
-"use client";
-
 import React from 'react';
 import Masonry from 'react-masonry-css';
 import Card from '@/components/card';
@@ -25,7 +23,7 @@ const MasonryGrid = ({ posts }) => {
           title={post.title}
           description={post.description}
           imageUrl={post.imageUrl}
-        />
+        />  
       ))}
     </Masonry>
   );

@@ -38,7 +38,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Header />
-        <div className="bg-gray-951">{children}</div>
+        <div>{children}</div>
       </body>
     </html>
   );
