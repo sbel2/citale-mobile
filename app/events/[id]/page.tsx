@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
 import { notFound } from "next/navigation";
-import Head from "next/head";
+import { LayoutProvider } from "@/app/context/PostContext";
 
 interface PostData {
   post_id: number;
@@ -54,10 +54,10 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   return (
-    <>
     <div>
+      <LayoutProvider layout = "default">
       <PostComponent {...postData} />
+      </LayoutProvider>
     </div>
-    </>
   );
 }

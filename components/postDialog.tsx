@@ -4,6 +4,7 @@ import PostComponent from "@/components/postComponent"; // Ensure this path is c
 import { X } from "lucide-react";
 import styles from "./card.module.css";
 import Image from "next/image";
+import { LayoutProvider } from "@/app/context/PostContext";
 
 interface PostDialogProps {
   post: {
@@ -40,6 +41,7 @@ const PostDialog: React.FC<PostDialogProps> = ({ post }) => {
         </div>
       </DialogTrigger>
       <DialogContent>
+        <LayoutProvider layout="popup">
         <PostComponent
           post_id={post.post_id}
           title={post.title}
@@ -49,6 +51,7 @@ const PostDialog: React.FC<PostDialogProps> = ({ post }) => {
           created_at={post.created_at}
           user_id={post.user_id}
         />
+        </LayoutProvider>
         <DialogClose className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer" aria-label="Close">
           <X className="h-6 w-6" />
         </DialogClose>

@@ -1,0 +1,168 @@
+/* General card styles applicable to all cards */
+.card {
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    width: 100%; /* Full width by default */
+    height: 100vh; /* Full viewport height by default */
+    position: relative;
+  }
+  
+  /* Fullscreen layout specific to .cardFull */
+  .cardFull {
+    margin: 0;
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+  }
+  
+  /* Centered card specific to .cardCentered */
+  .cardCentered {
+    width: 62%; /* Width adjusted to not be full screen */
+    height: 88%; /* Height adjusted similarly */
+    margin: auto; /* Center the card horizontally */
+    align-self: center; /* Center the card vertically in a flex container */
+    display: grid;
+    grid-template-columns: 60% 40%; /* Grid layout for internal content */
+    overflow: hidden; /* Hide overflow to maintain grid aesthetics */
+  }
+  
+  /* Responsive adjustments for .card that may be conflicting with .cardCentered */
+  @media (min-width: 768px) {
+    .card {
+      /* Ensure these styles do not interfere with .cardCentered */
+      width: 62%; /* Matches .cardCentered to maintain consistency in width */
+      height: 88%; /* Matches .cardCentered to maintain consistency in height */
+      display: grid; /* Use grid if necessary for layout */
+      grid-template-columns: 60% 40%; /* Same column setup as .cardCentered */
+      margin: auto; /* Center the card within its container */
+      align-self: center; /* Align card centrally vertically */
+    }
+  }
+
+    .imagecontainer {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    background: rgba(0, 0, 0, 0.05);
+    }
+
+    .imagecontainer:hover .navigation {
+    display: flex;
+    }
+
+    @media (max-width: 768px) {
+      .imagecontainer {
+        width: 100%;
+        height: 300px; /* Fixed height for small screens */
+      }
+    }
+
+    .navigation {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        right: 10px;
+        justify-content: space-between;
+        align-items: center;
+        transform: translateY(-50%);
+        }
+
+    .navbutton {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    font-size: 15px;
+    font-weight: 300;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    }
+
+    .textcontainer {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        color: black;
+        overflow-y: auto;
+        padding: 0px;
+        }
+
+    .header{
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    box-shadow: 0 2px 2px -2px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    }
+
+    @media (max-width: 768px) {
+    .header {
+        position: fixed; /* Fixed at the top */
+        top: 0; /* Align to the top */
+        left: 0; /* Stretch across the top */
+        background: white; /* White background */
+    }
+    }
+
+    .content{
+    flex: 1;
+    width: auto;
+    padding-right: 20px;
+    padding-left: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    white-space: normal;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }}
+
+    .preformattedtext {
+    white-space: pre-wrap; /* respects both spaces and line breaks */
+    font-size: 15px;
+    }
+    
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      height: 65px;
+      box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
+    }
+
+
+    @media (max-width: 768px) {
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white; /* Ensure the footer has a background color */
+      }
+    }
+
+    .icon {
+    width: 23px;
+    height: 23px;
+    margin-right: 8px; /* Space between icon and text */
+    stroke-width: 1.25; /* Ensure stroke width is consistent */
+    flex-shrink: 0; /* Prevents icon from shrinking */
+    transition: fill 0.2s; /* Smooth fill transition */
+    }
+
+    @media (max-width: 768px) {
+    .content {
+        margin-bottom: 70px; /* Add bottom margin equal to the footer height */
+    }
+}
