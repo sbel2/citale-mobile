@@ -1,31 +1,23 @@
 import React from "react";
 import styles from "./card.module.css";
-import Image from "next/image";
 import PostDialog from "@/components/PostDialog";
 
-interface CardProps {
-  post_id: string;
+interface Post {
+  post_id: number;
   title: string;
   description: string;
   imageUrl: string[];
+  like_count: number;
+  created_at: string;
+  user_id: number;
 }
 
-const Card: React.FC<CardProps> = ({ post_id, title, description, imageUrl }) => {
-  // Create the post object to pass to the dialog
-  const post = {
-    post_id: Number(post_id),
-    title,
-    description,
-    imageUrl,
-    like_count: 0, // Placeholder, replace with actual data if available
-    created_at: new Date().toISOString(), // Placeholder, replace with actual data
-    user_id: 1, // Placeholder, replace with actual data
-  };
+interface CardProps extends Post {}
 
+const Card: React.FC<CardProps> = (props) => {
   return (
     <div className={styles.card}>
-      {/* PostDialog is now used here to handle dialog opening and content display */}
-      <PostDialog post={post} />
+      <PostDialog post={props} />
     </div>
   );
 };

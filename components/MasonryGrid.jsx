@@ -18,11 +18,13 @@ const MasonryGrid = ({ posts }) => {
     >
       {posts.map((post) => (
         <Card 
-          key={post.post_id.toString()}
+          key={post.post_id}
           post_id={post.post_id.toString()}
           title={post.title}
           description={post.description}
           imageUrl={post.imageUrl}
+          created_at={post.created_at}
+          like_count={post.like_count}
         />  
       ))}
     </Masonry>

@@ -1,4 +1,4 @@
-/* General card styles applicable to all cards */
+/* Base styles for .card that apply to all scenarios */
 .card {
     background: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -6,38 +6,29 @@
     width: 100%; /* Full width by default */
     height: 100vh; /* Full viewport height by default */
     position: relative;
-  }
-  
-  /* Fullscreen layout specific to .cardFull */
-  .cardFull {
-    margin: 0;
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-  }
-  
-  /* Centered card specific to .cardCentered */
-  .cardCentered {
-    width: 62%; /* Width adjusted to not be full screen */
-    height: 88%; /* Height adjusted similarly */
-    margin: auto; /* Center the card horizontally */
-    align-self: center; /* Center the card vertically in a flex container */
-    display: grid;
-    grid-template-columns: 60% 40%; /* Grid layout for internal content */
-    overflow: hidden; /* Hide overflow to maintain grid aesthetics */
-  }
-  
-  /* Responsive adjustments for .card that may be conflicting with .cardCentered */
-  @media (min-width: 768px) {
+}
+
+/* Responsive styles for larger screens */
+@media (min-width: 768px) {
     .card {
-      /* Ensure these styles do not interfere with .cardCentered */
-      width: 62%; /* Matches .cardCentered to maintain consistency in width */
-      height: 88%; /* Matches .cardCentered to maintain consistency in height */
-      display: grid; /* Use grid if necessary for layout */
-      grid-template-columns: 60% 40%; /* Same column setup as .cardCentered */
-      margin: auto; /* Center the card within its container */
-      align-self: center; /* Align card centrally vertically */
+        display: grid;
+        grid-template-columns: 60% 40%;
+        align-self: center;
+        overflow: hidden;
+        /* Base large screen adjustments */
+        width: 62%;
+        height: 88%;
+        margin: auto;
     }
-  }
+
+    /* Adjustments specifically for popup scenarios */
+    .card.popup {  /* Using a modifier class combined with the base .card */
+        width: 100%; /* Full width */
+        height: 100vh; /* Full viewport height */
+        margin: 0; /* Zero margins */
+    }
+}
+
 
     .imagecontainer {
     display: flex;

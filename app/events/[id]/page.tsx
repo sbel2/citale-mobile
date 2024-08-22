@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
 import { notFound } from "next/navigation";
-import { LayoutProvider } from "@/app/context/PostContext";
 
-interface PostData {
+interface Post {
   post_id: number;
   title: string;
   description: string;
@@ -20,7 +19,7 @@ const supabase = createClient();
 
 export default function Page({ params }: { params: { id: string } }) {
   const { id: post_id } = params;
-  const [postData, setPostData] = useState<PostData | null>(null);
+  const [postData, setPostData] = useState<Post | null>(null);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -35,7 +34,7 @@ export default function Page({ params }: { params: { id: string } }) {
         notFound();
       } else {
         console.log('Fetched post data:', data);
-        setPostData(data as PostData);
+        setPostData(data as Post);
       }
     };
 
@@ -55,9 +54,7 @@ export default function Page({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <LayoutProvider layout = "default">
       <PostComponent {...postData} />
-      </LayoutProvider>
     </div>
   );
 }

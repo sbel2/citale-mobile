@@ -3,7 +3,6 @@ import React from "react";
 import { useState } from "react";
 import Linkify from 'react-linkify';
 import Image from 'next/image';
-import { useLayout } from "@/app/context/PostContext";
 import styles from "./postComponent.module.css"
 
 //reading in data from backend
@@ -54,7 +53,6 @@ interface PostComponentProps {
     const [liked, setLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const { layout } = useLayout();
 
     const handlePrevious = () => {
       const newIndex =
@@ -79,10 +77,6 @@ interface PostComponentProps {
   
     return (
     <>
-        <div className={`${layout === 'popup' ? styles.cardFull : styles.cardCentered}`}>
-            {/* element for the post card */}
-            <div className={styles.card}>
-                {/* element for the image */}
                 <div className={styles.imagecontainer}>
                     {imageUrl.length > 0 && (
                     <Image
@@ -140,8 +134,6 @@ interface PostComponentProps {
                       </button>
                   </div>
                 </div>
-            </div>
-        </div>
     </>
   );
   };
