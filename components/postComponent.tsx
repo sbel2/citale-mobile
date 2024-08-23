@@ -7,6 +7,7 @@ import styles from "./postComponent.module.css"
 
 //reading in data from backend
 interface PostComponentProps {
+  post: {
     post_id: number;
     title: string;
     description: string;
@@ -14,7 +15,9 @@ interface PostComponentProps {
     like_count: number;
     created_at: string;
     user_id: number;
-  }
+  };
+  context: 'popup' | 'static'; // Defining possible context values
+}
 
   // making the link in post clickable
   const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
@@ -41,28 +44,21 @@ interface PostComponentProps {
     return true;
   }
 
-  const PostComponent: React.FC<PostComponentProps> = ({
-    post_id,
-    title,
-    description,
-    imageUrl,
-    like_count,
-    created_at,
-    user_id,
-  }) => {
+  const PostComponent: React.FC<PostComponentProps> = ({post, context}) => {
     const [liked, setLiked] = useState(false);
-    const [likesCount, setLikesCount] = useState(like_count);
+    const [likesCount, setLikesCount] = useState(post.like_count);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const headerClass = context === 'popup' ? styles.popup : styles.static;
 
     const handlePrevious = () => {
       const newIndex =
-        currentImageIndex > 0 ? currentImageIndex - 1 : imageUrl.length - 1;
+        currentImageIndex > 0 ? currentImageIndex - 1 : post.imageUrl.length - 1;
       setCurrentImageIndex(newIndex);
     };
   
     const handleNext = () => {
       const newIndex =
-        currentImageIndex < imageUrl.length - 1 ? currentImageIndex + 1 : 0;
+        currentImageIndex < post.imageUrl.length - 1 ? currentImageIndex + 1 : 0;
       setCurrentImageIndex(newIndex);
     };
     
@@ -77,24 +73,24 @@ interface PostComponentProps {
   
     return (
     <>
-      <div className={styles.card}>
+      <div className={`${styles.card} ${headerClass}`}>
         <div className={styles.imagecontainer}>
-            {imageUrl.length > 0 && (
+            {post.imageUrl.length > 0 && (
             <Image
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
-            alt={title}
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[currentImageIndex]}`}
+            alt={post.title}
             fill
             style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
           />
             )}
-            {imageUrl.length > 1 && (
+            {post.imageUrl.length > 1 && (
                 <div className={styles.navigation}>
                     <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
                     <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
                 </div>
             )}
             <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-                {`${currentImageIndex + 1}/${imageUrl.length}`}
+                {`${currentImageIndex + 1}/${post.imageUrl.length}`}
             </span>
         </div>
         {/* element for the text, header, and footer */}
@@ -113,12 +109,12 @@ interface PostComponentProps {
           </div>
           <div className = {`${styles.content} mt-2 mb-2`}>
               <h4 className='text-lg font-bold mb-4 text-black'>
-                  {title}
+                  {post.title}
               </h4>
               <div className={styles.preformattedtext}>
-                  <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
+                  <Linkify componentDecorator={linkDecorator}>{post.description}</Linkify>
               </div>
-              <div className='text-xs text-gray-500 mt-5'>{created_at}</div>
+              <div className='text-xs text-gray-500 mt-5'>{post.created_at}</div>
           </div>
           <div className = {styles.footer}>
               <button className="flex items-center p-1 pr-8" onClick = {handleLike}>

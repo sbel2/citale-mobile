@@ -37,7 +37,10 @@
     @media (max-width: 768px) {
       .imagecontainer {
         width: 100%;
-        height: 300px; /* Fixed height for small screens */
+        height: 300px; /* Adjusted height if necessary */
+        position: relative; /* Adjust if necessary */
+        top: 75px; /* Set top to the height of the header */
+        margin-bottom: 70px; /* Bottom margin equal to the footer height */
       }
     }
 
@@ -87,9 +90,18 @@
     @media (max-width: 768px) {
     .header {
         position: fixed; /* Fixed at the top */
-        top: 0; /* Align to the top */
-        left: 0; /* Stretch across the top */
+        width: 100%;
         background: white; /* White background */
+    }
+    
+    .popup .header{
+      top: 0px;
+      left: 0; 
+    }
+
+    .static .header{
+      top: 50px;
+      left: 0;
     }
     }
 

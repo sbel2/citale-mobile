@@ -35,28 +35,22 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
-  <DialogOverlay />
-  <DialogPrimitive.Content
-    ref={ref}
-    className={cn(
-      "fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl md: w-[720px] lg: w-[900px] transform -translate-x-1/2 -translate-y-1/2",
-      "overflow-auto bg-white duration-200 sm:rounded-lg",
-      "h-full md:h-[575px] lg:h-[718px]",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <div className="block sm:hidden">
-      <DialogClose 
-        className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer"
-      >
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed inset-0 z-50 grid w-full h-full transform-none overflow-auto bg-white duration-200 sm:rounded-lg",
+        "md:w-[720px] md:max-w-4xl md:h-[575px] lg:w-[900px] lg:h-[718px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogClose className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
         <X className="h-6 w-6" />
       </DialogClose>
-    </div>
-  </DialogPrimitive.Content>
-</DialogPortal>
-
+    </DialogPrimitive.Content>
+  </DialogPortal>
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 

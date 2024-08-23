@@ -63,8 +63,8 @@ const Card: React.FC<CardProps> = ({ post }) => {
         </div>
       </DialogTrigger>
 
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-        <PostComponent {...post}/>
+      <DialogContent className="" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <PostComponent post={post} context="popup"/>
         <DialogClose 
           onClick={handleClose}
           aria-label="Close"

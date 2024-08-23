@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 
 interface Post {
   post_id: number;
@@ -20,6 +20,7 @@ const supabase = createClient();
 export default function Page({ params }: { params: { id: string } }) {
   const { id: post_id } = params;
   const [postData, setPostData] = useState<Post | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -53,19 +54,29 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className='post-container'>
-      <PostComponent {...postData} />
+    <div className="post-container">
+      <PostComponent post = {postData} context = "static"/>
       <style jsx>{`
         .post-container {
           position: absolute;
-          top: 18%;
+          top: 15%;
           right: 15%;
-          bottom: 8%;
+          bottom: 5%;
           left: 15%;
           display: flex;
+          flex-direction: column;
           justify-content: center;
           align-items: center;
           overflow: auto;
+        }
+
+        @media (max-width: 768px) {
+          .post-container {
+            top:50px;
+            right: 0;
+            bottom: 0;
+            left: 0;
+          }
         }
       `}</style>
     </div>
