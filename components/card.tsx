@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
 import { X } from "lucide-react";
@@ -18,10 +18,34 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ post }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.title = post.title; // Update the document title
+    } else {
+      document.title = "Citale | Explore Boston"; // Revert to the default title when closed
+    }
+  }, [isOpen, post.title]);
+
+  const handleClick = () => {
+    window.history.pushState(null, '', `/post/${post.post_id}`);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    window.history.pushState(null, '', '/');
+    setIsOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        handleClose();
+      }
+    }}>
       <DialogTrigger asChild>
-        <div className="cursor-pointer">
+        <div onClick={handleClick} className="cursor-pointer">
           <div className={styles['image-container']}>
             <Image
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[0]}`}
@@ -41,7 +65,11 @@ const Card: React.FC<CardProps> = ({ post }) => {
       </DialogTrigger>
       <DialogContent>
         <PostComponent {...post}/>
-        <DialogClose className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer" aria-label="Close">
+        <DialogClose 
+          onClick={handleClose}
+          className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer" 
+          aria-label="Close"
+        >
           <X className="h-6 w-6" />
         </DialogClose>
       </DialogContent>
