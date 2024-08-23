@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose } from "@/components/ui/dialog";
-import PostComponent from "@/components/postComponent"; // Ensure this path is correct
+import PostComponent from "@/components/postComponent"; 
 import { X } from "lucide-react";
 import styles from "./card.module.css";
 import Image from "next/image";
