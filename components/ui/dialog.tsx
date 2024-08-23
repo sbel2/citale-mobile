@@ -39,7 +39,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-0 z-50 grid w-full h-full transform-none overflow-auto bg-white duration-200 sm:rounded-lg",
+        "dialog-content fixed inset-0 z-50 grid w-full h-full transform-none overflow-auto bg-white duration-200 sm:rounded-lg",
         "md:w-[720px] md:max-w-4xl md:h-[575px] lg:w-[900px] lg:h-[717px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
         className
       )}
