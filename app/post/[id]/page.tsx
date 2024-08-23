@@ -54,20 +54,14 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="post-container">
+    <div className="post-container md:w-[750px] md:h-[600px] lg:w-[850px] lg:h-[678px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
       <PostComponent post = {postData} context = "static"/>
       <style jsx>{`
         .post-container {
           position: absolute;
-          top: 15%;
-          right: 15%;
-          bottom: 5%;
-          left: 15%;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          overflow: auto;
+          border:0.5px solid #d1d5db;
+          margin-top: 20px;
+          box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
@@ -79,6 +73,6 @@ export default function Page({ params }: { params: { id: string } }) {
           }
         }
       `}</style>
-    </div>
+      </div>
   );
 }
