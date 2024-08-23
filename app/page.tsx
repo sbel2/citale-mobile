@@ -8,16 +8,18 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 interface Post {
-  id: number;
+  post_id: number;
   title: string;
-  content: string;
-  created_at: string;
+  description: string;
+  imageUrl: string[];
   like_count: number;
-  // Add any other fields your posts have
+  created_at: string;
+  user_id: number;
 }
 
+const supabase = createClient();
+
 export default function Home() {
-  const supabase = createClient();
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,14 +28,14 @@ export default function Home() {
     setLoading(true);
     const { data, error } = await supabase
       .from('posts')
-      .select('*')
+      .select("post_id, title, description, imageUrl, user_id, like_count, created_at")
       .order('created_at', { ascending: false })
       .order('like_count', { ascending: false });
 
     if (error) {
       setError(error.message);
     } else {
-      setPosts(data || []);
+      setPosts(data as Post[]);
     }
     setLoading(false);
   }, [supabase]);
@@ -60,7 +62,7 @@ export default function Home() {
   if (loading) {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-        <div className="px-2 pb-10 md:px-10 md:pb-20">
+        <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
           <SkeletonCardRow />
         </div>
       </main>
@@ -77,7 +79,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-      <div className="px-2 pb-10 md:px-10 md:pb-20">
+      <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
         <MasonryGrid posts={posts} />
       </div>
     </main>

@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes = "any"/>
+      <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
         <meta name="theme-color" content="#ffffff" />
 
         {/* Hotjar Script */}
@@ -38,7 +38,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Header />
-        <div className="bg-gray-951">{children}</div>
+        <div>{children}</div>
       </body>
     </html>
   );

@@ -11,8 +11,12 @@
   "dependencies": {
     "@amplitude/analytics-browser": "^2.9.3",
     "@hotjar/browser": "^1.0.9",
+    "@radix-ui/react-dialog": "^1.1.1",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.44.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.428.0",
     "next": "^14.2.4",
     "pg": "^8.12.0",
     "react": "^18.3.1",
@@ -20,7 +24,9 @@
     "react-hotjar": "^6.3.1",
     "react-icons": "^5.3.0",
     "react-linkify": "^1.0.0-alpha",
-    "react-masonry-css": "^1.0.16"
+    "react-masonry-css": "^1.0.16",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
