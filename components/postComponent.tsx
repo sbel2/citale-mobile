@@ -77,63 +77,65 @@ interface PostComponentProps {
   
     return (
     <>
-                <div className={styles.imagecontainer}>
-                    {imageUrl.length > 0 && (
-                    <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
-                    alt={title}
-                    fill
-                    style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
-                  />
-                    )}
-                    {imageUrl.length > 1 && (
-                        <div className={styles.navigation}>
-                            <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
-                            <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
-                        </div>
-                    )}
-                    <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-                        {`${currentImageIndex + 1}/${imageUrl.length}`}
-                    </span>
+      <div className={styles.card}>
+        <div className={styles.imagecontainer}>
+            {imageUrl.length > 0 && (
+            <Image
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${imageUrl[currentImageIndex]}`}
+            alt={title}
+            fill
+            style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
+          />
+            )}
+            {imageUrl.length > 1 && (
+                <div className={styles.navigation}>
+                    <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
+                    <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
                 </div>
-                {/* element for the text, header, and footer */}
-                <div className={`${styles.textcontainer} p-4 md:p-10`}>
-                  <div className={styles.header}>
-                    <div className="flex items-center ml-8">
-                    <Image
-                      src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/profile-pic/citalelogo.jpg`}
-                      alt="Profile"
-                      width={40}
-                      height={40}
-                      className="rounded-full mr-5"
-                    />
-                      <p>Citale</p>
-                    </div>
-                  </div>
-                  <div className = {`${styles.content} mt-2 mb-2`}>
-                      <h4 className='text-lg font-bold mb-4 text-black'>
-                          {title}
-                      </h4>
-                      <div className={styles.preformattedtext}>
-                          <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
-                      </div>
-                      <div className='text-xs text-gray-500 mt-5'>{created_at}</div>
-                  </div>
-                  <div className = {styles.footer}>
-                      <button className="flex items-center p-1 pr-8" onClick = {handleLike}>
-                          {liked ? (
-                              <svg fill='red' stroke = "red" viewBox='0 0 24 24' className={styles.icon}>
-                                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
-                              </svg>
-                              ) : (
-                              <svg fill='none' stroke='black' viewBox='0 0 24 24' className={styles.icon}>
-                                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
-                              </svg>
-                          )}
-                          <span className="text-xs inline-block w-4 text-center">{likesCount}</span>
-                      </button>
-                  </div>
-                </div>
+            )}
+            <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
+                {`${currentImageIndex + 1}/${imageUrl.length}`}
+            </span>
+        </div>
+        {/* element for the text, header, and footer */}
+        <div className={`${styles.textcontainer} p-4 md:p-10`}>
+          <div className={styles.header}>
+            <div className="flex items-center ml-8">
+            <Image
+              src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/profile-pic/citalelogo.jpg`}
+              alt="Profile"
+              width={40}
+              height={40}
+              className="rounded-full mr-5"
+            />
+              <p>Citale</p>
+            </div>
+          </div>
+          <div className = {`${styles.content} mt-2 mb-2`}>
+              <h4 className='text-lg font-bold mb-4 text-black'>
+                  {title}
+              </h4>
+              <div className={styles.preformattedtext}>
+                  <Linkify componentDecorator={linkDecorator}>{description}</Linkify>
+              </div>
+              <div className='text-xs text-gray-500 mt-5'>{created_at}</div>
+          </div>
+          <div className = {styles.footer}>
+              <button className="flex items-center p-1 pr-8" onClick = {handleLike}>
+                  {liked ? (
+                      <svg fill='red' stroke = "red" viewBox='0 0 24 24' className={styles.icon}>
+                          <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                      </svg>
+                      ) : (
+                      <svg fill='none' stroke='black' viewBox='0 0 24 24' className={styles.icon}>
+                          <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                      </svg>
+                  )}
+                  <span className="text-xs inline-block w-4 text-center">{likesCount}</span>
+              </button>
+          </div>
+        </div>
+      </div>
     </>
   );
   };

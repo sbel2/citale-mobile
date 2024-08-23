@@ -1,7 +1,6 @@
 import React, { useEffect,useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
-import { X } from "lucide-react";
 import styles from "./card.module.css";
 import Image from "next/image";
 
@@ -63,14 +62,13 @@ const Card: React.FC<CardProps> = ({ post }) => {
           </div>
         </div>
       </DialogTrigger>
-      <DialogContent>
+
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <PostComponent {...post}/>
         <DialogClose 
           onClick={handleClose}
-          className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer" 
           aria-label="Close"
         >
-          <X className="h-6 w-6" />
         </DialogClose>
       </DialogContent>
     </Dialog>

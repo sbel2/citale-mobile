@@ -41,21 +41,21 @@ export default function Header({ font }: { font?: string }) {
   };
 
   return (
-    <header className={`py-2 md:py-7 pt-7 md:pt-10 bg-gray-0 ${font}`}>
-      <div className="max-w-[100rem] px-5 md:px-10 mx-auto flex items-center">
+    <header className={`py-1 md:py-3 pt-4 md:pt-6 bg-gray-0 ${font}`}>
+      <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
         <Link href="/" legacyBehavior>
           <a aria-label="Home">
             <Image
               src="/citale_header.svg"
               alt="Citale Logo"
-              width={110}
-              height={40}
+              width={110}  // Reduced width
+              height={40} // Reduced height
               priority
             />
           </a>
         </Link>
         <div className="flex-grow flex justify-center">
-          <div className="w-full max-w-md p-2 sm:p-4">
+          <div className="w-full max-w-sm p-1 sm:p-2"> {/* Adjusted padding */}
             <SearchBar onSearch={handleSearch} />
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function Header({ font }: { font?: string }) {
           href="https://forms.gle/fr4anWBWRkeCEgSN6"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden md:block ml-4 text-blue-600 underline hover:text-blue-800 transition-colors duration-200 text-sm md:text-base"
+          className="hidden md:block ml-3 text-blue-600 underline hover:text-blue-800 transition-colors duration-200 text-sm md:text-base"
         >
           How do you like Citale?
         </a>

@@ -53,8 +53,21 @@ export default function Page({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div>
+    <div className='post-container'>
       <PostComponent {...postData} />
+      <style jsx>{`
+        .post-container {
+          position: absolute;
+          top: 18%;
+          right: 15%;
+          bottom: 8%;
+          left: 15%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          overflow: auto;
+        }
+      `}</style>
     </div>
   );
 }
