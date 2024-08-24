@@ -59,7 +59,13 @@ const Search = () => {
   };
 
   if (loading) {
-    return <SkeletonCardRow />;
+    return (
+      <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
+        <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+          <SkeletonCardRow />
+        </div>
+      </main>
+    );
   }
 
   if (error) {
@@ -67,7 +73,7 @@ const Search = () => {
   }
 
   return (
-    <div className="px-2 pb-10 md:px-10 md:pb-20">
+    <div className="px-2 pb-10 pt-10 md:px-10 md:pb-20">
       {posts.length === 0 ? (
         <p className="text-center">No posts found :) </p>
       ) : (
