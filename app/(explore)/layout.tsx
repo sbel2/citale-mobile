@@ -1,8 +1,8 @@
 import Header from "@/components/header";
-import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import '../globals.css';
 import Script from 'next/script';
+import { Metadata } from "next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      <link rel="icon" href="/favicon.ico" type="image/x-icon"/>
+        <link rel="icon" href="/favicon.ico" sizes = "any"/>
         <meta name="theme-color" content="#ffffff" />
 
         {/* Hotjar Script */}
@@ -38,7 +38,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Header />
-        <div>{children}</div>
+        <main className="bg-gray-951">{children}</main>
       </body>
     </html>
   );

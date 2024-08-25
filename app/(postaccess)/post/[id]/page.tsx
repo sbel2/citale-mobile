@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
-import { notFound, useRouter } from "next/navigation";
+import { notFound } from "next/navigation";
 
 interface Post {
   post_id: number;
@@ -20,7 +20,6 @@ const supabase = createClient();
 export default function Page({ params }: { params: { id: string } }) {
   const { id: post_id } = params;
   const [postData, setPostData] = useState<Post | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -60,16 +59,17 @@ export default function Page({ params }: { params: { id: string } }) {
         .post-container {
           position: absolute;
           border:0.5px solid #d1d5db;
-          margin-top: 20px;
-          box-sizing: border-box;
+          // margin-top: 20px;
+          // box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
           .post-container {
-            top:50px;
+            top:0;
             right: 0;
             bottom: 0;
             left: 0;
+            overflow:hidden;
           }
         }
       `}</style>

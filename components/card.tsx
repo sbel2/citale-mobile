@@ -1,8 +1,9 @@
 import React, { useEffect,useState } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
 import styles from "./card.module.css";
 import Image from "next/image";
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface CardProps {
   post: {
@@ -21,10 +22,14 @@ const Card: React.FC<CardProps> = ({ post }) => {
 
   useEffect(() => {
     if (isOpen) {
-      document.title = post.title; // Update the document title
+      document.title = post.title;
     } else {
-      document.title = "Citale | Explore Boston"; // Revert to the default title when closed
+      document.title = "Citale | Explore Boston";
     }
+  
+    return () => {
+      document.title = "Citale | Explore Boston"; // Cleanup on unmount
+    };
   }, [isOpen, post.title]);
 
   const handleClick = () => {
@@ -39,8 +44,11 @@ const Card: React.FC<CardProps> = ({ post }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) {
-        handleClose();
+      if (open !== isOpen) {
+        setIsOpen(open);
+        if (!open) {
+          handleClose();
+        }
       }
     }}>
       <DialogTrigger asChild>
@@ -63,6 +71,12 @@ const Card: React.FC<CardProps> = ({ post }) => {
         </div>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+        <VisuallyHidden>
+          <DialogTitle>{post.title}</DialogTitle>
+          <DialogDescription>
+          This dialog contains detailed information about the selected post.
+        </DialogDescription>
+        </VisuallyHidden>
         <PostComponent post={post} context="popup"/>
         <DialogClose 
           onClick={handleClose}
