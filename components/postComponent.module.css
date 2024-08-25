@@ -53,19 +53,19 @@
         transform: translateY(-50%);
         }
 
-    .navbutton {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.55);
-    color: white;
-    font-size: 15px;
-    font-weight: 300;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    }
+      .navbutton {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.55);
+      color: white;
+      font-size: 15px;
+      font-weight: 300;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      }
 
     .textcontainer {
         flex: 1;
@@ -89,17 +89,9 @@
     .header {
         position: fixed; /* Fixed at the top */
         width: 100%;
+        top:0;
+        left:0;
         background: white; /* White background */
-    }
-    
-    .popup .header{
-      top: 0px;
-      left: 0; 
-    }
-
-    .static .header{
-      top: 50px;
-      left: 0;
     }
     }
 
@@ -153,6 +145,6 @@
 
     @media (max-width: 768px) {
     .content {
-        margin-bottom: 70px; /* Add bottom margin equal to the footer height */
+        margin-bottom: 70px;
     }
 }

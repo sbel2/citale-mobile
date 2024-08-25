@@ -3,6 +3,7 @@ import React, { useState, useRef } from "react";
 import Linkify from 'react-linkify';
 import Image from 'next/image';
 import styles from "./postComponent.module.css";
+import {useRouter} from 'next/navigation';
 
 //reading in data from backend
 interface PostComponentProps {
@@ -49,6 +50,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const headerClass = context === 'popup' ? styles.popup : styles.static;
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const router = useRouter();
 
   const handlePrevious = () => {
     const newIndex =
@@ -70,6 +72,12 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     }
     setLiked(!liked);
   };
+
+  const handleBack = () => {
+    setTimeout(() => {
+        router.push('/');
+    }, 0);
+};
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.changedTouches[0].screenX;
@@ -155,6 +163,16 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           </div>
         </div>
       </div>
+      {context === 'static' && (
+        <button
+          className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+          onClick={handleBack}
+          aria-label='Close Post'
+        >
+          &#x2715;
+        </button>
+      )}
     </>
   );
 };
