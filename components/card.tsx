@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect,useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
