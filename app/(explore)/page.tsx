@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
@@ -37,7 +37,6 @@ export default function Home() {
         setLoading(false);
         return;
       }
-
       setPosts(data);
       setLoading(false);
     };
@@ -62,7 +61,7 @@ export default function Home() {
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
       <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
-        <MasonryGrid posts={posts} />
+          <MasonryGrid posts={posts}/>
       </div>
     </main>
   );

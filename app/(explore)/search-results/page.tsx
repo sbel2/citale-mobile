@@ -42,7 +42,9 @@ const Search = () => {
       const { data, error } = await supabase
         .from('posts')
         .select('post_id, title, description, imageUrl, user_id, like_count, created_at')
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+        .order('created_at', { ascending: false })
+        .order('like_count', { ascending: false });
 
       if (error) {
         console.error('Error fetching posts:', error);
