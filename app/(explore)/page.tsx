@@ -1,9 +1,10 @@
-'use client'; // Mark this component as a client component
+'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
+import { PostgrestError } from '@supabase/supabase-js';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -17,47 +18,31 @@ interface Post {
   user_id: number;
 }
 
-const supabase = createClient();
-
 export default function Home() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [posts, setPosts] = useState<Post[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('posts')
-      .select("post_id, title, description, imageUrl, user_id, like_count, created_at")
-      .order('created_at', { ascending: false })
-      .order('like_count', { ascending: false });
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setPosts(data as Post[]);
-    }
-    setLoading(false);
-  }, [supabase]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initial fetch of posts
-    fetchPosts();
+    const fetchPosts = async () => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('posts')
+        .select('post_id, title, description, imageUrl, user_id, like_count, created_at')
+        .order('created_at', { ascending: false })
+        .order('like_count', { ascending: false });
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('realtime:posts')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, (payload: any) => {
-        console.log('Change detected:', payload);
-        fetchPosts();
-      })
-      .subscribe();
-
-    // Cleanup function to unsubscribe from the channel
-    return () => {
-      supabase.removeChannel(channel);
+      if (error) {
+        setError((error as PostgrestError).message);
+        setLoading(false);
+        return;
+      }
+      setPosts(data);
+      setLoading(false);
     };
-  }, [fetchPosts, supabase]);
+
+    fetchPosts();
+  }, []);
 
   if (loading) {
     return (
@@ -73,14 +58,10 @@ export default function Home() {
     return <p>Error loading posts: {error}</p>;
   }
 
-  if (posts.length === 0) {
-    return <p>No posts found</p>;
-  }
-
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
       <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
-        <MasonryGrid posts={posts} />
+          <MasonryGrid posts={posts}/>
       </div>
     </main>
   );

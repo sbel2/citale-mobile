@@ -10,13 +10,13 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 interface Post {
-  id: number;
+  post_id: number;
   title: string;
-  content: string;
   created_at: string;
   like_count: number;
   description?: string;
-  imageURL?: string;
+  imageUrl?: string;
+  user_id: number;
 }
 
 const supabase = createClient();
@@ -41,8 +41,10 @@ const Search = () => {
     try {
       const { data, error } = await supabase
         .from('posts')
-        .select('*')
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`);
+        .select('post_id, title, description, imageUrl, user_id, like_count, created_at')
+        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+        .order('created_at', { ascending: false })
+        .order('like_count', { ascending: false });
 
       if (error) {
         console.error('Error fetching posts:', error);

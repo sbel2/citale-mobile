@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect,useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
@@ -63,18 +65,18 @@ const Card: React.FC<CardProps> = ({ post }) => {
             />
             <div className={styles['overlay']}></div>
           </div>
-          <div className="px-2 py-3">
-            <div className="text-sm sm:text-base mb-1 2xl:mb-2 line-clamp-3 text-black">
-              {post.title}
+            <div className="px-2 py-3">
+              <div className="text-sm sm:text-base mb-1 2xl:mb-2 line-clamp-3 text-black">
+                {post.title}
+              </div>
             </div>
-          </div>
         </div>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <VisuallyHidden>
           <DialogTitle>{post.title}</DialogTitle>
           <DialogDescription>
-          This dialog contains detailed information about the selected post.
+          {post.description}
         </DialogDescription>
         </VisuallyHidden>
         <PostComponent post={post} context="popup"/>
