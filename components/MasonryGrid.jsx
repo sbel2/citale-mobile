@@ -7,7 +7,7 @@ import Card from '@/components/card';
 const MasonryGrid = ({ posts }) => {
   const breakpointColumnsObj = {
     default: 5,
-    1400: 4,
+    1300: 4,
     1020: 3,
     750: 2
   };

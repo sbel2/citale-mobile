@@ -5,7 +5,7 @@ import React from 'react';
 const SkeletonPost = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 animate-pulse w-full max-w-xs mx-auto">
-      <div className="h-80 bg-gray-300 rounded-md mb-4"></div>
+      <div className="h-60 xl:h-80 bg-gray-300 rounded-md mb-4"></div>
     </div>
   );
 };
