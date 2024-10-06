@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
+import FilterButton from '@/components/Filter';
 import React, { useState } from 'react';
 import { createClient } from "@/supabase/client";
 import { usePathname } from 'next/navigation';
@@ -16,6 +17,7 @@ interface Post {
 export default function Header({ font }: { font?: string }) {
   const [loading, setLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Post[] | null>(null);
+  const [filterOption, setFilterOption] = useState<string | undefined>(undefined);
   const supabase = createClient();
   const pathname = usePathname(); 
 
@@ -42,6 +44,39 @@ export default function Header({ font }: { font?: string }) {
     }
   };
 
+  const handleFilter = async (option: string) => {
+    setFilterOption(option);
+    console.log(`Selected filter: ${option}`);
+    setLoading(true);
+    try {
+      let {data, error} = {data: [], error: null};
+      if(option === 'all'){
+        const { data, error } = await supabase
+        .from('posts')
+        .select('*');
+
+      }
+      else{
+        const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('category', option);
+      }
+      if (error) {
+        console.error('Error fetching posts:', error);
+        alert("Failed to fetch search results."); // User feedback
+      } else {
+        setFilterOption(option ||'all'); // Ensure searchResults is never null
+      }
+
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert("An unexpected error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <header className={`py-1 md:py-3 pt-4 md:pt-6 bg-gray-0 ${font}`}>
       <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
@@ -58,6 +93,7 @@ export default function Header({ font }: { font?: string }) {
           <div className="w-full max-w-sm p-1 sm:p-2"> {/* Adjusted padding */}
             <SearchBar onSearch={handleSearch} />
           </div>
+          
         </div>
         <a
           href="https://forms.gle/fr4anWBWRkeCEgSN6"
@@ -68,6 +104,11 @@ export default function Header({ font }: { font?: string }) {
           How do you like Citale?
         </a>
       </div>
+      
+      <div className="w-55 max-w-xs p-1 sm:p-2" style={{margin: '0 auto'}}>
+        <FilterButton onFilter={handleFilter} />
+      </div>
+      
     </header>
   );
 }
