@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-// import { FiFilter } from "react-icons/fi";  // Import a filter icon from react-icons
 
 interface FilterProps {
     onFilter: (option: string) => Promise<void>;
@@ -14,6 +13,9 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     setFilterOption(option)
     if (option.trim()) {
       router.push(`/filter-results?option=${encodeURIComponent(option)}`);
+    }
+    if (option === 'all'){
+      router.push(`/`)
     }
   };
 

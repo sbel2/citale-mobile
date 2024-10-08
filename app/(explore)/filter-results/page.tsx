@@ -99,7 +99,9 @@ const Filter = () => {
 
 const FilterResult = () => {
   return (
-    <Filter />
+    <Suspense fallback={<div>Loading search parameters...</div>}>
+      <Filter />
+    </Suspense>
   );
 };
 

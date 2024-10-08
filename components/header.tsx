@@ -49,26 +49,29 @@ export default function Header({ font }: { font?: string }) {
     console.log(`Selected filter: ${option}`);
     setLoading(true);
     try {
-      let {data, error} = {data: [], error: null};
       if(option === 'all'){
         const { data, error } = await supabase
         .from('posts')
         .select('*');
-
+        if (error) {
+          console.error('Error fetching posts:', error);
+          alert("Failed to fetch search results."); // User feedback
+        } else {
+          setFilterOption(option ||'all'); // Ensure searchResults is never null
+        }
       }
       else{
         const { data, error } = await supabase
         .from('posts')
         .select('*')
         .eq('category', option);
+        if (error) {
+          console.error('Error fetching posts:', error);
+          alert("Failed to fetch search results."); // User feedback
+        } else {
+          setFilterOption(option ||'all'); // Ensure searchResults is never null
+        }
       }
-      if (error) {
-        console.error('Error fetching posts:', error);
-        alert("Failed to fetch search results."); // User feedback
-      } else {
-        setFilterOption(option ||'all'); // Ensure searchResults is never null
-      }
-
     } catch (error) {
       console.error('Unexpected error:', error);
       alert("An unexpected error occurred. Please try again later.");
