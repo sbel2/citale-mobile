@@ -36,26 +36,32 @@ const Filter = () => {
   }, [selectedOption]);
 
   const handleFilter = async (option: string) => {
-    let { data, error } = { data: [], error: null };
     setLoading(true);
     try {
       if (option === 'all') {
-        ({ data, error } = await supabase
+        const { data, error } = await supabase
           .from('posts')
-          .select('*'));
+          .select('*');
+        if (error) {
+          console.error('Error fetching posts:', error);
+          setError('Failed to load posts');
+        } else {
+          setPosts(data ?? []);
+        }
       } else {
-        ({ data, error } = await supabase
+        const { data, error } = await supabase
           .from('posts')
           .select('*')
-          .eq('category', option));
+          .eq('category', option);
+        if (error) {
+          console.error('Error fetching posts:', error);
+          setError('Failed to load posts');
+        } else {
+          setPosts(data ?? []);
+        }
       }
       
-      if (error) {
-        console.error('Error fetching posts:', error);
-        setError('Failed to load posts');
-      } else {
-        setPosts(data ?? []);
-      }
+      
     } catch (error) {
       console.error('Unexpected error:', error);
       setError('An unexpected error occurred');
