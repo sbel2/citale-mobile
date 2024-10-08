@@ -46,7 +46,7 @@ const Filter = () => {
           console.error('Error fetching posts:', error);
           setError('Failed to load posts');
         } else {
-          setPosts(data ?? []);
+          setPosts(data || []);
         }
       } else {
         const { data, error } = await supabase
@@ -57,7 +57,7 @@ const Filter = () => {
           console.error('Error fetching posts:', error);
           setError('Failed to load posts');
         } else {
-          setPosts(data ?? []);
+          setPosts(data || []);
         }
       }
       
