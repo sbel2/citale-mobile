@@ -7,12 +7,7 @@ import FilterButton from '@/components/Filter';
 import React, { useState } from 'react';
 import { createClient } from "@/supabase/client";
 import { usePathname } from 'next/navigation';
-
-interface Post {
-  id: number;
-  title: string;
-  description: string;
-}
+import { Post } from "@/app/lib/types";
 
 export default function Header({ font }: { font?: string }) {
   const [loading, setLoading] = useState(false);

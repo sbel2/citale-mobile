@@ -5,18 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
+import { Post } from '../../lib/types';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
-
-interface Post {
-    post_id: number;
-    title: string;
-    created_at: string;
-    like_count: number;
-    description?: string;
-    imageUrl?: string;
-    user_id: number;
-}
 
 const supabase = createClient();
 

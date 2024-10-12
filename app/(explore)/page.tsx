@@ -5,21 +5,12 @@ import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { PostgrestError } from '@supabase/supabase-js';
+import { Post } from '../lib/types';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
-interface Post {
-  post_id: number;
-  title: string;
-  description: string;
-  imageUrl: string[];
-  like_count: number;
-  created_at: string;
-  user_id: number;
-}
-
 export default function Home() {
-  const [posts, setPosts] = useState<Post[] | null>(null);
+  const [posts, setPosts] = useState<Post[] | null>(null); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

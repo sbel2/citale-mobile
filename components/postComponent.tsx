@@ -4,19 +4,12 @@ import Linkify from 'react-linkify';
 import Image from 'next/image';
 import styles from "./postComponent.module.css";
 import {useRouter} from 'next/navigation';
+import { Post } from "@/app/lib/types";
 
-//reading in data from backend
+//defining the variables
 interface PostComponentProps {
-  post: {
-    post_id: number;
-    title: string;
-    description: string;
-    imageUrl: string[];
-    like_count: number;
-    created_at: string;
-    user_id: number;
-  };
-  context: 'popup' | 'static'; // Defining possible context values
+  post: Post; 
+  context: 'popup' | 'static'; 
 }
 
 // making the link in post clickable
