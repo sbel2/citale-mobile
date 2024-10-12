@@ -6,37 +6,18 @@ import SearchBar from '@/components/SearchBar';
 import FilterButton from '@/components/Filter';
 import React, { useState } from 'react';
 import { createClient } from "@/supabase/client";
-import { usePathname } from 'next/navigation';
-import { Post } from "@/app/lib/types";
+import { useRouter } from 'next/navigation';
 
 export default function Header({ font }: { font?: string }) {
-  const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<Post[] | null>(null);
   const [filterOption, setFilterOption] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(true);
   const supabase = createClient();
-  const pathname = usePathname(); 
+  
+  const router = useRouter();
 
-  const handleSearch = async (query: string) => {
-    console.log("Searching for:", query);
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
-
-      if (error) {
-        console.error('Error fetching posts:', error);
-        alert("Failed to fetch search results."); // User feedback
-      } else {
-        setSearchResults(data || []); // Ensure searchResults is never null
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      alert("An unexpected error occurred. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+  const searchRoute = async (searchQuery: string) => {
+    // Redirect to search results page with the query in URL
+    router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
   };
 
   const handleFilter = async (option: string) => {
@@ -89,7 +70,7 @@ export default function Header({ font }: { font?: string }) {
         </Link>
         <div className="flex-grow flex justify-center">
           <div className="w-full max-w-sm p-1 sm:p-2"> {/* Adjusted padding */}
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={searchRoute}/>
           </div>
           
         </div>

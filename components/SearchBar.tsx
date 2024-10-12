@@ -1,24 +1,44 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { FiSearch } from 'react-icons/fi'; // Import a search icon from react-icons
+import React, { useState, useEffect } from 'react';
+import { FiSearch } from 'react-icons/fi';
+import { usePathname, useSearchParams } from 'next/navigation';
 
+//defining the type for props that SearchBar will receive
 interface SearchBarProps {
   onSearch: (searchQuery: string) => Promise<void>;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+  // Set searchQuery from URL on mount
+  useEffect(() => {
+    const query = searchParams.get('query');
+    if (query) {
+      setSearchQuery(query); // Set the search query from URL if available
+    }
+  }, [searchParams]);
+
+  //check if user entered a query and calling onsearch to fetch results
+  const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
-    }
+      // Call the onSearch function with the search query
+      await onSearch(searchQuery.trim());
+  }
   };
 
+  // Use effect to clear searchQuery when the user navigates to home
+  useEffect(() => {
+    if (pathname === '/') {
+      setSearchQuery(''); // Clear the search query when at home
+    }
+  }, [pathname]);
+
+
   return (
-    <form onSubmit={handleSearch} style={styles.form}>
+    <form onSubmit={handleSearchSubmit} style={styles.form}>
       <input
         type="text"
         placeholder="Search..."
