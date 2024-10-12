@@ -12,14 +12,12 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    const originalTitle = document.title
     if (isOpen) {
       document.title = post.title;
-    } else {
-      document.title = "Citale | Explore Boston";
     }
-  
     return () => {
-      document.title = "Citale | Explore Boston"; // Cleanup on unmount
+      document.title = originalTitle;
     };
   }, [isOpen, post.title]);
 

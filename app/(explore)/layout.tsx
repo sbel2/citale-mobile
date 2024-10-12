@@ -7,7 +7,7 @@ import { Metadata } from "next";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Citale",
+  title: "Citale | Explore Boston",
   description: "Things to do in Boston",
 };
 

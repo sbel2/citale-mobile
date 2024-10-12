@@ -12,7 +12,7 @@ const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: fal
 const supabase = createClient();
 
 const Filter = () => {
-  const filterParams = useSearchParams(); // Wrap this in a Suspense boundary
+  const filterParams = useSearchParams(); 
   const selectedOption = filterParams.get('option') || 'all';
 
   const [posts, setPosts] = useState<Post[]>([]);

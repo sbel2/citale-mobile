@@ -14,13 +14,18 @@ const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: fal
 const Search = () => {
   const searchParams = useSearchParams(); // Wrap this in a Suspense boundary
   const query = searchParams.get('query');
-
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log('Current query', query);
+    document.title = query ? `${query} - Citale Search` : 'Citale Search';
+  
+    return () => {
+    };
+  }, [query]);
+
+  useEffect(() => {
     const fetchData = async () => {
       if (query) {
         setLoading(true);
@@ -49,10 +54,6 @@ const Search = () => {
   }
 
   return (
-    <>
-    <Head>
-      <title>{query} - Citale Search</title>
-    </Head>
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
       <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
       {posts.length === 0 ? (
@@ -62,7 +63,6 @@ const Search = () => {
       )}
     </div>
     </main>
-    </>
   );
 };
 
