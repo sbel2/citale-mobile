@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
 import FilterButton from '@/components/Filter';
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { createClient } from "@/supabase/client";
 import { useRouter } from 'next/navigation';
 
@@ -69,8 +69,10 @@ export default function Header({ font }: { font?: string }) {
           />
         </Link>
         <div className="flex-grow flex justify-center">
-          <div className="w-full max-w-sm p-1 sm:p-2"> {/* Adjusted padding */}
+          <div className="w-full max-w-sm p-1 sm:p-2">
+          <Suspense fallback={<div>Loading search parameters...</div>}>
             <SearchBar onSearch={searchRoute}/>
+          </Suspense>
           </div>
           
         </div>
