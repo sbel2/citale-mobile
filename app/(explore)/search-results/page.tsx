@@ -6,13 +6,12 @@ import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
 import {handleSearch} from '../../lib/searchUtils'
-import Head from 'next/head';
 
 // Dynamically import other components with Suspense handling
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 const Search = () => {
-  const searchParams = useSearchParams(); // Wrap this in a Suspense boundary
+  const searchParams = useSearchParams();
   const query = searchParams.get('query');
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
