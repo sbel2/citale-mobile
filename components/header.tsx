@@ -50,7 +50,7 @@ export default function Header({ font }: { font?: string }) {
       </div>
       
       {pathname !== "/search-results" &&(
-        <div className="w-full p-1 sm:p-2">
+        <div className="w-full p-1 sm:p-5">
           <FilterButton onFilter={filterRoute} />
         </div>
       )}

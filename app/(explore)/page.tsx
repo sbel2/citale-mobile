@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { PostgrestError } from '@supabase/supabase-js';
 import { Post } from '../lib/types';
+import styles from '@/components/page.module.css';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -38,7 +39,7 @@ export default function Home() {
   if (loading) {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-        <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+        <div className={styles.container}>
           <SkeletonCardRow />
         </div>
       </main>
@@ -51,7 +52,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-      <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+      <div className={styles.container}>
           <MasonryGrid posts={posts}/>
       </div>
     </main>

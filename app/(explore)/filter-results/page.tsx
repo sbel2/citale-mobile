@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
 import {handleFilter} from '../../lib/filterUtils'
+import styles from '@/components/page.module.css'
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -42,7 +43,7 @@ const Filter = () => {
   if (loading && firstLoad) {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-        <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+        <div className={styles.container}>
           <SkeletonCardRow />
         </div>
       </main>
@@ -55,7 +56,7 @@ const Filter = () => {
 
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-      <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+      <div className={styles.container}>
       {posts.length === 0 ? (
         <p className="text-center">No posts found :) </p>
       ) : (
