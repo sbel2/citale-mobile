@@ -2,15 +2,12 @@
 
 import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
 import {handleFilter} from '../../lib/filterUtils'
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
-
-const supabase = createClient();
 
 const Filter = () => {
   const searchParams = useSearchParams(); 
