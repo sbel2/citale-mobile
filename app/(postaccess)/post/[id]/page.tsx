@@ -3,16 +3,7 @@
 import { useEffect, useState } from 'react';
 import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
-
-interface Post {
-  post_id: number;
-  title: string;
-  description: string;
-  imageUrl: string[];
-  like_count: number;
-  created_at: string;
-  user_id: number;
-}
+import { Post } from '../../../lib/types';
 
 export default function Page({ params }: { params: { id: string } }) {
   const { id: post_id } = params;

@@ -6,21 +6,12 @@ import PostComponent from "@/components/postComponent";
 import styles from "./card.module.css";
 import Image from "next/image";
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Post } from "@/app/lib/types";
+import { useRouter } from "next/navigation";
 
-interface CardProps {
-  post: {
-    post_id: number;
-    title: string;
-    description: string;
-    imageUrl: string[];
-    like_count: number;
-    created_at: string;
-    user_id: number;
-  };
-}
-
-const Card: React.FC<CardProps> = ({ post }) => {
+const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (isOpen) {
@@ -40,9 +31,9 @@ const Card: React.FC<CardProps> = ({ post }) => {
   };
 
   const handleClose = () => {
-    window.history.pushState(null, '', '/');
-    setIsOpen(false);
-  };
+    setIsOpen(false); // Close the post dialog or component
+    router.back();
+};
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
