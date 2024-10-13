@@ -5,17 +5,15 @@ interface FilterProps {
     onFilter: (option: string) => Promise<void>;
 }
 
-const LoadingFallback = () => <div>Loading search parameters...</div>;
-
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterOption, setFilterOption] = useState('');
   const filterParams = useSearchParams();
 
-  // Set searchQuery from URL on mount
+  // Set option from URL
   useEffect(() => {
     const option = filterParams.get('option');
     if (option) {
-      setFilterOption(option); // Set the search query from URL if available
+      setFilterOption(option); // Set the filter from URL if available
     }
   }, [filterParams]);
   
@@ -28,7 +26,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   return (
     <form style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
       <button type="button" onClick={() => handleFilterClick('all')} style={filterOption === 'all' ? styles.clicked_button:styles.button }>
-        ALL
+        All
       </button>
       <button type="button" onClick={() => handleFilterClick('Outdoor')} style={filterOption === 'Outdoor' ? styles.clicked_button:styles.button}>
         Outdoor

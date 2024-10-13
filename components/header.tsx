@@ -5,10 +5,12 @@ import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
 import FilterButton from '@/components/Filter';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Header({ font }: { font?: string }) {
   const router = useRouter();
+  const pathname = usePathname();
+
 
   const searchRoute = async (searchQuery: string) => {
     // Redirect to search results page with the query in URL
@@ -47,9 +49,12 @@ export default function Header({ font }: { font?: string }) {
         </a>
       </div>
       
-      <div className="w-55 max-w-xs p-1 sm:p-2" style={{margin: '0 auto'}}>
-        <FilterButton onFilter={filterRoute} />
-      </div>
+
+      {pathname !== "/search-results" &&(
+        <div className="w-55 max-w-xs p-1 sm:p-2" style={{ margin: '0 auto' }}>
+          <FilterButton onFilter={filterRoute} />
+        </div>
+      )}
       
     </header>
   );
