@@ -33,18 +33,30 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   };
 
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+    <>
+    <style jsx>{`
+        .hide-scrollbar {
+          overflow-x: auto; /* Enable horizontal scrolling */
+          -ms-overflow-style: none; /* Internet Explorer and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+        }
+      `}</style>
+    <div className="flex m-2 xl:justify-center hide-scrollbar">
       {categories.map((category) => (
-        <button
-          key={category}
-          type="button"
-          onClick={() => handleFilterClick(category)}
-          style={filterOption === category || (filterOption === '' && category === 'All') ? styles.clicked_button : styles.button}
-        >
-          {category}
-        </button>
+          <button
+              key={category}
+              type="button"
+              onClick={() => handleFilterClick(category)}
+              className={`px-3 py-3 rounded-full text-sm min-w-max ${filterOption === category || (filterOption === '' && category === 'All') ? 'bg-gray-300' : 'bg-white'}`}
+          >
+              {category}
+          </button>
       ))}
     </div>
+    </>
   );
 };
 

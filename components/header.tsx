@@ -4,16 +4,29 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
 import FilterButton from '@/components/Filter';
-import React from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header({ font }: { font?: string }) {
-  const router = useRouter();
   const pathname = usePathname();
+  const router = useRouter();
+  const prevPathnameRef = useRef<string | null>(null);
+  const [fromSearch, setFromSearch] = useState(false);
+
+  useEffect(() => {
+    // Check if the previous pathname was "/search-results"
+    if (prevPathnameRef.current === '/search-results' && pathname.startsWith('/post')) {
+      setFromSearch(true);
+    } else {
+      setFromSearch(false);
+    }
+
+    // Update the ref with the current pathname
+    prevPathnameRef.current = pathname;
+  }, [pathname]);
 
 
   const searchRoute = async (searchQuery: string) => {
-    // Redirect to search results page with the query in URL
     router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
   };
 
@@ -49,8 +62,8 @@ export default function Header({ font }: { font?: string }) {
         </a>
       </div>
       
-      {pathname !== "/search-results" &&(
-        <div className="w-full p-1 sm:p-5">
+      {pathname !== "/search-results" && !fromSearch && (
+        <div className="w-full p-1">
           <FilterButton onFilter={filterRoute} />
         </div>
       )}

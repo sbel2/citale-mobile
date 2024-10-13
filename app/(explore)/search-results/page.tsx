@@ -45,7 +45,9 @@ const Search = () => {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
         <div className={styles.container}>
+          <div className="mt-10">
           <SkeletonCardRow />
+          </div>
         </div>
       </main>
     );
@@ -61,7 +63,9 @@ const Search = () => {
       {posts.length === 0 ? (
         <p className="text-center">No posts found :) </p>
       ) : (
+        <div className = 'mt-10'>
         <MasonryGrid posts={posts} />
+        </div>
       )}
     </div>
     </main>
