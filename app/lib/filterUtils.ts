@@ -8,7 +8,9 @@ export async function handleFilter(option: string) : Promise<Post[] | null> {
     if (option === 'all') {
       const { data, error } = await supabase
         .from('posts')
-        .select('*');
+        .select('*')
+        .order('created_at', { ascending: false })
+        .order('like_count', { ascending: false });
       if (error) {
         console.error('Error fetching posts:', error);
         return null;
@@ -19,7 +21,9 @@ export async function handleFilter(option: string) : Promise<Post[] | null> {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('category', option);
+        .ilike('category', `%${option}%`)
+        .order('created_at', { ascending: false })
+        .order('like_count', { ascending: false });
       if (error) {
         console.error('Error fetching posts:', error);
         return null;
