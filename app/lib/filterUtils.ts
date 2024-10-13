@@ -5,7 +5,7 @@ const supabase = createClient();
 
 export async function handleFilter(option: string) : Promise<Post[] | null> {
   try {
-    if (option === 'all') {
+    if (option === 'All') {
       const { data, error } = await supabase
         .from('posts')
         .select('*')

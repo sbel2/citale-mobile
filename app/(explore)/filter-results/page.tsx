@@ -15,6 +15,7 @@ const Filter = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   useEffect(() => {
     document.title = selectedOption ? `${selectedOption} - Citale Search` : 'Citale Search';
@@ -31,13 +32,14 @@ const Filter = () => {
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);
+        setFirstLoad(false);
       }
     };
 
     fetchData();
   }, [selectedOption]);
 
-  if (loading) {
+  if (loading && firstLoad) {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
         <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
