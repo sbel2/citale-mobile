@@ -12,21 +12,16 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const originalTitle = document.title
     if (isOpen) {
       document.title = post.title;
+    } else {
+      document.title = "Citale | Explore Boston";
     }
+  
     return () => {
-      document.title = originalTitle;
+      document.title = "Citale | Explore Boston"; // Cleanup on unmount
     };
   }, [isOpen, post.title]);
-
-  useEffect(() => {
-    // On page load, check if the current URL contains the post_id, and open the dialog if so
-    if (window.location.pathname === `/post/${post.post_id}`) {
-      setIsOpen(true);
-    }
-  }, [post.post_id]);
 
   const handleClick = () => {
     window.history.pushState(null, '', `/post/${post.post_id}`);
@@ -34,7 +29,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   };
 
   const handleClose = () => {
-    window.history.back();
+    window.history.pushState(null, '', '/');
     setIsOpen(false);
   };
 

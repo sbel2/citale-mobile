@@ -14,7 +14,7 @@ const supabase = createClient();
 
 const Filter = () => {
   const searchParams = useSearchParams(); 
-  const selectedOption = searchParams.get('option') || 'all';
+  const selectedOption = searchParams.get('option');
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
