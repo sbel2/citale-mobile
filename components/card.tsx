@@ -21,13 +21,20 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     };
   }, [isOpen, post.title]);
 
+  useEffect(() => {
+    // On page load, check if the current URL contains the post_id, and open the dialog if so
+    if (window.location.pathname === `/post/${post.post_id}`) {
+      setIsOpen(true);
+    }
+  }, [post.post_id]);
+
   const handleClick = () => {
     window.history.pushState(null, '', `/post/${post.post_id}`);
     setIsOpen(true);
   };
 
   const handleClose = () => {
-    window.history.pushState(null, '', '/');
+    window.history.back();
     setIsOpen(false);
   };
 

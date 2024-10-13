@@ -1,36 +1,40 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect  } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 interface FilterProps {
     onFilter: (option: string) => Promise<void>;
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterOption, setFilterOption] = useState('all');
-  const router = useRouter();
+  const [filterOption, setFilterOption] = useState('');
+  const filterParams = useSearchParams();
 
-  const handleFilter = (option: string) => {
-    setFilterOption(option)
-    if (option.trim()) {
-      router.push(`/filter-results?option=${encodeURIComponent(option)}`);
+  // Set searchQuery from URL on mount
+  useEffect(() => {
+    const option = filterParams.get('option');
+    if (option) {
+      setFilterOption(option); // Set the search query from URL if available
     }
-    if (option === 'all'){
-      router.push(`/`)
-    }
+  }, [filterParams]);
+  
+  //check if user entered a query and calling onsearch to fetch results
+  const handleFilterClick = async (option: string) => {
+    setFilterOption(option);
+    await onFilter(option); // Trigger the filter logic after updating the option
   };
 
   return (
     <form style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-      <button type="button" onClick={() => handleFilter('all')} style={filterOption === 'all' ? styles.clicked_button:styles.button }>
+      <button type="button" onClick={() => handleFilterClick('all')} style={filterOption === 'all' ? styles.clicked_button:styles.button }>
         ALL
       </button>
-      <button type="button" onClick={() => handleFilter('Outdoor')} style={filterOption === 'Outdoor' ? styles.clicked_button:styles.button}>
+      <button type="button" onClick={() => handleFilterClick('Outdoor')} style={filterOption === 'Outdoor' ? styles.clicked_button:styles.button}>
         Outdoor
       </button>
-      <button type="button" onClick={() => handleFilter('Music')} style={filterOption === 'Music' ? styles.clicked_button:styles.button}>
+      <button type="button" onClick={() => handleFilterClick('Music')} style={filterOption === 'Music' ? styles.clicked_button:styles.button}>
         Music
       </button>
-      <button type="button" onClick={() => handleFilter('Museum')} style={filterOption === 'Museum' ? styles.clicked_button:styles.button}>
+      <button type="button" onClick={() => handleFilterClick('Museum')} style={filterOption === 'Museum' ? styles.clicked_button:styles.button}>
         Museum
       </button>
     </form>

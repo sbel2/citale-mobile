@@ -6,60 +6,39 @@ import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
+import {handleFilter} from '../../lib/filterUtils'
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 const supabase = createClient();
 
 const Filter = () => {
-  const filterParams = useSearchParams(); 
-  const selectedOption = filterParams.get('option') || 'all';
-
+  const searchParams = useSearchParams(); 
+  const selectedOption = searchParams.get('option') || 'all';
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (selectedOption) {
-      document.title = `${selectedOption} - Citale Search`;
-      handleFilter(selectedOption);
-    }
+    document.title = selectedOption ? `${selectedOption} - Citale Search` : 'Citale Search';
+  
+    return () => {
+    };
   }, [selectedOption]);
 
-  const handleFilter = async (option: string) => {
-    setLoading(true);
-    try {
-      if (option === 'all') {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*');
-        if (error) {
-          console.error('Error fetching posts:', error);
-          setError('Failed to load posts');
-        } else {
-          setPosts(data || []);
-        }
-      } else {
-        const { data, error } = await supabase
-          .from('posts')
-          .select('*')
-          .eq('category', option);
-        if (error) {
-          console.error('Error fetching posts:', error);
-          setError('Failed to load posts');
-        } else {
-          setPosts(data || []);
-        }
+  useEffect(() => {
+    const fetchData = async () => {
+      if (selectedOption) {
+        setLoading(true);
+        const data = await handleFilter(selectedOption);
+        setPosts(data || []); // Fallback to an empty array if data is null
+        setError(data ? null : 'Failed to load posts'); // Set error if data is null
+        setLoading(false);
       }
-      
-      
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      setError('An unexpected error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, [selectedOption]);
 
   if (loading) {
     return (

@@ -20,40 +20,8 @@ export default function Header({ font }: { font?: string }) {
     router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
   };
 
-  const handleFilter = async (option: string) => {
-    setFilterOption(option);
-    console.log(`Selected filter: ${option}`);
-    setLoading(true);
-    try {
-      if(option === 'all'){
-        const { data, error } = await supabase
-        .from('posts')
-        .select('*');
-        if (error) {
-          console.error('Error fetching posts:', error);
-          alert("Failed to fetch search results."); // User feedback
-        } else {
-          setFilterOption(option ||'all'); // Ensure searchResults is never null
-        }
-      }
-      else{
-        const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('category', option);
-        if (error) {
-          console.error('Error fetching posts:', error);
-          alert("Failed to fetch search results."); // User feedback
-        } else {
-          setFilterOption(option ||'all'); // Ensure searchResults is never null
-        }
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      alert("An unexpected error occurred. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+  const filterRoute = async (option: string) => {
+    router.push(`/filter-results?option=${encodeURIComponent(option)}`);
   };
 
   return (
@@ -87,7 +55,7 @@ export default function Header({ font }: { font?: string }) {
       </div>
       
       <div className="w-55 max-w-xs p-1 sm:p-2" style={{margin: '0 auto'}}>
-        <FilterButton onFilter={handleFilter} />
+        <FilterButton onFilter={filterRoute} />
       </div>
       
     </header>
