@@ -11,7 +11,7 @@ import {handleSearch} from '../../lib/searchUtils'
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 const Search = () => {
-  const searchParams = useSearchParams(); 
+  const searchParams = useSearchParams(); // Wrap this in a Suspense boundary
   const query = searchParams.get('query');
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +67,7 @@ const Search = () => {
 
 const SearchResult = () => {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div>Loading search parameters...</div>}>
       <Search />
     </Suspense>
   );

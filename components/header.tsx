@@ -33,7 +33,7 @@ export default function Header({ font }: { font?: string }) {
         </Link>
         <div className="flex-grow flex justify-center">
           <div className="w-full max-w-sm p-1 sm:p-2">
-          <Suspense fallback={<div>Loading search parameters...</div>}>
+          <Suspense fallback={null}>
             <SearchBar onSearch={searchRoute}/>
           </Suspense>
           </div>
