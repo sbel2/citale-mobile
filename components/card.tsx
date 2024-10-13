@@ -7,9 +7,11 @@ import styles from "./card.module.css";
 import Image from "next/image";
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
+import { useRouter } from "next/navigation";
 
 const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (isOpen) {
@@ -29,9 +31,9 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   };
 
   const handleClose = () => {
-    window.history.pushState(null, '', '/');
-    setIsOpen(false);
-  };
+    setIsOpen(false); // Close the post dialog or component
+    router.back();
+};
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect , Suspense } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import {useSearchParams, usePathname} from 'next/navigation';
 
 interface FilterProps {
     onFilter: (option: string) => Promise<void>;
@@ -8,14 +8,23 @@ interface FilterProps {
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterOption, setFilterOption] = useState('');
   const filterParams = useSearchParams();
+  const pathname = usePathname();
 
-  // Set option from URL
+  const categories = [
+    'All','Outdoor', 'Sport', 'Photography', 'Back Bay', 'Beacon Hill', 'Shopping', 'Market',
+    'Music', 'Dating', 'Performance', 'Event', 'Museum', 'Food', 'Art'
+  ];
+
   useEffect(() => {
     const option = filterParams.get('option');
-    if (option) {
-      setFilterOption(option); // Set the filter from URL if available
+
+    // Check if the current pathname is the home page
+    if (pathname === '/' || pathname === '/home') {
+        setFilterOption('All'); // Default to 'All' if on home page
+    } else if (option) {
+        setFilterOption(option); // Set the search query from URL if available
     }
-  }, [filterParams]);
+}, [filterParams, pathname]);
   
   //check if user entered a query and calling onsearch to fetch results
   const handleFilterClick = async (option: string) => {
@@ -24,20 +33,18 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   };
 
   return (
-    <form style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-      <button type="button" onClick={() => handleFilterClick('all')} style={filterOption === 'all' ? styles.clicked_button:styles.button }>
-        All
-      </button>
-      <button type="button" onClick={() => handleFilterClick('Outdoor')} style={filterOption === 'Outdoor' ? styles.clicked_button:styles.button}>
-        Outdoor
-      </button>
-      <button type="button" onClick={() => handleFilterClick('Music')} style={filterOption === 'Music' ? styles.clicked_button:styles.button}>
-        Music
-      </button>
-      <button type="button" onClick={() => handleFilterClick('Museum')} style={filterOption === 'Museum' ? styles.clicked_button:styles.button}>
-        Museum
-      </button>
-    </form>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+      {categories.map((category) => (
+        <button
+          key={category}
+          type="button"
+          onClick={() => handleFilterClick(category)}
+          style={filterOption === category || (filterOption === '' && category === 'All') ? styles.clicked_button : styles.button}
+        >
+          {category}
+        </button>
+      ))}
+    </div>
   );
 };
 
