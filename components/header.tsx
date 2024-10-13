@@ -4,15 +4,10 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
 import FilterButton from '@/components/Filter';
-import React, { Suspense, useState } from 'react';
-import { createClient } from "@/supabase/client";
+import React, { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function Header({ font }: { font?: string }) {
-  const [filterOption, setFilterOption] = useState<string | undefined>(undefined);
-  const [loading, setLoading] = useState<boolean>(true);
-  const supabase = createClient();
-  
   const router = useRouter();
 
   const searchRoute = async (searchQuery: string) => {
