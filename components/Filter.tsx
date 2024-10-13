@@ -1,9 +1,11 @@
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect , Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 interface FilterProps {
     onFilter: (option: string) => Promise<void>;
 }
+
+const LoadingFallback = () => <div>Loading search parameters...</div>;
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterOption, setFilterOption] = useState('');
@@ -41,6 +43,14 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   );
 };
 
+const Filter = (props: FilterProps) => {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <FilterButton {...props} />
+    </Suspense>
+  );
+};
+
 const styles = {
   form: {
     display: 'flex',
@@ -70,4 +80,6 @@ const styles = {
   }
 }
 
-export default FilterButton;
+
+
+export default Filter;
