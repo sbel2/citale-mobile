@@ -10,15 +10,14 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
-  // Set searchQuery from URL on mount
   useEffect(() => {
-    const query = searchParams.get('query');
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('query');
     if (query) {
       setSearchQuery(query); // Set the search query from URL if available
     }
-  }, [searchParams]);
+  }, []); 
 
   //check if user entered a query and calling onsearch to fetch results
   const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
