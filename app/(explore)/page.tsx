@@ -1,25 +1,17 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/supabase/client';
 import dynamic from 'next/dynamic';
 import SkeletonCardRow from '@/components/SkeletonPost';
 import { PostgrestError } from '@supabase/supabase-js';
+import { Post } from '../lib/types';
+import styles from '@/components/page.module.css';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
-interface Post {
-  post_id: number;
-  title: string;
-  description: string;
-  imageUrl: string[];
-  like_count: number;
-  created_at: string;
-  user_id: number;
-}
-
 export default function Home() {
-  const [posts, setPosts] = useState<Post[] | null>(null);
+  const [posts, setPosts] = useState<Post[] | null>(null); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,7 +39,7 @@ export default function Home() {
   if (loading) {
     return (
       <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-        <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+        <div className={styles.container}>
           <SkeletonCardRow />
         </div>
       </main>
@@ -60,7 +52,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen mx-auto max-w-[100rem] overflow-x-hidden">
-      <div className="px-2 pb-8 pt-10 md:px-10 md:pb-20">
+      <div className={styles.container}>
           <MasonryGrid posts={posts}/>
       </div>
     </main>

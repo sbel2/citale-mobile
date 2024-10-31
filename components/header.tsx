@@ -3,43 +3,35 @@
 import Link from "next/link";
 import Image from "next/legacy/image";
 import SearchBar from '@/components/SearchBar';
-import React, { useState } from 'react';
-import { createClient } from "@/supabase/client";
-import { usePathname } from 'next/navigation';
-
-interface Post {
-  id: number;
-  title: string;
-  description: string;
-}
+import FilterButton from '@/components/Filter';
+import React, { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Header({ font }: { font?: string }) {
-  const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<Post[] | null>(null);
-  const supabase = createClient();
-  const pathname = usePathname(); 
+  const pathname = usePathname();
+  const router = useRouter();
+  const prevPathnameRef = useRef<string | null>(null);
+  const [fromSearch, setFromSearch] = useState(false);
 
-  const handleSearch = async (query: string) => {
-    console.log("Searching for:", query);
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%`);
-
-      if (error) {
-        console.error('Error fetching posts:', error);
-        alert("Failed to fetch search results."); // User feedback
-      } else {
-        setSearchResults(data || []); // Ensure searchResults is never null
-      }
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      alert("An unexpected error occurred. Please try again later.");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    // Check if the previous pathname was "/search-results"
+    if (prevPathnameRef.current === '/search-results' && pathname.startsWith('/post')) {
+      setFromSearch(true);
+    } else {
+      setFromSearch(false);
     }
+
+    // Update the ref with the current pathname
+    prevPathnameRef.current = pathname;
+  }, [pathname]);
+
+
+  const searchRoute = async (searchQuery: string) => {
+    router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
+  };
+
+  const filterRoute = async (option: string) => {
+    router.push(`/filter-results?option=${encodeURIComponent(option)}`);
   };
 
   return (
@@ -55,9 +47,10 @@ export default function Header({ font }: { font?: string }) {
           />
         </Link>
         <div className="flex-grow flex justify-center">
-          <div className="w-full max-w-sm p-1 sm:p-2"> {/* Adjusted padding */}
-            <SearchBar onSearch={handleSearch} />
+          <div className="w-full max-w-sm p-1 sm:p-2">
+            <SearchBar onSearch={searchRoute}/>
           </div>
+          
         </div>
         <a
           href="https://forms.gle/fr4anWBWRkeCEgSN6"
@@ -68,6 +61,13 @@ export default function Header({ font }: { font?: string }) {
           How do you like Citale?
         </a>
       </div>
+      
+      {pathname !== "/search-results" && !fromSearch && (
+        <div className="w-full p-1">
+          <FilterButton onFilter={filterRoute} />
+        </div>
+      )}
+      
     </header>
   );
 }
