@@ -19,7 +19,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     const option = filterParams.get('option');
 
     // Check if the current pathname is the home page
-    if (pathname === '/' || pathname === '/home') {
+    if (pathname === '/') {
         setFilterOption('All'); // Default to 'All' if on home page
     } else if (option) {
         setFilterOption(option); // Set the search query from URL if available

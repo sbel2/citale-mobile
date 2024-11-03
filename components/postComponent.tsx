@@ -97,28 +97,43 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     <>
       <div className={`${styles.card} ${headerClass}`}>
         <div 
-          className={styles.imagecontainer}
+          className={post.is_video ? styles.videocontainer : styles.imagecontainer}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {post.mediaUrl.length > 0 && (
+          {post.is_video ? (
+            // Video display if the post is a video
+            <video
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.mediaUrl[currentImageIndex]}`}
+              controls
+              className="w-full h-full object-cover"
+              poster={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
+            />
+          ) : (
+            // Image display if the post is an image
             <Image
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
-              style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
+              style={{ objectFit: "contain" }}
             />
           )}
-          {post.mediaUrl.length > 1 && (
+          {post.mediaUrl.length > 1 && !post.is_video && (
             <div className={styles.navigation}>
-              <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
-              <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
+              <button className={styles.navbutton} onClick={handlePrevious} aria-label="Previous Image">
+                &lt;
+              </button>
+              <button className={styles.navbutton} onClick={handleNext} aria-label="Next Image">
+                &gt;
+              </button>
             </div>
           )}
-          <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-            {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
-          </span>
+          {!post.is_video && (
+            <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+              {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
+            </span>
+          )}
         </div>
         {/* element for the text, header, and footer */}
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
