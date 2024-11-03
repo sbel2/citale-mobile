@@ -20,7 +20,7 @@ export default function Home() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from('posts')
-        .select('post_id, title, description, is_video, mediaUrl, user_id, like_count, created_at')
+        .select('post_id, title, description, is_video, mediaUrl, thumbnailUrl, user_id, like_count, created_at')
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
 
@@ -30,9 +30,7 @@ export default function Home() {
         return;
       }
 
-      // Filter out posts where is_video is true
-      const imagePosts = data?.filter((post: Post) => !post.is_video) || null;
-      setPosts(imagePosts);
+      setPosts(data);
       setLoading(false);
     };
 
