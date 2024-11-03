@@ -44,7 +44,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const router = useRouter();
-  const apiKey = 'AIzaSyAOlzSrpt-fabOsqzxr4SLkc_0GKCqQaoM';  // google map api key
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
 
   const handlePrevious = () => {
