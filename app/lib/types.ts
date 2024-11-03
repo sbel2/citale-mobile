@@ -3,6 +3,7 @@ export interface Post {
     post_id: number;
     title: string;
     description: string;
+    is_video: boolean;
     mediaUrl: string[];
     like_count: number;
     created_at: string;
