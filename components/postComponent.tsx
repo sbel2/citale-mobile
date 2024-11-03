@@ -94,7 +94,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     <>
       <div className={`${styles.card} ${headerClass}`}>
         <div 
-          className={styles.imagecontainer}
+          className={post.is_video ? styles.videocontainer : styles.imagecontainer}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -104,7 +104,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             <video
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.mediaUrl[currentImageIndex]}`}
               controls
-              className="w-full h-full object-contain"
+              className="w-full h-full object-cover"
               poster={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
             />
           ) : (
