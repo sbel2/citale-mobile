@@ -44,6 +44,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const router = useRouter();
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const address = post.mapUrl;
 
   const handlePrevious = () => {
     const newIndex =
@@ -88,7 +90,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     if (touchEndX.current - touchStartX.current > 50) {
       handlePrevious(); // Swipe right to move to the previous image
     }
-  };
+  }
+
 
   return (
     <>
@@ -153,6 +156,20 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             <div className={styles.preformattedtext}>
               <Linkify componentDecorator={linkDecorator}>{post.description}</Linkify>
             </div>
+            {address && (
+              <div className={styles.mapUrl}>
+              {(() => {
+                const encodedAddress = encodeURIComponent(address);
+                const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
+                return (
+                  <iframe
+                    className={styles.mapIframe}
+                    src={mapUrl}
+                  ></iframe>
+                );
+              })()}
+              </div>
+            )}
             <div className='text-xs text-gray-500 mt-5'>{post.created_at}</div>
           </div>
           <div className={styles.footer}>
@@ -170,7 +187,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             </button>
           </div>
         </div>
-      </div>
+        </div>
+
       {context === 'static' && (
         <button
           className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'

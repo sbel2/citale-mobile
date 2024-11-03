@@ -143,6 +143,23 @@
       box-shadow: 0 -2px 2px -2px rgba(0, 0, 0, 0.3);
     }
 
+    .mapUrl {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      height: 150px;
+      background-color: white;
+      border-radius: 15px;
+      padding: 10px;
+    }
+
+    .mapIframe{
+      width: 100%;
+      height: 150px;
+      border: none;
+      border-radius: 15px;
+    }
+
 
     @media (max-width: 768px) {
       .footer {

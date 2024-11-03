@@ -5,6 +5,7 @@ export interface Post {
     description: string;
     is_video: boolean;
     mediaUrl: string[];
+    mapUrl: string;
     thumbnailUrl: string;
     like_count: number;
     created_at: string;
