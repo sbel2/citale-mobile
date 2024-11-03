@@ -47,13 +47,13 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   const handlePrevious = () => {
     const newIndex =
-      currentImageIndex > 0 ? currentImageIndex - 1 : post.imageUrl.length - 1;
+      currentImageIndex > 0 ? currentImageIndex - 1 : post.mediaUrl.length - 1;
     setCurrentImageIndex(newIndex);
   };
 
   const handleNext = () => {
     const newIndex =
-      currentImageIndex < post.imageUrl.length - 1 ? currentImageIndex + 1 : 0;
+      currentImageIndex < post.mediaUrl.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
   };
 
@@ -99,22 +99,22 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {post.imageUrl.length > 0 && (
+          {post.mediaUrl.length > 0 && (
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
               style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
             />
           )}
-          {post.imageUrl.length > 1 && (
+          {post.mediaUrl.length > 1 && (
             <div className={styles.navigation}>
               <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
               <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
             </div>
           )}
           <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-            {`${currentImageIndex + 1}/${post.imageUrl.length}`}
+            {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
           </span>
         </div>
         {/* element for the text, header, and footer */}

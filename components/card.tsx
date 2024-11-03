@@ -48,7 +48,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         <div onClick={handleClick} className="cursor-pointer">
           <div className={styles['image-container']}>
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[0]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
               alt={post.title}
               width={300}
               height={200}

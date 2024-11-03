@@ -3,7 +3,7 @@ export interface Post {
     post_id: number;
     title: string;
     description: string;
-    imageUrl: string[];
+    mediaUrl: string[];
     like_count: number;
     created_at: string;
     category?: string;
