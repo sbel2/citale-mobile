@@ -54,10 +54,11 @@
 
       .videocontainer{
         width: 100%;
-        height: 81vh; /* Full viewport height for videos */
+        height: 80vh; /* Full viewport height for videos */
         position:relative;
         top: 75px; /* Set top to the height of the header */
         margin-bottom: 70px; /* Bottom margin equal to the footer height */
+        overflow: hidden;
       }
     }
 
@@ -146,7 +147,7 @@
       display: flex;
       justify-content: flex-end;
       width: 100%;
-      height: 175px;
+      height: 160px;
       align-items: center;
       background-color: white;
       border-radius: 15px;
