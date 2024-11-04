@@ -107,8 +107,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             <video
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.mediaUrl[currentImageIndex]}`}
               controls
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
               poster={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
+              playsInline
             />
           ) : (
             // Image display if the post is an image
