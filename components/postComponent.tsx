@@ -158,19 +158,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               <Linkify componentDecorator={linkDecorator}>{post.description}</Linkify>
             </div>
             {address && (
-              <div className="pt-4"> 
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.mapUrl}
-              >
-                <iframe
-                  className={styles.mapIframe}
-                  src={`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(address)}`}
-                  allowFullScreen
-                ></iframe>
-              </a>
+              <div className={styles.mapUrl}>
+              {(() => {
+                const encodedAddress = encodeURIComponent(address);
+                const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
+                return (
+                  <iframe
+                    className={styles.mapIframe}
+                    src={mapUrl}
+                  ></iframe>
+                );
+              })()}
               </div>
             )}
             <div className='text-xs text-gray-500 mt-5'>{post.created_at}</div>
