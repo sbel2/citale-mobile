@@ -157,14 +157,15 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             <div className={styles.preformattedtext}>
               <Linkify componentDecorator={linkDecorator}>{post.description}</Linkify>
             </div>
+            {/* map visualization code */}
             {address && (
-              <div className={styles.mapUrl}>
+              <div className="flex justify-end w-full h-40 items-center bg-white rounded-lg pt-4">
               {(() => {
                 const encodedAddress = encodeURIComponent(address);
                 const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
                 return (
                   <iframe
-                    className={styles.mapIframe}
+                    className="w-full h-36 border-none rounded-lg"
                     src={mapUrl}
                   ></iframe>
                 );
