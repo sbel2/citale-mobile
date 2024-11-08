@@ -38,16 +38,6 @@ function isValidUrl(string: string): boolean {
 
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
-  useEffect(() => {
-    // Add the `body-no-scroll` class to the body
-    document.body.classList.add("no-scroll");
-
-    // Remove the class on unmount
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, []);
-
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
