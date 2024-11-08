@@ -176,9 +176,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
                 const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
                 return (
                   <iframe
-                    className={`${styles.mapFrame}w-full h-36 border-none rounded-lg`}
+                    className="w-full h-36 border-none rounded-lg"
                     src={mapUrl}
-                    tabIndex={-1}
                   ></iframe>
                 );
               })()}
