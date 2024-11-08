@@ -109,6 +109,15 @@
         padding: 0px;
         }
 
+    .mapFrame {
+      outline: none; /* Prevents focus outline */
+    }
+    
+    .mapFrame:focus {
+      outline: none; /* Ensures no focus styles are applied */
+      box-shadow: none; /* Removes any shadow effects */
+    }
+        
     .header{
     height: 75px;
     display: flex;
