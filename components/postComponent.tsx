@@ -161,7 +161,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               <p>Citale</p>
             </div>
           </div>
-          <div className={`${styles.content} mt-2 mb-2`}>
+          <div className={`${styles.content} mt-8 mb-2`}>
             <h4 className='text-lg font-bold mb-4 text-black'>
               {post.title}
             </h4>
@@ -183,7 +183,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               })()}
               </div>
             )}
-            <div className='text-xs text-gray-500 mt-5'>{post.created_at}</div>
+            <div className='text-xs text-gray-500 mt-10 mb-20'>{post.created_at}</div>
           </div>
           <div className={styles.footer}>
             <button className="flex items-center p-1 pr-8" onClick={handleLike}>
