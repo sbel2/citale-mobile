@@ -160,6 +160,16 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               />
               <p>Citale</p>
             </div>
+            {context === 'static' && (
+              <button
+                className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+                style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+                onClick={handleBack}
+                aria-label='Close Post'
+              >
+                &#x2715;
+              </button>
+            )}
           </div>
           <div className={`${styles.content} mt-2 mb-2`}>
             <h4 className='text-lg font-bold mb-4 text-black'>
@@ -201,16 +211,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           </div>
         </div>
         </div>
-      {context === 'static' && (
-        <button
-          className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
-          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-          onClick={handleBack}
-          aria-label='Close Post'
-        >
-          &#x2715;
-        </button>
-      )}
     </>
   );
 };
