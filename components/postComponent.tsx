@@ -178,6 +178,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
                   <iframe
                     className={`${styles.mapFrame}w-full h-36 border-none rounded-lg`}
                     src={mapUrl}
+                    tabIndex={-1}
                   ></iframe>
                 );
               })()}
