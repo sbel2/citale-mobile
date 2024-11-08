@@ -76,7 +76,7 @@
     }
     
     /* Chrome-specific styles */
-    @supports (backdrop-filter: blur(0)) {
+    @supports (backdrop-filter: blur(0)) and (not (-webkit-backdrop-filter: blur(0))) {
       .videocontainer {
           height: 80%;
       }

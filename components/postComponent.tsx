@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Linkify from 'react-linkify';
 import Image from 'next/image';
 import styles from "./postComponent.module.css";
@@ -37,6 +37,17 @@ function isValidUrl(string: string): boolean {
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
+
+  useEffect(() => {
+    // Add the `body-no-scroll` class to the body
+    document.body.classList.add("body-no-scroll");
+
+    // Remove the class on unmount
+    return () => {
+      document.body.classList.remove("body-no-scroll");
+    };
+  }, []);
+
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -190,7 +201,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           </div>
         </div>
         </div>
-
       {context === 'static' && (
         <button
           className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
