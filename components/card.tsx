@@ -25,15 +25,6 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     };
   }, [isOpen, post.title]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    }
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [isOpen]);
-
   const handleClick = () => {
     window.history.pushState(null, '', `/post/${post.post_id}`);
     setIsOpen(true);
@@ -108,7 +99,6 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         <DialogClose 
           onClick={handleClose}
           aria-label="Close"
-          className = "fixed"
         >
         </DialogClose>
       </DialogContent>

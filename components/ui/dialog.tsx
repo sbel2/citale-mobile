@@ -46,7 +46,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogClose className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
+      <DialogClose className="fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
         <X className="h-6 w-6" />
       </DialogClose>
     </DialogPrimitive.Content>
