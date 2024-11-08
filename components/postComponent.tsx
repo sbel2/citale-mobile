@@ -40,11 +40,11 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   useEffect(() => {
     // Add the `body-no-scroll` class to the body
-    document.body.classList.add("body-no-scroll");
+    document.body.classList.add("no-scroll");
 
     // Remove the class on unmount
     return () => {
-      document.body.classList.remove("body-no-scroll");
+      document.body.classList.remove("no-scroll");
     };
   }, []);
 
@@ -106,7 +106,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   return (
     <>
-      <div className={`${styles.card} ${headerClass} ${styles["full-viewport-height"]}`}>
+      <div className={`${styles.card} ${headerClass}`}>
         <div 
           className={post.is_video ? styles.videocontainer : styles.imagecontainer}
           onTouchStart={handleTouchStart}

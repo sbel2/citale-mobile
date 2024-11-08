@@ -69,6 +69,11 @@
   .text-balance {
     text-wrap: balance;
   }
+  .no-scroll {
+    overflow: hidden; /* Disable scrolling */
+    position: fixed; /* Prevent background movement */
+    width: 100%; /* Ensure full width */
+  }
 }
 
 .my-masonry-grid {
