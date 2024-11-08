@@ -53,11 +53,12 @@
         position: relative; /* Adjust if necessary */
         top: 75px; /* Set top to the height of the header */
         margin-bottom: 70px; /* Bottom margin equal to the footer height */
+        overflow: hidden;
       }
 
       .videocontainer {
         width: 100%;
-        height: 60%; /* Default for unsupported browsers */
+        height: 60%;
         position: relative;
         top: 75px; /* Set top to the height of the header */
         margin-bottom: 70px; /* Bottom margin equal to the footer height */
