@@ -203,7 +203,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         </div>
         {context === 'static' && (
               <button
-                className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+                className='fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
                 style={{ width: "30px", height: "30px", lineHeight: "30px" }}
                 onClick={handleBack}
                 aria-label='Close Post'

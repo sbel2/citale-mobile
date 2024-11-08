@@ -99,6 +99,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         <DialogClose 
           onClick={handleClose}
           aria-label="Close"
+          className = "fixed"
         >
         </DialogClose>
       </DialogContent>
