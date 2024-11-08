@@ -1,3 +1,13 @@
+.full-viewport-height {
+  height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  .full-viewport-height {
+    height: 100dvh;
+  }
+}
+
 .card {
   background: white;
   overflow: auto;

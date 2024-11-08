@@ -106,7 +106,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   return (
     <>
-      <div className={`${styles.card} ${headerClass}`}>
+      <div className={`${styles.card} ${headerClass} ${styles["full-viewport-height"]}`}>
         <div 
           className={post.is_video ? styles.videocontainer : styles.imagecontainer}
           onTouchStart={handleTouchStart}
