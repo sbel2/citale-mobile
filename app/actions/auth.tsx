@@ -9,6 +9,9 @@ export const signUpUser = async ({ email, password }: { email: string; password:
     if (error.message.includes('User already registered')) { 
       throw new Error('This email is already registered. Please proceed to sign in.');
     }
+    else if(error.code == "email_not_confirmed"){
+      throw new Error('This email has not been verified. Please check your inbox.');
+    }
     throw new Error(error.message);
   }
   

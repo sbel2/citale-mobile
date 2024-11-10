@@ -13,7 +13,8 @@ export default function SignInPage() {
       const result = await signInUser({ email, password });
       // Handle success (e.g., redirect or update UI)
       console.log('Sign-in successful:', result);
-      setError(null);
+      console.log(email , password);
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -21,7 +22,7 @@ export default function SignInPage() {
 
   return (
     <div>
-      <SignInForm onSubmit={handleSignIn} />
+      <SignInForm onSignIn={handleSignIn} />
     </div>
   );
 }

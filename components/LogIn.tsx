@@ -4,10 +4,10 @@
 import { useState } from 'react';
 
 type LogInFormProps = {
-  onSubmit: (email: string, password: string) => Promise<void>;
+  onSignIn: (email: string, password: string) => Promise<void>;
 };
 
-export default function LogInForm({ onSubmit }: LogInFormProps) {
+export default function LogInForm({ onSignIn }: LogInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
@@ -17,9 +17,16 @@ export default function LogInForm({ onSubmit }: LogInFormProps) {
     setMessage(null); // Reset message on new submit attempt
 
     try {
-      await onSubmit(email, password);
-      setMessage({ text: 'Sign-in successful! Redirecting...', type: 'success' });
+      const response = await onSignIn(email, password);
+      if (response.status === 200){
+        setMessage({ text: 'Sign-in successful! Redirecting...', type: 'success' });
+      }
+      else if (response.status === 400){
+        setMessage({ text: 'Password incorrect. Please try again', type: 'error' });
+      }
+
     } catch (err) {
+      console.error('Sign-in error:', err);
       if (err instanceof Error) {
         // Differentiate messages based on error content
         if (err.message.includes('Invalid login credentials')) {
@@ -38,7 +45,7 @@ export default function LogInForm({ onSubmit }: LogInFormProps) {
   return (
     <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
       <h1 className="text-2xl font-semibold mb-4 text-gray-800">Sign In</h1>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col">
+      <form onSignIn={handleSubmit} className="w-full flex flex-col">
         <input
           type="email"
           placeholder="Email"
