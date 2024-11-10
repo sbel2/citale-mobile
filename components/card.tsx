@@ -47,13 +47,38 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
       <DialogTrigger asChild>
         <div onClick={handleClick} className="cursor-pointer">
           <div className={styles['image-container']}>
-            <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[0]}`}
-              alt={post.title}
-              width={300}
-              height={200}
-              className="transition-transform duration-500 ease-in-out transform"
-            />
+            {post.is_video ? (
+              <>
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
+                  alt={post.title}
+                  width={300}
+                  height={200}
+                  className="transition-transform duration-500 ease-in-out transform"
+                />
+                <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="white"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    className="text-white"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </>
+            ) : (
+              // Otherwise, display the image
+                <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
+                alt={post.title}
+                width={300}
+                height={200}
+                className="transition-transform duration-500 ease-in-out transform"
+              />
+            )}
             <div className={styles['overlay']}></div>
           </div>
             <div className="px-2 py-3">

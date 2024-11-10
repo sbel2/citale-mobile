@@ -7,7 +7,7 @@ export async function handleSearch(query: string): Promise<Post[] | null> {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .select('post_id, title, description, imageUrl, user_id, like_count, created_at')
+      .select('post_id, title, description, is_video, mediaUrl, thumbnailUrl, mapUrl,user_id, like_count, created_at')
       .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
       .order('created_at', { ascending: false })
       .order('like_count', { ascending: false });

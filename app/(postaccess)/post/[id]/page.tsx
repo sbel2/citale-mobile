@@ -16,7 +16,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const fetchPostData = async () => {
       const { data, error } = await supabase
         .from("posts")
-        .select("post_id, title, description, imageUrl, user_id, like_count, created_at")
+        .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at")
         .eq("post_id", post_id)
         .single();
 

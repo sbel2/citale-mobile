@@ -39,14 +39,14 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "dialog-content fixed inset-0 z-50 grid w-full h-full transform-none overflow-auto bg-white duration-200 sm:rounded-lg",
+        "dialog-content fixed inset-0 z-50 grid w-full h-full transform-none overflow-hidden bg-white duration-200 sm:rounded-lg",
         "md:w-[720px] md:max-w-4xl md:h-[575px] xl:w-[810px] xl:h-[645px] xl:w-[855px] xl:h-[684px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
         className
       )}
       {...props}
     >
       {children}
-      <DialogClose className="absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
+      <DialogClose className="fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
         <X className="h-6 w-6" />
       </DialogClose>
     </DialogPrimitive.Content>

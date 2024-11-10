@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Linkify from 'react-linkify';
 import Image from 'next/image';
 import styles from "./postComponent.module.css";
@@ -37,6 +37,7 @@ function isValidUrl(string: string): boolean {
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
+
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -44,16 +45,18 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const router = useRouter();
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const address = post.mapUrl;
 
   const handlePrevious = () => {
     const newIndex =
-      currentImageIndex > 0 ? currentImageIndex - 1 : post.imageUrl.length - 1;
+      currentImageIndex > 0 ? currentImageIndex - 1 : post.mediaUrl.length - 1;
     setCurrentImageIndex(newIndex);
   };
 
   const handleNext = () => {
     const newIndex =
-      currentImageIndex < post.imageUrl.length - 1 ? currentImageIndex + 1 : 0;
+      currentImageIndex < post.mediaUrl.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
   };
 
@@ -88,34 +91,51 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     if (touchEndX.current - touchStartX.current > 50) {
       handlePrevious(); // Swipe right to move to the previous image
     }
-  };
+  }
+
 
   return (
     <>
       <div className={`${styles.card} ${headerClass}`}>
         <div 
-          className={styles.imagecontainer}
+          className={post.is_video ? styles.videocontainer : styles.imagecontainer}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {post.imageUrl.length > 0 && (
+          {post.is_video ? (
+            // Video display if the post is a video
+            <video
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.mediaUrl[currentImageIndex]}`}
+              controls
+              className="w-full h-full object-contain"
+              poster={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
+              playsInline
+            />
+          ) : (
+            // Image display if the post is an image
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.imageUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
-              style={{ objectFit: 'contain' }} // Use objectFit to control how the image scales
+              style={{ objectFit: "contain" }}
             />
           )}
-          {post.imageUrl.length > 1 && (
+          {post.mediaUrl.length > 1 && !post.is_video && (
             <div className={styles.navigation}>
-              <button className={styles.navbutton} onClick={handlePrevious} aria-label='Previous Image'>&lt;</button>
-              <button className={styles.navbutton} onClick={handleNext} aria-label='Next Image'>&gt;</button>
+              <button className={styles.navbutton} onClick={handlePrevious} aria-label="Previous Image">
+                &lt;
+              </button>
+              <button className={styles.navbutton} onClick={handleNext} aria-label="Next Image">
+                &gt;
+              </button>
             </div>
           )}
-          <span className='absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs'>
-            {`${currentImageIndex + 1}/${post.imageUrl.length}`}
-          </span>
+          {!post.is_video && (
+            <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+              {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
+            </span>
+          )}
         </div>
         {/* element for the text, header, and footer */}
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
@@ -131,14 +151,29 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               <p>Citale</p>
             </div>
           </div>
-          <div className={`${styles.content} mt-2 mb-2`}>
+          <div className={`${styles.content} mt-8 mb-2`}>
             <h4 className='text-lg font-bold mb-4 text-black'>
               {post.title}
             </h4>
             <div className={styles.preformattedtext}>
               <Linkify componentDecorator={linkDecorator}>{post.description}</Linkify>
             </div>
-            <div className='text-xs text-gray-500 mt-5'>{post.created_at}</div>
+            {/* map visualization code */}
+            {address && (
+              <div className="flex justify-end w-full h-40 items-center bg-white rounded-lg pt-4">
+              {(() => {
+                const encodedAddress = encodeURIComponent(address);
+                const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodedAddress}`;
+                return (
+                  <iframe
+                    className="w-full h-36 border-none rounded-lg"
+                    src={mapUrl}
+                  ></iframe>
+                );
+              })()}
+              </div>
+            )}
+            <div className='text-xs text-gray-500 mt-10 mb-20'>{post.created_at}</div>
           </div>
           <div className={styles.footer}>
             <button className="flex items-center p-1 pr-8" onClick={handleLike}>
@@ -155,17 +190,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             </button>
           </div>
         </div>
-      </div>
-      {context === 'static' && (
-        <button
-          className='absolute top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
-          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-          onClick={handleBack}
-          aria-label='Close Post'
-        >
-          &#x2715;
-        </button>
-      )}
+        </div>
+        {context === 'static' && (
+              <button
+                className='fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+                style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+                onClick={handleBack}
+                aria-label='Close Post'
+              >
+                &#x2715;
+              </button>
+            )}
     </>
   );
 };
