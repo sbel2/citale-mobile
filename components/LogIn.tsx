@@ -16,8 +16,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
     e.preventDefault();
     setMessage(null); // Reset message on new submit attempt
 
-    try {
-      const response = await onSignIn(email, password);
+    const response = await onSignIn(email, password);
       if (!response) {
         setMessage({ text: 'No response from server. Please try again later.', type: 'error' });
         return;
@@ -27,23 +26,6 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
       } else if (response.status === 400) {
         setMessage({ text: 'Password or Email incorrect. Please try again', type: 'error' });
       }
-    } catch (err) {
-      console.error('Sign-in error:', err);
-      if (err instanceof Error) {
-        // Differentiate messages based on error content
-        /*
-        if (err.message.includes('Invalid login credentials')) {
-          setMessage({ text: 'Password incorrect. Please try again.', type: 'error' });
-        } else if (err.message.includes('User not found')) {
-          setMessage({ text: 'No account found. Please sign up.', type: 'error' });
-        } else {
-          setMessage({ text: err.message, type: 'error' });
-        }
-      } else {
-        setMessage({ text: 'An unexpected error occurred.', type: 'error' });
-      */
-      }
-    }
   };
 
   return (
