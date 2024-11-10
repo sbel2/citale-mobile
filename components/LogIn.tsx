@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 type LogInFormProps = {
-  onSignIn: (email: string, password: string) => Promise<void>;
+  onSignIn: (email: string, password: string) => Promise<{ status: number; message?: string } | undefined>;
 };
 
 export default function LogInForm({ onSignIn }: LogInFormProps) {
@@ -18,17 +18,20 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
 
     try {
       const response = await onSignIn(email, password);
-      if (response.status === 200){
+      if (!response) {
+        setMessage({ text: 'No response from server. Please try again later.', type: 'error' });
+        return;
+      }
+      if (response.status === 200) {
         setMessage({ text: 'Sign-in successful! Redirecting...', type: 'success' });
+      } else if (response.status === 400) {
+        setMessage({ text: 'Password or Email incorrect. Please try again', type: 'error' });
       }
-      else if (response.status === 400){
-        setMessage({ text: 'Password incorrect. Please try again', type: 'error' });
-      }
-
     } catch (err) {
       console.error('Sign-in error:', err);
       if (err instanceof Error) {
         // Differentiate messages based on error content
+        /*
         if (err.message.includes('Invalid login credentials')) {
           setMessage({ text: 'Password incorrect. Please try again.', type: 'error' });
         } else if (err.message.includes('User not found')) {
@@ -38,6 +41,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
         }
       } else {
         setMessage({ text: 'An unexpected error occurred.', type: 'error' });
+      */
       }
     }
   };
@@ -45,7 +49,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
   return (
     <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
       <h1 className="text-2xl font-semibold mb-4 text-gray-800">Sign In</h1>
-      <form onSignIn={handleSubmit} className="w-full flex flex-col">
+      <form onSubmit={handleSubmit} className="w-full flex flex-col">
         <input
           type="email"
           placeholder="Email"

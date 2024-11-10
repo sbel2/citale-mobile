@@ -24,11 +24,15 @@ export const signInUser = async ({ email, password }: { email: string; password:
   if (error) {
     // Custom error handling based on specific messages
     if (error.message.includes('Invalid login credentials')) {
-      throw new Error('Password incorrect. Please try again.');
-    } else if (error.message.includes('User not found')) {
+      throw new Error('Password or Email incorrect. Please try again.');
+    } 
+    /*
+    if (error.message.includes('User not found')) {
       throw new Error('No account found with this email. Please sign up.');
     }
+      */
     throw new Error(error.message);
+    
   }
 
   return data;

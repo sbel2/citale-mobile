@@ -14,9 +14,12 @@ export default function SignInPage() {
       // Handle success (e.g., redirect or update UI)
       console.log('Sign-in successful:', result);
       console.log(email , password);
-      
+      setError(null);
+      return { status: 200, message: "Sign-in successful"}
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      console.log(email , password);
+      return {status: 400, message: "error"}
     }
   };
 
