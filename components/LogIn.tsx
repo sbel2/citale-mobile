@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 type LogInFormProps = {
   onSignIn: (email: string, password: string) => Promise<{ status: number; message?: string } | undefined>;
@@ -11,6 +12,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +25,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
       }
       if (response.status === 200) {
         setMessage({ text: 'Sign-in successful! Redirecting...', type: 'success' });
+        router.push('/')
       } else if (response.status === 400) {
         setMessage({ text: 'Password or Email incorrect. Please try again', type: 'error' });
       }
