@@ -49,12 +49,15 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
           <div className={styles['image-container']}>
             {post.is_video ? (
               <>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.thumbnailUrl}`}
-                  alt={post.title}
+                <video
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.thumbnailUrl}`}
                   width={300}
                   height={200}
-                  className="transition-transform duration-500 ease-in-out transform"
+                  autoPlay
+                  loop
+                  muted
+                  className="transition-transform duration-500 ease-in-out transform filter brightness-95"
+                  playsInline
                 />
                 <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
                   <svg
