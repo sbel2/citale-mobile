@@ -26,14 +26,37 @@ export const signInUser = async ({ email, password }: { email: string; password:
     if (error.message.includes('Invalid login credentials')) {
       throw new Error('Password or Email incorrect. Please try again.');
     } 
-    /*
-    if (error.message.includes('User not found')) {
-      throw new Error('No account found with this email. Please sign up.');
-    }
-      */
     throw new Error(error.message);
     
   }
 
   return data;
 };
+
+export async function resetPasswordByEmail(email: string) {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+  if (error) {
+    console.error('Failed to reset password:', error.message);
+
+    // Example of handling a specific error case
+    if (error.message === 'Email not found') {
+      return { success: false, message: 'No account found with that email. Please try again.' };
+    }
+
+    // Generic error fallback
+    return { success: false, message: 'Failed to reset password. Please try again.' };
+  }
+  
+  return { success: true, message: 'Password reset email sent successfully. Please check your email.' };
+}
+
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) {
+    console.error('Failed to update password:', error);
+    return { success: false, message: error.message };
+  }
+
+  console.log('Password updated successfully for user:', data);
+  return { success: true, message: 'Password updated successfully' };
+}

@@ -1,4 +1,5 @@
 import Header from "@/components/header";
+import Toolbar from "@/components/toolbar"; 
 import { Inter } from "next/font/google";
 import '../globals.css';
 import Script from 'next/script';
@@ -37,10 +38,19 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={inter.className}>
-        <Header />
-        <main className="bg-gray-951">{children}</main>
+      <body className={`${inter.className} flex flex-col md:flex-row`}>
+        {/* Toolbar on the left */}
+        <Toolbar />
+
+        {/* Group Header and Main Content */}
+        <div className="flex-1 flex flex-col md:ml-64">
+          <Header />
+          <main className="flex-1 p-4 bg-gray-951">
+            {children}
+          </main>
+        </div>
       </body>
+
     </html>
   );
 }

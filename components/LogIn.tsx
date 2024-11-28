@@ -8,7 +8,7 @@ type LogInFormProps = {
   onSignIn: (email: string, password: string) => Promise<{ status: number; message?: string } | undefined>;
 };
 
-export default function LogInForm({ onSignIn }: LogInFormProps) {
+export default function LogInForm({ onSignIn}: LogInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<{ text: string; type: 'error' | 'success' } | null>(null);
@@ -55,6 +55,10 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
         >
           Sign In
         </button>
+        <a href="/reset-password" className="text-blue-600 hover:underline">Forgot password? </a>
+        <p className="mt-4">
+          Don't have an account? <a href="/sign-up" className="text-blue-600 hover:underline">Sign up</a>
+        </p>
       </form>
 
       {/* Display success or error message */}
