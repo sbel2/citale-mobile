@@ -91,7 +91,7 @@ const SignUpForm = () => {
         {/* Display error message if sign-up fails */}
         {error && <p className="mt-2 text-red-600 text-sm">{error}</p>}
         <p className="mt-2 text-red-600 text-sm">
-          Already have an account? <Link href="/log-in">Sign in</Link>
+          Already have an account? <Link href="/log-in">Log in</Link>
         </p>
       </div>
     </div>

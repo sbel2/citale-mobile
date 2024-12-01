@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from 'app/context/AuthContext';
 
 const Toolbar: React.FC = () => {
   return (

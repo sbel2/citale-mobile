@@ -1,9 +1,7 @@
 export const metadata = {
-  title: 'Citale | Sign Up',
-  description: 'Thank you joining Citale!',
+  title: 'Citale | Reset Password',
+  description: 'Reset your password',
 }
-
-import '../globals.css';
 
 export default function RootLayout({
   children,
