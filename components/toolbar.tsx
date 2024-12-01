@@ -27,6 +27,12 @@ const Toolbar: React.FC = () => {
       >
         Logout
       </a>
+      <a
+        href="/log-in"
+        className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      >
+        Login
+      </a>
     </nav>
   );
 };
