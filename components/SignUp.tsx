@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { signUpUser } from 'app/actions/auth';  // Call the auth action
+import { signUpUser, getUserId, addingProfile } from 'app/actions/auth';  // Call the auth action
 import Link from 'next/link';
+import { createClient } from '@/supabase/client';
+import { signInUser } from '@/app/actions/auth';
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +12,10 @@ const SignUpForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);  // Track success state
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null);
+  const supabase = createClient()
+
 
   const handleSignUp = async () => {
     // Reset error and success states before handling sign-up
@@ -17,7 +23,7 @@ const SignUpForm = () => {
     setSuccess(false);
 
     try {
-      await signUpUser({ email, password });
+      await signUpUser({ email, password});
       setSuccess(true);  // Set success to true when sign-up is completed
     } catch (err) {
       if (err instanceof Error) {
@@ -26,6 +32,7 @@ const SignUpForm = () => {
         setError('An unknown error occurred');
       }
     }
+    
   };
 
   return (

@@ -1,4 +1,5 @@
 import { supabase } from '@/app/lib/definitions';
+import { createClient } from '@/supabase/server';
 
 export const signUpUser = async ({ email, password }: { email: string; password: string }) => {
   // Call the sign-up function
@@ -9,13 +10,11 @@ export const signUpUser = async ({ email, password }: { email: string; password:
     if (error.message.includes('User already registered')) { 
       throw new Error('This email is already registered. Please proceed to sign in.');
     }
-    else if(error.code == "email_not_confirmed"){
-      throw new Error('This email has not been verified. Please check your inbox.');
+    else if(error.message.includes("Email not confirmed")){
+      throw new Error('Please check your inbox to verify your email.');
     }
     throw new Error(error.message);
   }
-  
-  return data;
 };
 
 export const signInUser = async ({ email, password }: { email: string; password: string }) => {
@@ -29,7 +28,6 @@ export const signInUser = async ({ email, password }: { email: string; password:
     throw new Error(error.message);
     
   }
-
   return data;
 };
 
@@ -59,4 +57,30 @@ export async function updatePassword(newPassword: string) {
 
   console.log('Password updated successfully for user:', data);
   return { success: true, message: 'Password updated successfully' };
+}
+
+export async function getUserId(){
+  const {data, error}  = await supabase.auth.getUser()
+  if(error){
+    console.error('Error fetching user id', error.message)
+    return null;
+  }
+  return data?.user.id || null;
+}
+
+export async function addingProfile(userId: string, username: string, email: string){
+  const {data, error} = await supabase
+    .from('profiles')
+    .upsert([
+      {
+        id: userId,
+        username: username,
+        email: email
+      }
+    ]);
+  if(error){
+    console.error('Error updating profile:', error.message)
+    return null;
+  }
+  return data;
 }

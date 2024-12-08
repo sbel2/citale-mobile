@@ -7,6 +7,7 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 import { PostgrestError } from '@supabase/supabase-js';
 import { Post } from '../lib/types';
 import styles from '@/components/page.module.css';
+import { supabase } from '../lib/definitions';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -33,7 +34,6 @@ export default function Home() {
       setPosts(data);
       setLoading(false);
     };
-
     fetchPosts();
   }, []);
 
