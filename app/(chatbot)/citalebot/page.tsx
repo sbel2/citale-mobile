@@ -1,29 +1,79 @@
-import { Chat } from "@/components/chatbot";
-import { cookies } from "next/headers";
-import { ragChat } from "@/app/lib/rag-chat";
-import { GET } from "@/app/api/rag-context/route";
+'use client';
 
+import React, { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
-export default async function Home() {
-  const response = await GET();
-  const result = await response.json();
+export default function Chat() {
+  const [messages, setMessages] = useState<{ id: number; content: string; role: string }[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  if (result.error) {
-    console.error("Error initializing RAGChat context:", result.error);
-    return <p>Error: {result.error}</p>;
-  }
+  const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setInput(event.target.value);
+  };
 
-  console.log("RAGChat context initialized successfully.");
-  
-  // Retrieve the session ID from cookies (middleware guarantees it exists)
-  const sessionId = cookies().get("sessionId")?.value!;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!input.trim()) return;
 
-  // Fetch initial messages for the session
-  const initialMessages = await ragChat.history.getMessages({
-    amount: 5,
-    sessionId,
-  });
+    const newMessage = {
+      id: Date.now(),
+      content: input,
+      role: 'user'
+    };
+    setMessages([...messages, newMessage]);
+    setIsLoading(true);
 
-  // Render the Chat component with session ID and initial messages
-  return <Chat sessionId={sessionId} initialMessages={initialMessages} />;
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ messages: [newMessage] })
+      });
+
+      const responseData = await response.json();
+      if (response.ok) {
+        setMessages(prev => [...prev, { id: Date.now(), content: responseData.generatedText, role: 'ai' }]);
+      } else {
+        console.error('API error:', responseData.error);
+      }
+    } catch (error) {
+      console.error('Error submitting chat:', error);
+    }
+
+    setIsLoading(false);
+    setInput('');
+  };
+
+  return (
+    <div>
+      {messages.map((m) => (
+        <div key={m.id} style={{ 
+          backgroundColor: m.role === 'user' ? '#e6f2ff' : '#f0f0f0',
+          padding: '10px',
+          margin: '5px 0',
+          borderRadius: '5px'
+        }}>
+          <strong>{m.role === 'user' ? 'User: ' : 'AI: '}</strong>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {m.content}
+          </ReactMarkdown>
+        </div>
+      ))}
+
+      {isLoading && <div>AI is thinking...</div>}
+
+      <form onSubmit={handleSubmit}>
+        <input
+          value={input}
+          placeholder="Say something..."
+          onChange={handleInputChange}
+        />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+  );
 }
