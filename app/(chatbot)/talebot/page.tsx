@@ -113,39 +113,55 @@ export default function Chat() {
   
      {/* Input form */}
       <div className="border-t border-gray-200 dark:border-gray-800 p-4">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-          <div className="flex gap-2">
+      <form 
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(e);
+          setInput(''); // Clear input after submission
+          const target = (e.target as HTMLElement).querySelector('textarea') as HTMLTextAreaElement;
+          if (target) {
+            target.style.height = '44px'; // Reset height after submission
+          }
+        }} 
+        className="max-w-3xl mx-auto"
+      >
+        <div className="flex gap-2">
           <textarea
-              value={input}
-              placeholder="Ask something..."
-              onChange={handleInputChange}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                // Reset to initial height if empty
-                if (!target.value) {
-                  target.style.height = '44px';
-                  return;
-                }
-                // Otherwise adjust height based on content
-                target.style.height = '44px';
-                const newHeight = Math.min(target.scrollHeight, 120);
-                target.style.height = `${newHeight}px`;
-              }}
-              className="flex-1 rounded-[24px] px-4 py-2 border border-gray-200 
-                dark:border-gray-700 focus:outline-none focus:ring-2 
-                focus:ring-blue-500 dark:bg-gray-800 dark:text-white 
-                resize-none overflow-y-auto h-[44px] min-h-[44px] 
-                max-h-[120px] transition-all duration-200"
-            />
-            <button 
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80px] h-[44px] flex items-center justify-center shrink-0"
-            >
-              Send
-            </button>
-          </div>
-        </form>
+            value={input}
+            placeholder="Ask something..."
+            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+                setInput(''); // Clear input after submission
+                const target = e.currentTarget; // Reference to the textarea
+                target.style.height = '44px'; // Reset height after submission
+              }
+            }}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = '44px'; // Reset height for accurate scrollHeight calculation
+              const newHeight = Math.min(target.scrollHeight, 120);
+              target.style.height = `${newHeight}px`; // Adjust height based on content
+            }}
+            className="flex-1 rounded-[24px] px-4 py-2 border border-gray-200 
+              dark:border-gray-700 focus:outline-none focus:ring-2 
+              focus:ring-blue-500 dark:bg-gray-800 dark:text-white 
+              resize-none overflow-y-auto h-[44px] min-h-[44px] 
+              max-h-[120px] transition-all duration-200"
+          />
+          <button 
+            type="submit"
+            disabled={isLoading}
+            className="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80px] h-[44px] flex items-center justify-center shrink-0"
+          >
+            Send
+          </button>
+        </div>
+      </form>
+
+
       </div>
 
     </div>
