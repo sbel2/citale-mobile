@@ -24,6 +24,10 @@ export default function Chat() {
     };
     setMessages([...messages, newMessage]);
     setIsLoading(true);
+  
+  const removeCitations = (text: string) => {
+    return text.replace(/\[\d+\]/g, '').trim();
+  };
 
     try {
       const response = await fetch('/api/chat', {
@@ -36,7 +40,8 @@ export default function Chat() {
 
       const responseData = await response.json();
       if (response.ok) {
-        setMessages(prev => [...prev, { id: Date.now(), content: responseData.generatedText, role: 'ai' }]);
+        const cleanedText = removeCitations(responseData.generatedText);
+        setMessages(prev => [...prev, { id: Date.now(), content: cleanedText, role: 'ai' }]);
       } else {
         console.error('API error:', responseData.error);
       }

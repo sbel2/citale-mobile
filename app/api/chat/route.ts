@@ -12,21 +12,22 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
 
-    // Check if the messages are valid
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: 'Invalid input: Messages must be a non-empty array.' }, { status: 400 });
     }
 
-    // Extract the last message content as the prompt
-    const prompt = messages[messages.length - 1].content;
-
     // Generate text using the configured AI model
     const textResponse = await generateText({
       model: aiModel('llama-3.1-sonar-large-128k-online'),
-      prompt: prompt,
+      messages: [
+        {
+          role: "system",
+          content: "You are an friendly and upbeat AI assistant specializing in Boston recommendations for things to do on the weekend, providing inspiration about coffee shops, restaurants, seasonal events and markets, and activities in the greater Boston area. Please show me 5 options, each with a brief description along with the address, no links needed. Only give me recommendations when prompted for it, otherwise, please just chat with me. Like, if I say hi, just say hi back."
+        },
+        ...messages
+      ]
     });
 
-    // Send the generated text as a response
     return NextResponse.json({ generatedText: textResponse.text });
   } catch (error) {
     console.error('Error generating text:', error);
