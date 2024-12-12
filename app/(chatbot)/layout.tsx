@@ -1,6 +1,6 @@
 import '../globals.css';
 export const metadata = {
-  title: 'Citale | talechat',
+  title: 'Citale | talebot',
   description: 'recommendation bot',
 }
 
