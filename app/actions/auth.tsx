@@ -1,9 +1,17 @@
 import { supabase } from '@/app/lib/definitions';
 import { createClient } from '@/supabase/server';
 
-export const signUpUser = async ({ email, password }: { email: string; password: string }) => {
+export const signUpUser = async ({ email, password, username }: { email: string; password: string; username: string }) => {
   // Call the sign-up function
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({ 
+    email, 
+    password, 
+    options:{
+      data:{
+        username: username,
+      },
+    },
+  });
 
   // Check for explicit "User already registered" error
   if (error) {
