@@ -32,7 +32,9 @@ const Toolbar: React.FC = () => {
       }
       else if (event === 'SIGNED_IN') {
         setIsLoggedIn(true);
-        setUserId(session.user.id);
+        if (session && session.user){
+          setUserId(session.user.id);
+        }
       } 
     });
 
