@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { getUserId } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
+import Image from 'next/image';
 
 export default function ProfilePage() {
     const [userId, setUserId] = useState<string|null>(null);
@@ -40,10 +41,12 @@ export default function ProfilePage() {
 return (
     <div className="p-4">
         <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
-        <img
+        <Image
             className="h-32 w-32 rounded-full border-4 border-white dark:border-gray-800 mx-auto my-4"
             src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/avatar.png`}
             alt="User Avatar"
+            width={300}
+            height={300} 
         />
         </div>
         <div>

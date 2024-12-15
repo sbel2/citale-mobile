@@ -57,7 +57,7 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
         </button>
         <a href="/account/reset-password" className="text-blue-600 hover:underline">Forgot password? </a>
         <p className="mt-4">
-          Don't have an account? <a href="/account/sign-up" className="text-blue-600 hover:underline">Sign up</a>
+          Don&apos;t have an account? <a href="/account/sign-up" className="text-blue-600 hover:underline">Sign up</a>
         </p>
       </form>
 
