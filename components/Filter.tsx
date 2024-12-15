@@ -12,7 +12,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
   const categories = [
     'All','Outdoor', 'Sport', 'Photography', 'Back Bay', 'Beacon Hill', 'Shopping', 'Market',
-    'Music', 'Dating', 'Performance', 'Event', 'Museum', 'Food', 'Art', 'Hackathon'
+    'Music', 'Dating', 'Performance', 'Event', 'Museum', 'Food', 'Art'
   ];
 
   useEffect(() => {
