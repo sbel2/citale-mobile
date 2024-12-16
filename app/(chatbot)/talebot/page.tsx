@@ -64,7 +64,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-gray-900">
+    <div className="flex flex-col h-screen bg-white overflow-hidden">
       <header className="shrink-0 border-b border-gray-200 bg-white md:hidden">
         <div className="max-w-3xl mx-auto px-4 py-2">
           <Link href="/" aria-label="Home" className="inline-block">
