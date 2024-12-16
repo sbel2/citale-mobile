@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
@@ -8,25 +8,8 @@ const Toolbar = () => {
   const { push } = useRouter();
   const pathname = usePathname();
 
-  // Adjust viewport height for mobile browsers
-  useEffect(() => {
-    const setVh = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    };
-    window.addEventListener('resize', setVh);
-    setVh();
-    return () => window.removeEventListener('resize', setVh);
-  }, []);
-
   return (
-    <nav
-      className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50"
-      style={{
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingTop: 'env(safe-area-inset-top)',
-        height: 'calc(var(--vh) * 100)',
-      }}
-    >
+    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50">
       <Link href="/" aria-label="Home" className="pt-10 pl-8 pb-10 hidden md:inline">
         <Image
           src="/citale_header.svg"
@@ -36,12 +19,7 @@ const Toolbar = () => {
           priority
         />
       </Link>
-      <button
-        onClick={() => push('/')}
-        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${
-          pathname === '/' ? 'text-bold fill-black' : ''
-        }`}
-      >
+      <button onClick={() => push('/')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/' ? 'text-bold fill-black' : ''}`}>
         <Image
           src={pathname === '/' ? "/home_s.svg" : "/home.svg"}
           alt="Home Icon"
@@ -51,12 +29,7 @@ const Toolbar = () => {
         />
         <span className="ml-5 hidden md:inline">Home</span>
       </button>
-      <button
-        onClick={() => push('/talebot')}
-        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${
-          pathname === '/talebot' ? 'text-bold fill-black' : ''
-        }`}
-      >
+      <button onClick={() => push('/talebot')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'text-bold fill-black' : ''}`}>
         <Image
           src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"}
           alt="Robot Icon"
