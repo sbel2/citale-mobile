@@ -74,7 +74,7 @@ export default function Chat() {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {messages.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full">
-          <div className="text-2xl text-gray-700 dark:text-gray-300">
+          <div className="text-xl md:text-2xl text-gray-700 dark:text-gray-300">
             What do you want to explore today?
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function Chat() {
       </div>
   
      {/* Input form */}
-      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+      <div className="border-t border-gray-200 p-4 pb-20 md:pb-4">
       <form 
         onSubmit={(e) => {
           e.preventDefault();
@@ -126,31 +126,38 @@ export default function Chat() {
         className="max-w-3xl mx-auto"
       >
         <div className="flex gap-2">
-          <textarea
-            value={input}
-            placeholder="Ask something..."
-            onChange={handleInputChange}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
-                setInput(''); // Clear input after submission
-                const target = e.currentTarget; // Reference to the textarea
-                target.style.height = '44px'; // Reset height after submission
-              }
-            }}
-            onInput={(e) => {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = '44px'; // Reset height for accurate scrollHeight calculation
-              const newHeight = Math.min(target.scrollHeight, 120);
-              target.style.height = `${newHeight}px`; // Adjust height based on content
-            }}
-            className="flex-1 rounded-[24px] px-4 py-2 border border-gray-200 
-              dark:border-gray-700 focus:outline-none focus:ring-2 
-              focus:ring-blue-500 dark:bg-gray-800 dark:text-white 
-              resize-none overflow-y-auto h-[44px] min-h-[44px] 
-              max-h-[120px] transition-all duration-200"
-          />
+        <textarea
+          value={input}
+          placeholder="Ask something..."
+          onChange={handleInputChange}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault(); // Prevent form submission by Enter key
+              handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>); // Handle the submission
+              setInput(''); // Clear input after submission
+              const target = e.currentTarget as HTMLTextAreaElement;
+              target.style.height = '44px'; // Reset height to minimum after submission
+            }
+          }}
+          onInput={(e) => {
+            const target = e.target as HTMLTextAreaElement;
+            target.style.height = 'auto'; // Temporarily reset height to ensure correct scrollHeight measurement
+            
+            // Calculate the number of lines by counting newline characters
+            const numberOfLines = (target.value.match(/\n/g) || []).length + 1; // +1 for the first line
+            const lineHeight = 35; // Approximate line height; adjust based on your CSS
+            const maxHeight = lineHeight * 15; // Maximum height for 6 lines
+            const newHeight = Math.min(lineHeight * numberOfLines, maxHeight);
+
+            target.style.height = `${newHeight}px`; // Adjust height based on line count
+          }}
+          className="flex-1 rounded-[24px] px-4 py-2 border border-gray-200 
+            dark:border-gray-700 focus:outline-none focus:ring-2 
+            focus:ring-blue-500 dark:bg-gray-800 dark:text-white 
+            resize-none overflow-y-auto h-[44px] min-h-[44px] 
+            max-h-[132px] transition-all duration-200"
+        />
+
           <button 
             type="submit"
             disabled={isLoading}
@@ -160,8 +167,6 @@ export default function Chat() {
           </button>
         </div>
       </form>
-
-
       </div>
 
     </div>

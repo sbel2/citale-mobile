@@ -16,12 +16,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} flex flex-col md:flex-row`}>
-        {/* Toolbar on the left */}
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{metadata.title}</title>
+        <meta name="description" content={metadata.description} />
+      </head>
+      <body className={`${inter.className} flex flex-col md:flex-row min-h-screen bg-gray-100`}>
+        {/* Toolbar on the left, takes fixed width on medium screens and up */}
         <Toolbar />
-          <main className="flex-1 p-4 bg-gray-951">
+        {/* Main content area, flex grow and takes remaining space */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             {children}
-          </main>
+          </div>
+
+        </main>
       </body>
     </html>
   )
