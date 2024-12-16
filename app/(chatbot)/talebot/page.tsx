@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
@@ -10,6 +10,14 @@ export default function Chat() {
   const [messages, setMessages] = useState<{ id: number; content: string; role: string }[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAppleBrowser, setIsAppleBrowser] = useState(false);
+
+  useEffect(() => {
+    // Detect if the browser is Safari or an Apple device
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isSafari = userAgent.includes("safari") && !userAgent.includes("chrome");
+    setIsAppleBrowser(isSafari);
+  }, []);
 
   const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setInput(event.target.value);
@@ -112,7 +120,9 @@ export default function Chat() {
       </div>
   
      {/* Input form */}
-      <div className="border-t border-gray-200 p-4 pb-20 md:pb-4">
+      <div
+        className={`border-t border-gray-200 p-4 ${isAppleBrowser ? 'pb-40' : 'pb-20'} md:pb-4`}
+      >
       <form 
         onSubmit={(e) => {
           e.preventDefault();
