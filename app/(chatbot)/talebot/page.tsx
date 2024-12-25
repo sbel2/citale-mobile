@@ -115,7 +115,7 @@ export default function Chat() {
       </div>
   
      {/* Input form */}
-      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+      <div className="border-t border-gray-200 dark:border-gray-800 p-4 pb-safe">
       <form 
         onSubmit={(e) => {
           e.preventDefault();
