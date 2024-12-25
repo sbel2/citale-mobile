@@ -23,9 +23,9 @@ export default function RootLayout({
         <meta name="description" content={metadata.description} />
       </head>
       <body className={`${inter.className} flex flex-col md:flex-row min-h-screen bg-gray-100`}>
-        {/* Toolbar on the left, takes fixed width on medium screens and up */}
-        <Toolbar />
-        {/* Main content area, flex grow and takes remaining space */}
+        <div className="hidden lg:block">
+          <Toolbar />
+        </div>
         <main className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-hidden">
             {children}

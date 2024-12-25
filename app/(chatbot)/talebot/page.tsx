@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
@@ -10,14 +10,6 @@ export default function Chat() {
   const [messages, setMessages] = useState<{ id: number; content: string; role: string }[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isAppleBrowser, setIsAppleBrowser] = useState(false);
-
-  useEffect(() => {
-    // Detect if the browser is Safari or an Apple device
-    const userAgent = navigator.userAgent.toLowerCase();
-    const isSafari = userAgent.includes("safari") && !userAgent.includes("chrome");
-    setIsAppleBrowser(isSafari);
-  }, []);
 
   const handleInputChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
     setInput(event.target.value);
@@ -64,10 +56,13 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white overflow-hidden">
+    <div className="flex flex-col h-screen bg-white dark:bg-gray-900">
       <header className="shrink-0 border-b border-gray-200 bg-white md:hidden">
-        <div className="max-w-3xl mx-auto px-4 py-2">
-          <Link href="/" aria-label="Home" className="inline-block">
+        <div className="max-w-3xl mx-auto px-4 py-2 flex justify-between items-center">
+          <button onClick={() => window.history.back()} aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
+                &#x2190; Home
+          </button>
+          <Link href="/" aria-label="Home" className="inline-block mt-1">
             <Image
               src="/citale_header.svg"
               alt="Citale Logo"
@@ -120,9 +115,7 @@ export default function Chat() {
       </div>
   
      {/* Input form */}
-      <div
-        className={`border-t border-gray-200 p-4 ${isAppleBrowser ? 'pb-40' : 'pb-20'} md:pb-4`}
-      >
+      <div className="border-t border-gray-200 dark:border-gray-800 p-4">
       <form 
         onSubmit={(e) => {
           e.preventDefault();
