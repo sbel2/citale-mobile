@@ -9,7 +9,8 @@ const Toolbar = () => {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-white text-black fixed top-0 left-0 md:h-full md:w-64 w-full h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50 pb-5 md:pb-0">
+    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50"
+     style={{paddingBottom: 'env(safe-area-inset-bottom)'}}>
       <Link href="/" aria-label="Home" className="pt-10 pl-8 pb-10 hidden md:inline">
         <Image
           src="/citale_header.svg"
