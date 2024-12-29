@@ -44,10 +44,10 @@ export default function ProfilePage() {
     const handleLogout = async () =>{
         await supabase.auth.signOut();
         router.push('/');
-    };
+      };
 
-    const handleEditProfile = async () =>{
-        router.push('/account/edit-profile');
+    const handleEditAvatar = async () =>{
+        await supabase
     };
 
     return (
@@ -61,25 +61,20 @@ export default function ProfilePage() {
                 width={128}
                 height={128}
                 />
+                <button
+                onClick={handleEditAvatar}
+                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                >
+                Edit Profile Picture
+                </button>
                 <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
                 <p className="text-sm text-gray-300">{userEmail || "Loading..."}</p>
             </div>
 
             {/* Navigation Links */}
             <div className="mt-4 w-full">
-                <button
-                onClick={handleEditProfile}
-                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                Edit Profile
-                </button>
-                <button
-                onClick={handleLogout}
-                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                LogOut
-                </button>
+                
             </div>
         </div>
-      );
+        );
     }
