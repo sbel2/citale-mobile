@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserId } from '@/app/actions/auth';
+import { getUserId, updateProfile } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -46,35 +46,57 @@ export default function ProfilePage() {
         router.push('/');
       };
 
-    const handleEditAvatar = async () =>{
-        await supabase
-    };
+    const handleEditProfile = async () =>{
+        await updateProfile(userId, userName, userEmail);
+    }
+    
 
     return (
-        <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-        
-            <div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <Image
-                className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/avatar.png`}
-                alt="User Avatar"
-                width={128}
-                height={128}
-                />
-                <button
-                onClick={handleEditAvatar}
-                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                Edit Profile Picture
-                </button>
-                <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
-                <p className="text-sm text-gray-300">{userEmail || "Loading..."}</p>
+        <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+            <h2 className="text-2xl font-bold mb-6 text-center">Edit Profile</h2>
+            <div className="space-y-4">
+                <div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <Image
+                    className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/avatar.png`}
+                    alt="User Avatar"
+                    width={128}
+                    height={128}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+                    <input
+                        id="username"
+                        type="username"
+                        placeholder="Enter your username"
+                        value={userName || ""}
+                        onChange={(e) => setUserName(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                </div>
+                <div>
+                    <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                        id="fullname"
+                        type="fullname"
+                        placeholder="Enter your fullname"
+                        value={userEmail || ""}
+                        onChange={(e) => setUserEmail(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                </div>
             </div>
+            
 
             {/* Navigation Links */}
             <div className="mt-4 w-full">
-                
+                <button onClick={handleEditProfile}>
+                    Save
+                </button>
             </div>
         </div>
+
+        
         );
     }

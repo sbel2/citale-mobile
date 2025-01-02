@@ -92,3 +92,18 @@ export async function addingProfile(userId: string, username: string, email: str
   }
   return data;
 }
+
+export async function updateProfile(userId: string, username: string, email: string){
+  const {data, error} = await supabase
+    .from('profiles')
+    .update({
+      username: username,
+      email: email
+    })
+    .eq('id', userId);
+  if(error){
+    console.error('Error updating profile:', error.message)
+    return null;
+  }
+  return data;
+}
