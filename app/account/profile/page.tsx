@@ -7,12 +7,17 @@ import { getUserId } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
 import Link from 'next/link';
+import { set } from 'zod';
+import Linkify from 'react-linkify';
 
 export default function ProfilePage() {
     const [userId, setUserId] = useState<string|null>(null);
     const [userName, setUserName] = useState<string|null>(null);
     const [userEmail, setUserEmail] = useState<string|null>(null);
     const [userAvatar, setUserAvatar] = useState<string|null>(null);
+    const [userWebsite, setUserWebsite] = useState<string|null>(null);
+    const [userBio, setUserBio] = useState<string|null>(null);
+    const [fullName, setFullName] = useState<string|null>(null);
     const router = useRouter();
 
     // get user information
@@ -28,7 +33,7 @@ export default function ProfilePage() {
 
             const {data, error} = await supabase
                 .from('profiles')
-                .select('username, email')
+                .select('username, email, avatar_url, website, bio, full_name')
                 .eq('id', userId)
                 .single();
             if(error){
@@ -37,9 +42,36 @@ export default function ProfilePage() {
             }
             setUserName(data?.username || null);
             setUserEmail(data?.email || null);
+            setUserAvatar(data?.avatar_url || null);
+            setFullName(data?.full_name || null);
+            setUserWebsite(data?.website || null);
+            setUserBio(data?.bio || null);
         };
         fetchUserData();
     },[])
+
+    // making the link in post clickable
+    const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
+      // Validate the URL
+        if (!isValidUrl(href)) {
+        return <span key={key}>{text}</span>;  // Just return text if URL is invalid
+        }
+    
+        return (
+        <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
+            {text}
+        </a>
+    );
+    };
+    // Simple URL validation function
+    function isValidUrl(string: string): boolean {
+        try {
+        new URL(string);
+        } catch (_) {
+        return false;  // Malformed URL
+        }
+        return true;
+    }
 
     const handleLogout = async () =>{
         await supabase.auth.signOut();
@@ -49,6 +81,10 @@ export default function ProfilePage() {
     const handleEditProfile = async () =>{
         router.push('/account/edit-profile');
     };
+
+    const handleReturn = async () => {
+		router.push('/');
+	};
 
     return (
         <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
@@ -62,7 +98,12 @@ export default function ProfilePage() {
                 height={128}
                 />
                 <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
+                <h2 className="text-lg font-bold">{fullName || null}</h2>
                 <p className="text-sm text-gray-300">{userEmail || "Loading..."}</p>
+                <div className="mt-4 w-full">
+                    <Linkify componentDecorator={linkDecorator}>{userWebsite}</Linkify>
+                </div>
+                <p className="text-sm text-gray-300">{userBio || "Loading..."}</p>
             </div>
 
             {/* Navigation Links */}
@@ -80,6 +121,11 @@ export default function ProfilePage() {
                 LogOut
                 </button>
             </div>
+            <div className="mt-4 w-full">
+                <button onClick={handleReturn}>
+                    Back
+                </button>
+            </div>
         </div>
-      );
+        );
     }

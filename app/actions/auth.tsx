@@ -93,17 +93,23 @@ export async function addingProfile(userId: string, username: string, email: str
   return data;
 }
 
-export async function updateProfile(userId: string, username: string, email: string){
+export async function updateProfile(userId: string, username: string, email: string, fullName: string, avatarUrl: string, website: string, bio: string){
+  // update user profile
   const {data, error} = await supabase
     .from('profiles')
     .update({
       username: username,
-      email: email
+      email: email,
+      full_name: fullName,
+      avatar_url: avatarUrl,
+      website: website,
+      bio: bio
     })
     .eq('id', userId);
+  // if error, such as unique value constraint, return error message
   if(error){
     console.error('Error updating profile:', error.message)
-    return null;
+    return { success: false, message: error.message };
   }
-  return data;
+  return { success: true, message: 'User Profile updated successfully' };
 }
