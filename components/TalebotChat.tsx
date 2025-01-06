@@ -26,7 +26,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSubmit, isLoading }) => {
   };
 
   return (
-    <div className="border-t border-gray-200 dark:border-gray-800 p-10 pb-safe">
+    <div className="border-t border-gray-200 p-6 pb-safe">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
         <div className="flex gap-2">
           <textarea
