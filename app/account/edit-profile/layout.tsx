@@ -1,3 +1,4 @@
+import '../../globals.css';
 export const metadata = {
     title: 'Citale | Edit Profile',
     description: 'Edit Profile Page',
