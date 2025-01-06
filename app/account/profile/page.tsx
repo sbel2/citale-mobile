@@ -91,14 +91,14 @@ export default function ProfilePage() {
         
             <div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <Image
-                className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/avatar.png`}
-                alt="User Avatar"
-                width={128}
-                height={128}
+                    className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                    alt="User Avatar"
+                    width={128}
+                    height={128}
                 />
-                <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
                 <h2 className="text-lg font-bold">{fullName || null}</h2>
+                <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
                 <p className="text-sm text-gray-300">{userEmail || "Loading..."}</p>
                 <div className="mt-4 w-full">
                     <Linkify componentDecorator={linkDecorator}>{userWebsite}</Linkify>
