@@ -29,7 +29,7 @@ export default function RootLayout({
 
             @supports (height: 100dvh) {
               .full-viewport-height {
-                height: 100dvh;
+                height: 120dvh;
               }
             }
           `}
