@@ -38,7 +38,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.className} flex flex-col md:flex-row`}>
+      <body className={`${inter.className} min-h-screen flex flex-col md:flex-row`}>
         {/* Toolbar on the left */}
         <Toolbar />
 
