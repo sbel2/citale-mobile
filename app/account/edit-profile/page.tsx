@@ -60,7 +60,15 @@ export default function ProfilePage() {
 		setMessage('Updating your password...');
 
 		try {
-			const { success, message } = await updateProfile(userId, userName, userEmail, fullName, userAvatar, userWebsite, userBio);
+			const { success, message } = await updateProfile(
+				userId ?? '',
+				userName ?? '',
+				userEmail ?? '',
+				fullName ?? '',
+				userAvatar ?? '',
+				userWebsite ?? '',
+				userBio ?? ''
+			);
 			if (!success) {
 			setError(message);
 			setMessage('');
@@ -79,18 +87,24 @@ export default function ProfilePage() {
 	};
 
 	// Handles Profile picture input
-	const handleFileInput = async	(event) => {
-		const selectedFile = event.target.files[0];
+	const handleFileInput = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const files = event.target.files;
+		if (!files) {
+			return;
+		}
+		const selectedFile = files[0];
 		if (selectedFile) {
 			setFile(selectedFile);
 			const filePath = await uploadPicToStorage(selectedFile);
-			setUserAvatar(filePath);
+			if (filePath) {
+				setUserAvatar(filePath);
+			}
 			setPreviewUrl(URL.createObjectURL(selectedFile));
 		}
 	};
 
 	// Uploads a file to the storage bucket
-	const uploadPicToStorage = async (file) => {
+	const uploadPicToStorage = async (file: File) => {
 		if (!file) {
 			return;
 		}
