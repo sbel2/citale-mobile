@@ -45,7 +45,7 @@ export default function RootLayout({
         {/* Group Header and Main Content */}
         <div className="flex-1 flex flex-col md:ml-64">
           <Header />
-          <main className="flex-1 p-4 bg-gray-951 pb-16 md:pb-0">
+          <main className="flex-1 p-4 bg-gray-951 h-[calc(100vh-16px)] md:h-full">
             {children}
           </main>
         </div>
