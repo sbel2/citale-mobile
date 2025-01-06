@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.ico" sizes = "any"/>
         <meta name="theme-color" content="#ffffff" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -43,14 +43,14 @@ export default function RootLayout({
         <Toolbar />
 
         {/* Group Header and Main Content */}
-        <div className="flex-1 flex flex-col md:ml-64 mt-16 md:mt-0">
-          {/* Add margin-top for mobile */}
+        <div className="flex-1 flex flex-col md:ml-64">
           <Header />
-          <main className="flex-1 p-4 bg-gray-951">
+          <main className="flex-1 p-4 bg-gray-951 pb-16 md:pb-0">
             {children}
           </main>
         </div>
       </body>
+
     </html>
   );
 }
