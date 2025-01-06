@@ -39,8 +39,8 @@ export default function RootLayout({
         <div className="hidden lg:block">
           <Toolbar />
         </div>
-        <main className="flex-1 flex flex-col overflow-hidden full-viewport-height">
-          <div className="overflow-hidden">
+        <main>
+          <div>
             {children}
           </div>
         </main>
