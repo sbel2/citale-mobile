@@ -12,7 +12,10 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        'safe': 'env(safe-area-inset-bottom)',  // Adding safe area padding
+        '2rem': '2rem'  // Ensuring your existing padding is still available
+      },
       screens: {
         "2xl": "1400px",
       },

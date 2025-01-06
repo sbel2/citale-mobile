@@ -37,7 +37,7 @@ export default function Header({ font }: { font?: string }) {
   return (
     <header className={`py-1 md:py-3 pt-4 md:pt-6 bg-gray-0 ${font}`}>
       <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
-        <Link href="/" aria-label="Home" className = "pt-1.5">
+        <Link href="/" aria-label="Home" className = "pt-1.5 md:hidden">
           <Image
             src="/citale_header.svg"
             alt="Citale Logo"
