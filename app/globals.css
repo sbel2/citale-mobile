@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    height: 100vh;  /* standard definition (as fallback) */
+    height: 100dvh; /* dynamic vh will make the trick on iOS */
+    margin: 0; /* Reset default margin */
+    padding: 0; /* Reset default padding */
+  }
+  
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;

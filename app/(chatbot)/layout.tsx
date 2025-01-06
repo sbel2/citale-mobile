@@ -21,16 +21,28 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
+        <style>
+          {`
+            .full-viewport-height {
+              height: 100vh;
+            }
+
+            @supports (height: 100dvh) {
+              .full-viewport-height {
+                height: 100dvh;
+              }
+            }
+          `}
+        </style>
       </head>
-      <body className={`${inter.className} flex flex-col md:flex-row min-h-screen bg-gray-100`}>
+      <body className={`${inter.className} bg-gray-100`}>
         <div className="hidden lg:block">
           <Toolbar />
         </div>
-        <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-hidden">
+        <main>
+          <div>
             {children}
           </div>
-
         </main>
       </body>
     </html>
