@@ -35,7 +35,7 @@ export default function RootLayout({
           `}
         </style>
       </head>
-      <body className={`${inter.className} flex flex-col min-h-screen bg-gray-100`}>
+      <body className={`${inter.className} bg-gray-100`}>
         <div className="hidden lg:block">
           <Toolbar />
         </div>
