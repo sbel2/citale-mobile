@@ -22,8 +22,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.ico" sizes = "any"/>
         <meta name="theme-color" content="#ffffff" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        
         {/* Hotjar Script */}
         <Script id="hotjar-script" strategy="afterInteractive">
           {`
@@ -38,14 +38,14 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.className} min-h-screen flex flex-col md:flex-row`}>
+      <body className={`${inter.className} flex flex-col md:flex-row`}>
         {/* Toolbar on the left */}
         <Toolbar />
 
         {/* Group Header and Main Content */}
         <div className="flex-1 flex flex-col md:ml-64">
           <Header />
-          <main className="flex-1 p-4 bg-gray-951 h-[calc(100vh-16px)] md:h-full">
+          <main className="flex-1 p-4 bg-gray-951">
             {children}
           </main>
         </div>
