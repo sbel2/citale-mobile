@@ -29,7 +29,7 @@ export default function RootLayout({
 
             @supports (height: 100dvh) {
               .full-viewport-height {
-                height: 120dvh;
+                height: 100dvh;
               }
             }
           `}
@@ -39,8 +39,8 @@ export default function RootLayout({
         <div className="hidden lg:block">
           <Toolbar />
         </div>
-        <main className="flex-1 flex flex-col overflow-hidden full-viewport-height">
-          <div className="flex-1 overflow-auto">
+        <main className="flex-1 flex flex-col overflow-hidden full-viewport-height m-10">
+          <div className="flex-1 overflow-auto m-10">
             {children}
           </div>
         </main>
