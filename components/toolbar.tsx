@@ -93,14 +93,28 @@ const Toolbar: React.FC = () => {
         href="/account/profile"
         className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
         >
-          Profile
+        <Image
+         src={pathname === '/account/profile' ? "/account_s.svg" : "/account.svg"}
+         alt="Profile Icon"
+         width={25}
+         height={25}
+         priority
+       />
+       <span className="ml-5 hidden md:inline">Profile</span>
         </a>
       ):(
         <a
         href="/log-in"
         className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
         >
-          Profile
+        <Image
+         src="/account.svg"
+         alt="Profile Icon"
+         width={25}
+         height={25}
+         priority
+       />
+       <span className="ml-5 hidden md:inline">Profile</span>
         </a>
       )}
       {isLoggedIn ? (
