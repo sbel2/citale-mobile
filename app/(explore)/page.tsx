@@ -56,6 +56,7 @@ export default function Home() {
       <div className={styles.container}>
           <MasonryGrid posts={posts}/>
       </div>
+      <div className="fixed bottom-0 left-0 w-full h-12 bg-white p-4 shadow-md z-10 md:hidden"></div>
     </main>
   );
 }
