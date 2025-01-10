@@ -12,7 +12,7 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [userAvatar, setUserAvatar] = useState<string | null>('avatar.png');
   const [userWebsite, setUserWebsite] = useState<string | null>(null);
   const [userBio, setUserBio] = useState<string | null>(null);
   const [fullName, setFullName] = useState<string | null>(null);
@@ -45,7 +45,7 @@ export default function ProfilePage() {
       }
       setUserName(data?.username || '');
       setUserEmail(data?.email || '');
-      setUserAvatar(data?.avatar_url || '');
+      setUserAvatar(data?.avatar_url || 'avatar.png');
       setUserWebsite(data?.website || '');
       setUserBio(data?.bio || '');
       setFullName(data?.full_name || '');
@@ -96,6 +96,7 @@ export default function ProfilePage() {
           contentType: file.type,
         });
         setUserAvatar(filePath);
+        console.log('filePath:', filePath);
         setPreviewUrl(filePath);
       if (error) {
         console.error('Error uploading file:', error.message);
