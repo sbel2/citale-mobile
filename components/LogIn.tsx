@@ -33,7 +33,7 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
 
   return (
     <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Log In</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Log in</h1>
       <form onSubmit={handleSubmit} className="w-full flex flex-col">
         <input
           type="email"
@@ -53,7 +53,7 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
           type="submit"
           className="p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Sign In
+          Log in
         </button>
         <a href="/account/reset-password" className="text-blue-600 hover:underline">Forgot password? </a>
         <p className="mt-4">
