@@ -53,9 +53,9 @@ export default function Chat() {
     <div className="flex flex-col h-[100dvh] bg-white">
       <header className="shrink-0 border-b border-gray-200 bg-white md:hidden">
         <div className="max-w-3xl mx-auto px-4 py-2 flex justify-between items-center">
-          <button onClick={() => window.history.back()} aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
+          <a href="/" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
             &#x2190; Home
-          </button>
+          </a>
           <Link href="/" aria-label="Home" className="inline-block mt-1">
             <Image
               src="/citale_header.svg"
