@@ -33,7 +33,7 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
 
   return (
     <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Sign In</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Log In</h1>
       <form onSubmit={handleSubmit} className="w-full flex flex-col">
         <input
           type="email"
