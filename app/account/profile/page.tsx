@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import { getUserId } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
-import Link from 'next/link';
-import { set } from 'zod';
 import Linkify from 'react-linkify';
 
 export default function ProfilePage() {

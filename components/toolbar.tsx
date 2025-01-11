@@ -5,6 +5,7 @@ import { createClient } from '@/supabase/client';
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
+import { getUserId } from '@/app/actions/auth';
 
 const Toolbar: React.FC = () => {
   const supabase = createClient()
@@ -12,44 +13,60 @@ const Toolbar: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
   const { push } = useRouter();
   const pathname = usePathname();
+  const [userAvatar, setUserAvatar] = useState<string|null>(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user) {
+    const initializeUser = async () => {
+      const userId = await getUserId();
+      if (userId) {
         setIsLoggedIn(true);
-        setUserId(data.user.id);
-        console.log(data.user.id)
-      }
-      else{
+        setUserId(userId);
+      } else {
         setIsLoggedIn(false);
         setUserId(null);
       }
     };
-
-    getUser();
+  
+    initializeUser();
+  
+    const fetchUserProfile = async (userId: any) => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user profile:', error.message);
+        return;
+      }
+      
+      // Set the user profile data
+      setUserAvatar(data?.avatar_url || null);  // Set avatar URL
+    };
 
     const { data } = supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session)
       if (event === 'SIGNED_OUT') {
         setIsLoggedIn(false);
         setUserId(null);
-      }
-      else if (event === 'SIGNED_IN') {
+        setUserAvatar(null);  // Clear avatar on sign out
+      } else if (event === 'SIGNED_IN') {
         setIsLoggedIn(true);
-        if (session && session.user){
+        if (session?.user) {
           setUserId(session.user.id);
+          fetchUserProfile(session.user.id);  // Fetch profile data (avatar)
         }
-      } 
+      }
     });
 
     // call unsubscribe to remove the callback
     return () => {
       if (data) {
-        data.subscription.unsubscribe(); // 
+        data.subscription.unsubscribe();
       }
     };
-  }, [supabase]); // update whenever state changes
+  }, []); // update whenever state changes
 
     const handleLogout = async () =>{
       await supabase.auth.signOut();
@@ -88,51 +105,43 @@ const Toolbar: React.FC = () => {
        />
        <span className="ml-5 hidden md:inline">Talebot</span>
      </button>
-      {isLoggedIn?(
+     {isLoggedIn ? (
         <a
-        href="/account/profile"
-        className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
+          href="/account/profile"
+          className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
         >
-        <Image
-         src={pathname === '/account/profile' ? "/account_s.svg" : "/account.svg"}
-         alt="Profile Icon"
-         width={25}
-         height={25}
-         priority
-       />
-       <span className="ml-5 hidden md:inline">Profile</span>
+          <Image
+            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+            alt="Profile Icon"
+            width={25}
+            height={25}
+            className="rounded-full"
+            priority
+          />
+          <span className="ml-5 hidden md:inline">Profile</span>
         </a>
-      ):(
-        <a
-        href="/log-in"
-        className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
-        >
-        <Image
-         src="/account.svg"
-         alt="Profile Icon"
-         width={25}
-         height={25}
-         priority
-       />
-       <span className="ml-5 hidden md:inline">Profile</span>
-        </a>
-      )}
-      {isLoggedIn ? (
-        <button
-          onClick={handleLogout}
-          className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-        >
-          LogOut
-        </button>
-      ):(
+      ) : (
         <a
           href="/log-in"
-          className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+          className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all md:hidden block"
         >
-          Login
+          <Image
+            src="/account.svg"
+            alt="Profile Icon"
+            width={25}
+            height={25}
+            priority
+          />
+          <span className="ml-5 hidden md:inline">Profile</span>
         </a>
-      )}
-      
+    )}
+     <a
+      href={isLoggedIn ? "#" : "/log-in"}
+      onClick={isLoggedIn ? handleLogout : undefined}
+      className="p-3 w-[88%] text-center bg-[#fd0000] text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all mx-auto mt-4 hidden md:block"
+    >
+      {isLoggedIn ? "Log out" : "Log in"}
+    </a>
     </nav>
   );
 };
