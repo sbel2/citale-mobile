@@ -3,6 +3,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 
 type LogInFormProps = {
   onSignIn: (email: string, password: string) => Promise<{ status: number; message?: string } | undefined>;
@@ -32,41 +34,71 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
   };
 
   return (
-    <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Sign In</h1>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Sign In
-        </button>
-        <a href="/account/reset-password" className="text-blue-600 hover:underline">Forgot password? </a>
-        <p className="mt-4">
-          Don&apos;t have an account? <a href="/account/sign-up" className="text-blue-600 hover:underline">Sign up</a>
-        </p>
-      </form>
+<div className="flex items-center justify-center min-h-screen p-4 relative">
+  {/* Go Back Button */}
+  <a
+    href="/"
+    aria-label="Go back home"
+    className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1"
+  >
+    &#x2190; Home
+  </a>
 
-      {/* Display success or error message */}
-      {message && (
-        <p className={`mt-4 text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-          {message.text}
-        </p>
-      )}
-    </div>
+  {/* Form Container */}
+  <div className="w-full h-full p-8 bg-white flex flex-col items-center justify-center md:h-[60%] md:w-[40%] rounded-lg md:border border-gray-200">
+    {/* Logo */}
+    <Link href="/" aria-label="Home" className="inline-block mb-6">
+      <Image
+        src="/citale_header.svg"
+        alt="Citale Logo"
+        width={140}
+        height={50}
+        priority
+      />
+    </Link>
+
+    {/* Login Form */}
+    <h1 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Log in</h1>
+    <form onSubmit={handleSubmit} className="w-full flex flex-col">
+      <input
+        type="email"
+        placeholder="Phone number, username, or email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <button
+        type="submit"
+        className="p-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Log in
+      </button>
+
+      {/* Forgot Password */}
+      <a href="/account/reset-password" className="text-blue-600 hover:underline mt-4 text-center">Forgot password?</a>
+
+      {/* Sign up link */}
+      <p className="mt-4 text-center">
+        Don&apos;t have an account? <a href="/account/sign-up" className="text-blue-600 hover:underline">Sign up</a>
+      </p>
+    </form>
+
+    {/* Display success or error message */}
+    {message && (
+      <p className={`mt-4 text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+        {message.text}
+      </p>
+    )}
+  </div>
+</div>
+
+  
   );
 }

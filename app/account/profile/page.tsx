@@ -1,131 +1,125 @@
-//profile page logic
-"use client";
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserId } from '@/app/actions/auth';
+import { useAuth } from 'app/context/AuthContext';  // Using the AuthContext
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
-import Link from 'next/link';
-import { set } from 'zod';
 import Linkify from 'react-linkify';
 
 export default function ProfilePage() {
-    const [userId, setUserId] = useState<string|null>(null);
-    const [userName, setUserName] = useState<string|null>(null);
-    const [userEmail, setUserEmail] = useState<string|null>(null);
-    const [userAvatar, setUserAvatar] = useState<string|null>('avatar.png');
-    const [userWebsite, setUserWebsite] = useState<string|null>(null);
-    const [userBio, setUserBio] = useState<string|null>(null);
-    const [fullName, setFullName] = useState<string|null>(null);
+    const { user, logout } = useAuth();  // Use context for user and logout
     const router = useRouter();
+    const [userProfile, setUserProfile] = useState<any>(null);
+    const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
 
-    // get user information
+    // Fetch user profile data from Supabase
     useEffect(() => {
-        const fetchUserData = async() =>{
-            // get user id, auth function
-            const userId = await getUserId();
-            if(!userId){
-                console.error('UserId not found');
-                return;
-            }
-            setUserId(userId);
+        if (user) {
+            const fetchUserData = async () => {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('username, email, avatar_url, website, bio, full_name')
+                    .eq('id', user.id)
+                    .single();
 
-            const {data, error} = await supabase
-                .from('profiles')
-                .select('username, email, avatar_url, website, bio, full_name')
-                .eq('id', userId)
-                .single();
-            if(error){
-                console.error('Error fetching user profile:', error.message)
-                return;
-            }
-            setUserName(data?.username || null);
-            setUserEmail(data?.email || null);
-            setUserAvatar(data?.avatar_url || 'avatar.png');
-            setFullName(data?.full_name || null);
-            setUserWebsite(data?.website || null);
-            setUserBio(data?.bio || null);
-        };
-        fetchUserData();
-    },[])
+                if (error) {
+                    console.error('Error fetching user profile:', error.message);
+                    return;
+                }
+                setUserAvatar(data.avatar_url || 'avatar.png');  // Set avatar URL
+                setUserProfile(data);  // Store the entire user profile
+            };
 
-    // making the link in post clickable
-    const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
-      // Validate the URL
-        if (!isValidUrl(href)) {
-        return <span key={key}>{text}</span>;  // Just return text if URL is invalid
+            fetchUserData();
+        } else {
+            console.error('User is not logged in');
         }
-    
+    }, [user]);
+
+    // Link decorator for clickable URLs in bio
+    const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
+        if (!isValidUrl(href)) {
+            return <span key={key}>{text}</span>;
+        }
+
         return (
-        <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
-            {text}
-        </a>
-    );
+            <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
+                {text}
+            </a>
+        );
     };
-    // Simple URL validation function
+
+    // Simple URL validation
     function isValidUrl(string: string): boolean {
         try {
-        new URL(string);
+            new URL(string);
         } catch (_) {
-        return false;  // Malformed URL
+            return false;
         }
         return true;
     }
 
-    const handleLogout = async () =>{
-        await supabase.auth.signOut();
+    const handleLogout = async () => {
+        await logout();  // Use logout from context
         router.push('/');
     };
 
-    const handleEditProfile = async () =>{
+    const handleEditProfile = () => {
         router.push('/account/edit-profile');
     };
 
-    const handleReturn = async () => {
-		router.push('/');
-	};
+    const handleReturn = () => {
+        router.push('/');
+    };
 
     return (
         <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-        
             <div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <Image
-                    className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-                    alt="User Avatar"
-                    width={128}
-                    height={128}
-                />
-                <h2 className="text-lg font-bold">{fullName || null}</h2>
-                <h2 className="text-lg font-bold">{userName || "Loading..."}</h2>
-                <p className="text-sm text-gray-300">{userEmail || "Loading..."}</p>
-                <div className="mt-4 w-full">
-                    <Linkify componentDecorator={linkDecorator}>{userWebsite}</Linkify>
-                </div>
-                <p className="text-sm text-gray-300">{userBio || "Loading..."}</p>
+                {userProfile ? (
+                    <>
+                        <Image
+                            className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                            alt="User Avatar"
+                            width={128}
+                            height={128}
+                        />
+                        <h2 className="text-lg font-bold">{userProfile.full_name || 'No Name'}</h2>
+                        <h2 className="text-lg font-bold">{userProfile.username || 'Loading...'}</h2>
+                        <p className="text-sm text-gray-300">{userProfile.email || 'Loading...'}</p>
+                        {userProfile.website && (
+                            <div className="mt-4 w-full">
+                                <Linkify componentDecorator={linkDecorator}>{userProfile.website}</Linkify>
+                            </div>
+                        )}
+                        <p className="text-sm text-gray-300">{userProfile.bio || 'No bio available'}</p>
+                    </>
+                ) : (
+                    <p>Loading...</p>
+                )}
             </div>
 
-            {/* Navigation Links */}
             <div className="mt-4 w-full">
                 <button
-                onClick={handleEditProfile}
-                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    onClick={handleEditProfile}
+                    className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 >
-                Edit Profile
+                    Edit Profile
                 </button>
                 <button
-                onClick={handleLogout}
-                className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                    onClick={handleLogout}
+                    className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 >
-                LogOut
+                    LogOut
                 </button>
             </div>
+
             <div className="mt-4 w-full">
-                <button onClick={handleReturn}>
+                <button onClick={handleReturn} className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                     Back
                 </button>
             </div>
         </div>
-        );
-    }
+    );
+}

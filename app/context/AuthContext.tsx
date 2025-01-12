@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
+      // Set the user and session if available
       setUser(data?.session?.user || null);
       setSession(data?.session || null);
     };
@@ -77,6 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [supabase]);
 
+  // Handle logout
   const logout = async () => {
     try {
       await supabase.auth.signOut();
