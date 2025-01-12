@@ -11,6 +11,7 @@ export default function ProfilePage() {
     const { user, logout } = useAuth();  // Use context for user and logout
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<any>(null);
+    const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
 
     // Fetch user profile data from Supabase
     useEffect(() => {
@@ -26,7 +27,7 @@ export default function ProfilePage() {
                     console.error('Error fetching user profile:', error.message);
                     return;
                 }
-
+                setUserAvatar(data.avatar_url || 'avatar.png');  // Set avatar URL
                 setUserProfile(data);  // Store the entire user profile
             };
 
@@ -79,7 +80,7 @@ export default function ProfilePage() {
                     <>
                         <Image
                             className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userProfile.avatar_url}`}
+                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
                             alt="User Avatar"
                             width={128}
                             height={128}

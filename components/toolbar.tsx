@@ -12,7 +12,7 @@ const Toolbar: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { push } = useRouter();
   const pathname = usePathname();
-  const [userAvatar, setUserAvatar] = useState<string|null>(null);
+  const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
 
   useEffect(() => {
     if (user) {
@@ -28,13 +28,13 @@ const Toolbar: React.FC = () => {
         if (error) {
           console.error('Error fetching user profile:', error.message);
         } else {
-          setUserAvatar(data?.avatar_url || null); // Set avatar URL
+          setUserAvatar(data?.avatar_url || 'avatar.png'); // Set avatar URL
         }
       };
 
       fetchUserProfile();
     } else {
-      setUserAvatar(null); // Reset avatar if user logs out
+      setUserAvatar('avatar.png'); // Reset avatar if user logs out
     }
   }, [user]);
 

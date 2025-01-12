@@ -1,19 +1,22 @@
 //profile page logic
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserId, updateProfile } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
 import Link from 'next/link';
 import { set } from 'zod';
+import Cropper, { ReactCropperElement } from 'react-cropper';
+import 'cropperjs/dist/cropper.css';
+
 
 export default function ProfilePage() {
   const [userId, setUserId] = useState<string|null>(null);
   const [userName, setUserName] = useState<string|null>(null);
   const [userEmail, setUserEmail] = useState<string|null>(null);
-  const [userAvatar, setUserAvatar] = useState<string|null>(null);
+  const [userAvatar, setUserAvatar] = useState<string|null>('avatar.png');
   const [userWebsite, setUserWebsite] = useState<string|null>(null);
   const [userBio, setUserBio] = useState<string|null>(null);
   const [fullName, setFullName] = useState<string|null>(null);
@@ -21,6 +24,9 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const cropperRef = useRef<ReactCropperElement>(null);
+  const [cropWindow, setCropWindow] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   // get user information
@@ -86,40 +92,58 @@ export default function ProfilePage() {
 		router.back();
 	};
 
-	// Handles Profile picture input
-	const handleFileInput = async (event: React.ChangeEvent<HTMLInputElement>) => {
-		const files = event.target.files;
-		if (!files) {
-			return;
-		}
-		const selectedFile = files[0];
-		if (selectedFile) {
-			setFile(selectedFile);
-			const filePath = await uploadPicToStorage(selectedFile);
-			if (filePath) {
-				setUserAvatar(filePath);
-			}
-			setPreviewUrl(URL.createObjectURL(selectedFile));
-		}
-	};
-
 	// Uploads a file to the storage bucket
-	const uploadPicToStorage = async (file: File) => {
-		if (!file) {
-			return;
-		}
-		console.log('Uploading file:', file.name, file.size);
-		const filePath = `${userId}/${file.name}`;
-		const { data, error } = await supabase.storage
-			.from('profile-pic')
-			.upload(filePath, file);
-		
-		if (error) {
-			console.error('Error uploading file:', error.message);
-			return;
-		}
-		return filePath;
-	};
+  const uploadPicToStorage = async (file: File) => {
+    if (!file) {
+      return;
+    }
+    const filePath = `${userId}/${Math.floor(Math.random() * 10000)}`;
+    const { data, error } = await supabase.storage
+      .from('profile-pic')
+      .upload(filePath, file, {
+        contentType: file.type,
+        upsert: true,
+      });
+      setUserAvatar(filePath);
+      console.log('filePath:', filePath);
+    if (error) {
+      console.error('Error uploading file:', error.message);
+      return;
+    }
+    return filePath;
+  };
+
+  const getCropData = async () => {
+    if (cropperRef.current) {
+      const croppedCanvas = (cropperRef.current?.cropper as any)?.getCroppedCanvas({
+        width: 128,
+        height: 128,
+      });
+      croppedCanvas.toBlob(async (blob: Blob | null) => {
+        if (blob) {
+          const file = new File([blob], 'cropped-image.png', { type: blob.type });
+          const filePath = await uploadPicToStorage(file);
+          setPreviewUrl(URL.createObjectURL(file));
+          setCropWindow(false);
+          return filePath;
+        }
+      });
+    }
+  };
+
+    // Handles Profile picture input
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+      setCropWindow(true);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
         
     return (
 			<div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
@@ -144,18 +168,32 @@ export default function ProfilePage() {
 							accept=".jpg, .jpeg, .png, .svg, .gif"
 							onChange={handleFileInput}
 							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-						/>
-						<label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-						<input
-							id="username"
-							type="username"
-							placeholder="Enter your username"
-							value={userName || ""}
-							onChange={(e) => setUserName(e.target.value)}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-						/>
+              ref={fileInputRef}
+            />
+						{cropWindow && (
+              <div>
+                <Cropper
+                  src={previewUrl || 'avatar.png'}
+                  style={{ height: 400, width: '100%' }}
+                  initialAspectRatio={1}
+                  guides={false}
+                  ref={cropperRef}
+                />
+                <button onClick={getCropData} 
+                className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Crop Image</button>
+              </div>
+            )}
 					</div>
 						<div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+              <input
+                id="username"
+                type="username"
+                placeholder="Enter your username"
+                value={userName || ""}
+                onChange={(e) => setUserName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
 							<label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Display Name</label>
 							<input
 								id="fullname"
