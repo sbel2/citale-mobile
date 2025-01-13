@@ -32,10 +32,21 @@ export default function ProfilePage() {
             };
 
             fetchUserData();
+
+            const fetchPost = async () => {
+                const { data, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+            };
+
         } else {
             console.error('User is not logged in');
         }
     }, [user]);
+
+    
 
     // Link decorator for clickable URLs in bio
     const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
