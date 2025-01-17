@@ -34,54 +34,41 @@ export default function ProfilePage() {
         }
     }, [user]);
 
-    const handleLogout = async () => {
-        await logout();
-        router.push('/');
-    };
-
-    const handleReturn = () => router.push('/');
-
     return (
-        <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-            <div className="p-3 mb-4 border border-gray-300 rounded-lg">
-                {userProfile ? (
-                    <>
-                        <Image
-                            className="h-32 w-32 rounded-full border-4 border-white mx-auto mb-4"
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-                            alt="User Avatar"
-                            width={128}
-                            height={128}
-                        />
-                        <h2 className="text-lg font-bold">{userProfile.full_name || 'No Name'}</h2>
-                        <h2 className="text-lg font-bold">{userProfile.username || 'Loading...'}</h2>
-                        <p className="text-sm text-gray-300">{userProfile.email || 'Loading...'}</p>
-                        {userProfile.website && (
-                            <div className="mt-4">
-                                <Linkify>{userProfile.website}</Linkify>
-                            </div>
-                        )}
-                        <p className="text-sm text-gray-300">{userProfile.bio || 'No bio available'}</p>
-                    </>
-                ) : (
-                    <p>Loading...</p>
+        <div className="flex flex-col items-center p-6 bg-gray-50 border border-gray-300 rounded-lg mb-6 w-full">
+        {userProfile ? (
+            <>
+                <Image
+                    className="h-32 w-32 rounded-full border-4 border-white mb-6"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                    alt="User Avatar"
+                    width={128}
+                    height={128}
+                />
+                <div className="flex items-center mb-2">
+                    <h2 className="text-3xl font-semibold text-gray-800 mr-4">{userProfile.full_name || 'No Name'}</h2>
+                    <button
+                        onClick={() => router.push('/account/edit-profile')}
+                        className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
+                    >
+                        Edit Profile
+                    </button>
+                </div>
+                <p className="text-xl text-gray-600 mb-2">{userProfile.username || 'No Username'}</p>
+                <p className="text-md text-gray-500 mb-4">{userProfile.email || 'No Email'}</p>
+                {userProfile.website && (
+                    <div className="mt-2 mb-4">
+                        <Linkify>
+                            <a className="text-blue-500">{userProfile.website}</a>
+                        </Linkify>
+                    </div>
                 )}
-            </div>
-
-            <div className="mt-4 w-full">
-                <button onClick={() => router.push('/account/edit-profile')} className="p-4 w-full hover:bg-gray-700">
-                    Edit Profile
-                </button>
-                <button onClick={handleLogout} className="p-4 w-full hover:bg-gray-700">
-                    LogOut
-                </button>
-            </div>
-
-            <div className="mt-4 w-full">
-                <button onClick={handleReturn} className="p-4 w-full hover:bg-gray-700">
-                    Back
-                </button>
-            </div>
-        </div>
+                <p className="text-sm text-gray-500">{userProfile.bio || 'No bio available'}</p>
+            </>
+        ) : (
+            <p className="text-gray-500">Loading...</p>
+        )}
+    </div>
+    
     );
-}
+} 
