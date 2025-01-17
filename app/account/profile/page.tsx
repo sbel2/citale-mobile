@@ -4,14 +4,23 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';  // Using the AuthContext
 import { supabase } from '@/app/lib/definitions';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Linkify from 'react-linkify';
+import { Post } from '@/app/lib/types';
+import styles from '@/components/postComponent.module.css'
+
+const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 export default function ProfilePage() {
     const { user, logout } = useAuth();  // Use context for user and logout
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<any>(null);
     const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
+    const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setloading] = useState<boolean>(true);
+    const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
     // Fetch user profile data from Supabase
     useEffect(() => {
@@ -29,17 +38,31 @@ export default function ProfilePage() {
                 }
                 setUserAvatar(data.avatar_url || 'avatar.png');  // Set avatar URL
                 setUserProfile(data);  // Store the entire user profile
+                setFetchSuccess(true);
             };
 
             fetchUserData();
 
-            const fetchPost = async () => {
+            const fetchPostData = async () => {
                 const { data, error } = await supabase
-                .from('posts')
-                .select('*')
-                .eq('user_id', user.id)
-                .single();
-            };
+                  .from("posts")
+                  .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at")
+                  .eq('user_id', user.id);
+          
+                if (error || !data) {
+                  console.error('Error fetching post data:', error);
+                  setPosts([]);
+                  setloading(false);
+                  return;
+                } else {
+                  setPosts(data);
+                  setloading(false);
+                }
+              };
+
+        if(fetchSuccess) {
+            fetchPostData();
+        }
 
         } else {
             console.error('User is not logged in');
@@ -108,6 +131,13 @@ export default function ProfilePage() {
                     </>
                 ) : (
                     <p>Loading...</p>
+                )}
+            </div>
+            <div className={styles.container}>
+                {posts.length === 0 ? (
+                    <p className="text-center">No posts found :) </p>
+                ) : (
+                    <MasonryGrid posts={posts} />
                 )}
             </div>
 

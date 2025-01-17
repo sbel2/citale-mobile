@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 import { getUserId, updateProfile } from '@/app/actions/auth';
 import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
-import Link from 'next/link';
-import { set } from 'zod';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
+import styles from '@/components/page.module.css';
 
 
 export default function ProfilePage() {
@@ -168,16 +167,18 @@ export default function ProfilePage() {
               ref={fileInputRef}
             />
 						{cropWindow && (
-              <div>
-                <Cropper
-                  src={previewUrl || 'avatar.png'}
-                  style={{ height: 400, width: '100%' }}
-                  initialAspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-                <button onClick={getCropData} 
-                className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Crop Image</button>
+              <div className={styles.popup}>
+                <div className={styles.popupInner}>
+                  <Cropper
+                    src={previewUrl || 'avatar.png'}
+                    style={{ height: 400, width: '100%' }}
+                    initialAspectRatio={1}
+                    guides={false}
+                    ref={cropperRef}
+                  />
+                  <button onClick={getCropData} 
+                  className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Crop Image</button>
+                </div>
               </div>
             )}
 					</div>
