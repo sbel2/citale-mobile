@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import React , {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { createClient } from '@/supabase/client';
 import Image from "next/image";
 import Link from "next/link";
@@ -9,14 +9,16 @@ import { useAuth } from 'app/context/AuthContext';
 
 const Toolbar: React.FC = () => {
   const { user, logout } = useAuth();
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userAvatar, setUserAvatar] = useState<string>('/account.svg');
   const { push } = useRouter();
   const pathname = usePathname();
-  const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
 
+  // Check localStorage for avatar and set it initially
   useEffect(() => {
-    if (user) {
-      // Fetch user avatar if the user is logged in
+    const storedAvatar = localStorage.getItem('userAvatar');
+    if (storedAvatar) {
+      setUserAvatar(storedAvatar); // Use stored avatar if available
+    } else if (user) {
       const fetchUserProfile = async () => {
         const supabase = createClient();
         const { data, error } = await supabase
@@ -24,27 +26,29 @@ const Toolbar: React.FC = () => {
           .select('avatar_url')
           .eq('id', user.id)
           .single();
-        
+
         if (error) {
           console.error('Error fetching user profile:', error.message);
         } else {
-          setUserAvatar(data?.avatar_url || 'avatar.png'); // Set avatar URL
+          const avatar = data?.avatar_url || '/account.svg';
+          setUserAvatar(avatar);
+          localStorage.setItem('userAvatar', avatar); // Store avatar in localStorage
         }
       };
 
       fetchUserProfile();
     } else {
-      setUserAvatar('avatar.png'); // Reset avatar if user logs out
+      setUserAvatar('/account.svg'); // Reset avatar if user logs out
     }
-  }, [user]);
+  }, [user]); // Only run when user state changes
 
   const handleLogout = async () => {
     await logout(); // Use the logout function from context
+    localStorage.removeItem('userAvatar'); // Optionally, clear avatar from localStorage on logout
   };
-  
 
   return (
-    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{paddingBottom: 'env(safe-area-inset-bottom)'}}>
+    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <Link href="/" aria-label="Home" className="pt-10 pl-8 pb-10 hidden md:inline">
         <Image src="/citale_header.svg" alt="Citale Logo" width={90} height={30} priority />
       </Link>
@@ -57,10 +61,10 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
       {user ? (
-        <a href="/account/profile" className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all">
+        <Link href="/account/profile" className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all">
           <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`} alt="Profile Icon" width={25} height={25} className="rounded-full" priority />
           <span className="ml-5 hidden md:inline">Profile</span>
-        </a>
+        </Link>
       ) : (
         <a href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all md:hidden block">
           <Image src="/account.svg" alt="Profile Icon" width={25} height={25} priority />
