@@ -50,16 +50,7 @@ export default function Header({ font }: { font?: string }) {
           <div className="w-full max-w-sm p-1 sm:p-2">
             <SearchBar onSearch={searchRoute}/>
           </div>
-          
         </div>
-        <a
-          href="https://forms.gle/fr4anWBWRkeCEgSN6"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden md:block ml-3 text-blue-600 underline hover:text-blue-800 transition-colors duration-200 text-base"
-        >
-          How do you like Citale?
-        </a>
       </div>
       
       {pathname !== "/search-results" && !fromSearch && (

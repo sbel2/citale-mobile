@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Things to do in Boston",
 };
 
-export default function RootLayout({
+export default function ExploreLayout({
   children,
 }: {
   children: React.ReactNode;

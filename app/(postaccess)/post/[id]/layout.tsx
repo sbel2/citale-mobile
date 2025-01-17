@@ -3,7 +3,7 @@ import '../../../globals.css';
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function RootLayout({
+export default function PostLayout({
   children,
 }: {
   children: React.ReactNode;

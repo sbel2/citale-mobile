@@ -9,7 +9,7 @@ export const metadata = {
   description: 'recommendation bot',
 }
 
-export default function RootLayout({
+export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode

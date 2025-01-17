@@ -9,7 +9,7 @@ export const metadata = {
     description: 'Profile Page',
   }
   
-  export default function RootLayout({
+  export default function ProfileLayout({
     children,
   }: {
     children: React.ReactNode

@@ -3,7 +3,7 @@ export const metadata = {
   description: 'Reset your password',
 }
 
-export default function RootLayout({
+export default function RpassLayout({
   children,
 }: {
   children: React.ReactNode
