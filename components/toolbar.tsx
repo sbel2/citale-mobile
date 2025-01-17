@@ -61,23 +61,31 @@ const Toolbar: React.FC = () => {
       <Link href="/" aria-label="Home" className="pt-10 pl-8 pb-10 hidden md:inline">
         <Image src="/citale_header.svg" alt="Citale Logo" width={90} height={30} priority />
       </Link>
-      <button onClick={() => push('/')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all`}>
+      
+      <button
+        onClick={() => push('/')}
+        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/' ? 'font-semibold' : ''}`}
+      >
         <Image src={pathname === '/' ? "/home_s.svg" : "/home.svg"} alt="Home Icon" width={25} height={25} priority />
         <span className="ml-5 hidden md:inline">Home</span>
       </button>
-      <button onClick={() => push('/talebot')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all`}>
+      
+      <button
+        onClick={() => push('/talebot')}
+        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'font-semibold' : ''}`}
+      >
         <Image src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"} alt="Robot Icon" width={25} height={25} priority />
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
 
       {/* Profile Button always visible when user is logged in */}
       {user ? (
-        <Link href="/account/profile" className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all">
+        <Link href="/account/profile" className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
           <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`} alt="Profile Icon" width={25} height={25} className="rounded-full" priority />
           <span className="ml-5 hidden md:inline">Profile</span>
         </Link>
       ) : (
-        <Link href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all">
+        <Link href="/log-in" className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all`}>
           <Image src="/account.svg" alt="Profile Icon" width={25} height={25} priority />
           <span className="ml-5 hidden md:inline">Profile</span>
         </Link>

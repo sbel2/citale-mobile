@@ -35,39 +35,48 @@ export default function ProfilePage() {
     }, [user]);
 
     return (
-        <div className="flex flex-col items-center p-6 bg-gray-50 border border-gray-300 rounded-lg mb-6 w-full">
+        <div className="flex h-screen">
+        <div className="flex flex-col items-center p-6 bg-white w-full">
         {userProfile ? (
-            <>
-                <Image
-                    className="h-32 w-32 rounded-full border-4 border-white mb-6"
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-                    alt="User Avatar"
-                    width={128}
-                    height={128}
-                />
-                <div className="flex items-center mb-2">
-                    <h2 className="text-3xl font-semibold text-gray-800 mr-4">{userProfile.full_name || 'No Name'}</h2>
-                    <button
-                        onClick={() => router.push('/account/edit-profile')}
-                        className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
-                    >
-                        Edit Profile
-                    </button>
+            <div className="flex items-start gap-6">
+                {/* Profile Image Section */}
+                <div className="flex-shrink-0">
+                    <Image
+                        className="h-32 w-32 rounded-full border-4 border-white"
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                        alt="User Avatar"
+                        width={128}
+                        height={128}
+                    />
                 </div>
-                <p className="text-xl text-gray-600 mb-2">{userProfile.username || 'No Username'}</p>
-                <p className="text-md text-gray-500 mb-4">{userProfile.email || 'No Email'}</p>
-                {userProfile.website && (
-                    <div className="mt-2 mb-4">
-                        <Linkify>
-                            <a className="text-blue-500">{userProfile.website}</a>
-                        </Linkify>
+
+                {/* User Info Section */}
+                <div className="flex flex-col justify-center">
+                    <div className="flex items-center mb-2">
+                        <h2 className="text-3xl font-semibold text-gray-800 mr-4">{userProfile.full_name || 'No Name'}</h2>
+                        <button
+                            onClick={() => router.push('/account/edit-profile')}
+                            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
+                        >
+                            Edit Profile
+                        </button>
                     </div>
-                )}
-                <p className="text-sm text-gray-500">{userProfile.bio || 'No bio available'}</p>
-            </>
+                    <div className="text-xl text-gray-600 mb-2">{userProfile.username}</div>
+                    <div className="text-md text-gray-500 mb-4">{userProfile.email}</div>
+                    {userProfile.website && (
+                        <div className="mt-2 mb-4">
+                            <Linkify>
+                                <a className="text-blue-500">{userProfile.website}</a>
+                            </Linkify>
+                        </div>
+                    )}
+                    <p className="text-sm text-gray-500">{userProfile.bio || 'No bio available'}</p>
+                </div>
+            </div>
         ) : (
             <p className="text-gray-500">Loading...</p>
         )}
+    </div>
     </div>
     
     );
