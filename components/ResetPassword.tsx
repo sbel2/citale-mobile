@@ -58,7 +58,7 @@ return (
           {/* Reset Password Form */}
           <h1 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Reset Password</h1>
           <p className="text-gray-600 text-sm mb-6 text-center">
-              Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
           </p>
 
           <form onSubmit={handleSubmit} className="w-full flex flex-col">
