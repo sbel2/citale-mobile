@@ -2,6 +2,8 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 
 type ResetProps = {
   onResetPassword: (email: string) => Promise<{  status: number; message?: string }>;
@@ -28,30 +30,70 @@ export default function ResetForm({ onResetPassword }: ResetProps) {
     }
 };
 
-  return (
-    <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-      <h1 className="text-2xl font-semibold mb-4 text-gray-800">Reset Password</h1>
-      <form onSubmit={handleSubmit} className="w-full flex flex-col">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          className="p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          Send login link
-        </button>
-      </form>
+return (
+  <div className="flex items-center justify-center min-h-screen p-4 relative">
+      {/* Go Back Button */}
+      <a
+          href="/account/log-in"
+          aria-label="Go back to login"
+          className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1"
+      >
+          &#x2190; Back to Login
+      </a>
 
-      {message && (
-        <p className={`mt-4 text-sm ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
-            {message.text}
-        </p>
-        )}
-    </div>
-  );
+      {/* Form Container */}
+      <div className="w-full h-full p-8 bg-white flex flex-col items-center justify-center md:h-[60%] md:w-[40%] rounded-lg md:border border-gray-200">
+          {/* Logo */}
+          <Link href="/" aria-label="Home" className="inline-block mb-6">
+              <Image
+                  src="/citale_header.svg"
+                  alt="Citale Logo"
+                  width={140}
+                  height={50}
+                  priority
+              />
+          </Link>
+
+          {/* Reset Password Form */}
+          <h1 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Reset Password</h1>
+          <p className="text-gray-600 text-sm mb-6 text-center">
+              Enter your email address and we'll send you a link to reset your password.
+          </p>
+
+          <form onSubmit={handleSubmit} className="w-full flex flex-col">
+              <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+              />
+              <button
+                  type="submit"
+                  className="p-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              >
+                  Send Reset Link
+              </button>
+
+              {message && (
+                  <p className={`mt-4 text-sm text-center ${
+                      message.type === 'success' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                      {message.text}
+                  </p>
+              )}
+
+              {/* Additional Links */}
+              <div className="mt-6 text-center">
+                  <Link 
+                      href="/log-in" 
+                      className="text-blue-600 hover:underline text-sm"
+                  >
+                      Return to Login
+                  </Link>
+              </div>
+          </form>
+      </div>
+  </div>
+);
 }

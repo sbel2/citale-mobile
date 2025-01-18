@@ -54,6 +54,7 @@ const Toolbar: React.FC = () => {
   const handleLogout = async () => {
     await logout(); // Use the logout function from context
     localStorage.removeItem('userAvatar'); // Optionally, clear avatar from localStorage on logout
+    push('/');
   };
 
   return (
