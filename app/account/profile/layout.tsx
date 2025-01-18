@@ -1,6 +1,7 @@
 import '../../globals.css';
 import { Inter } from "next/font/google";
 import Toolbar from "@/components/toolbar";
+import Header from "@/components/header";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,18 +17,21 @@ export default function ProfileLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`${inter.className} bg-gray-100`}>
+            <body className={`${inter.className} bg-white`}>
                 <div className="flex h-screen">
                     {/* Toolbar - hidden on small screens, visible on large screens */}
-                    <div className="hidden lg:block w-64">
+                    <div className="w-64">
                         <Toolbar />
                     </div>
+                    <div className="flex-1 flex flex-col">
+                        {/* Header */}
+                        <Header />
 
-                    {/* Main content area */}
-                    <main className="flex-1 flex justify-center">
-                        {/* Center content on the right side of the screen */}
-                        <div className="w-full">{children}</div>
-                    </main>
+                        {/* Profile Content */}
+                        <main className="flex-1 p-4 bg-gray-951">
+                            {children}
+                        </main>
+                    </div>
                 </div>
             </body>
         </html>
