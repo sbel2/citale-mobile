@@ -42,8 +42,8 @@ export default function ProfilePage() {
                             <Image
                                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
                                 alt="Profile"
-                                width={96}
-                                height={96}
+                                width={128}
+                                height={128}
                                 className="rounded-full object-cover"
                             />
                         </div>

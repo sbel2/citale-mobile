@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { set } from 'zod';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
+import {  FaUser, FaGlobe, FaInfoCircle, FaUpload } from 'react-icons/fa';
 
 
 export default function ProfilePage() {
@@ -145,104 +146,130 @@ export default function ProfilePage() {
   };
 
         
-    return (
-			<div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-				<h2 className="text-2xl font-bold mb-6 text-center">Edit Profile</h2>
-				<div className="space-y-4">
-					<div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-						<Image
-						className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-						src={previewUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-						alt="User Avatar"
-						width={128}
-						height={128}
-						/>
-					</div>
-					<div>
-						<label htmlFor="avatar" className="block text-sm font-medium text-gray-700">Profile Picture</label>
-						<input
-							type="file" 
-							id="urldata"
-							name="mediaUrl" 
-							multiple
-							accept=".jpg, .jpeg, .png, .svg, .gif"
-							onChange={handleFileInput}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              ref={fileInputRef}
-            />
-						{cropWindow && (
-              <div>
-                <Cropper
-                  src={previewUrl || 'avatar.png'}
-                  style={{ height: 400, width: '100%' }}
-                  initialAspectRatio={1}
-                  guides={false}
-                  ref={cropperRef}
-                />
-                <button onClick={getCropData} 
-                className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Crop Image</button>
-              </div>
-            )}
-					</div>
-						<div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-              <input
-                id="username"
-                type="username"
-                placeholder="Enter your username"
-                value={userName || ""}
-                onChange={(e) => setUserName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-							<label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Display Name</label>
-							<input
-								id="fullname"
-								type="fullname"
-								placeholder="Enter your fullname"
-								value={fullName || ""}
-								onChange={(e) => setFullName(e.target.value)}
-								className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-							/>
-						</div>
-						<div>
-							<label htmlFor="website" className="block text-sm font-medium text-gray-700">Website</label>
-							<input
-								id="website"
-								type="website"
-								placeholder="Enter your personal website"
-								value={userWebsite || ""}
-								onChange={(e) => setUserWebsite(e.target.value)}
-								className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-							/>
-						</div>
-							<div>
-								<label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio</label>
-								<input
-									id="bio"
-									type="bio"
-									placeholder="Enter your bio"
-									value={userBio || ""}
-									onChange={(e) => setUserBio(e.target.value)}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-								/>
-							</div>
-            </div>
-            
-            {error && <p className="text-red-600">{error}</p>}
-            {message && <p className="text-green-600">{message}</p>}
-            {/* Navigation Links */}
-            <div className="mt-4 w-full">
-							<button onClick={handleEditProfile}>
-								Save
-							</button>
-            </div>
-			<div className="mt-4 w-full">
-				<button onClick={handleReturn}>
-					Back
-				</button>
+  return (
+	<div className="max-w-4xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-lg">
+	  <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Edit Profile</h2>
+	  
+	  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+		<div className="space-y-6">
+		  <div className="flex flex-col items-center">
+			<div className="relative group">
+			  <Image
+				className="h-32 w-32 rounded-full border-4 border-blue-500 mb-4 transition-opacity group-hover:opacity-75"
+				src={previewUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+				alt="User Avatar"
+				width={128}
+				height={128}
+			  />
+			  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+				<label htmlFor="avatar" className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300">
+				  <FaUpload className="inline mr-2" />
+				  Change
+				  <input
+					type="file"
+					id="avatar"
+					name="mediaUrl"
+					accept=".jpg, .jpeg, .png, .svg, .gif"
+					onChange={handleFileInput}
+					className="hidden"
+					ref={fileInputRef}
+				  />
+				</label>
+			  </div>
 			</div>
-  </div>
-
-        
+		  </div>
+  
+		  <div className="space-y-4">
+			<div>
+			  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+				<FaUser className="inline mr-2" />Username
+			  </label>
+			  <input
+				id="username"
+				type="text"
+				placeholder="Enter your username"
+				value={userName || ""}
+				onChange={(e) => setUserName(e.target.value)}
+				className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			  />
+			</div>
+			
+			<div>
+			  <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">
+				<FaUser className="inline mr-2" />Display Name
+			  </label>
+			  <input
+				id="fullname"
+				type="text"
+				placeholder="Enter your full name"
+				value={fullName || ""}
+				onChange={(e) => setFullName(e.target.value)}
+				className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			  />
+			</div>
+			
+			<div>
+			  <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+				<FaGlobe className="inline mr-2" />Website
+			  </label>
+			  <input
+				id="website"
+				type="url"
+				placeholder="Enter your personal website"
+				value={userWebsite || ""}
+				onChange={(e) => setUserWebsite(e.target.value)}
+				className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+			  />
+			</div>
+			
+			<div>
+			  <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
+				<FaInfoCircle className="inline mr-2" />Bio
+			  </label>
+			  <textarea
+				id="bio"
+				placeholder="Enter your bio"
+				value={userBio || ""}
+				onChange={(e) => setUserBio(e.target.value)}
+				className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+				rows={4}
+			  />
+			</div>
+		  </div>
+		</div>
+		
+		<div className="space-y-6">
+		  {error && <p className="text-red-600 bg-red-100 p-3 rounded-md">{error}</p>}
+		  {message && <p className="text-green-600 bg-green-100 p-3 rounded-md">{message}</p>}
+		  
+		  <div className="flex space-x-4">
+			<button onClick={handleEditProfile} className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
+			  Save Changes
+			</button>
+			<button onClick={handleReturn} className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-300">
+			  Cancel
+			</button>
+		  </div>
+		</div>
+	  </div>
+	  
+	  {cropWindow && (
+		<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		  <div className="bg-white p-6 rounded-lg max-w-md w-full">
+			<Cropper
+			  src={previewUrl || 'avatar.png'}
+			  style={{ height: 300, width: '100%' }}
+			  initialAspectRatio={1}
+			  guides={false}
+			  ref={cropperRef}
+			/>
+			<div className="mt-4 flex justify-end space-x-4">
+			  <button onClick={() => setCropWindow(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+			  <button onClick={getCropData} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Crop Image</button>
+			</div>
+		  </div>
+		</div>
+	  )}
+	</div>
   );
 }

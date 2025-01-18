@@ -16,8 +16,8 @@ export const metadata = {
   }) {
     return (
       <html lang="en">
-        <body className={`${inter.className} bg-gray-100`}>
-        <div className="hidden lg:block">
+        <body className={`${inter.className} bg-white`}>
+        <div>
           <Toolbar />
         </div>
         <main>

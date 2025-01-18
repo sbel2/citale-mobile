@@ -34,7 +34,7 @@ return (
   <div className="flex items-center justify-center min-h-screen p-4 relative">
       {/* Go Back Button */}
       <a
-          href="/account/log-in"
+          href="/log-in"
           aria-label="Go back to login"
           className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1"
       >
