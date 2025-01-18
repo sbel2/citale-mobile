@@ -19,15 +19,11 @@ export default function ProfileLayout({
         <html lang="en">
             <body className={`${inter.className} bg-white`}>
                 <div className="flex h-screen">
-                    {/* Toolbar - hidden on small screens, visible on large screens */}
-                    <div className="w-64">
+                    <div className="md:w-64">
                         <Toolbar />
                     </div>
                     <div className="flex-1 flex flex-col">
-                        {/* Header */}
                         <Header />
-
-                        {/* Profile Content */}
                         <main className="flex-1 p-4 bg-gray-951">
                             {children}
                         </main>

@@ -13,7 +13,6 @@ export default function ProfilePage() {
     const [userProfile, setUserProfile] = useState<any>(null);
     const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
 
-    // Fetch user profile data when user is available
     useEffect(() => {
         if (user) {
             const fetchProfile = async () => {
@@ -35,53 +34,53 @@ export default function ProfilePage() {
     }, [user]);
 
     return (
-        <div className="flex flex-col items-center p-6 bg-white w-full h-screen">
-        {userProfile ? (
-            <div className="flex items-start gap-6 md:gap-16">
-                {/* Profile Image Section */}
-                <div className="flex-shrink-0">
-                    <Image
-                        className="h-16 w-16 md:h-32 md:w-32 rounded-full border-4 border-white"
-                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-                        alt="User Avatar"
-                        width={128}
-                        height={128}
-                    />
-                </div>
-
-                {/* User Info Section */}
-                <div className="flex flex-col justify-center">
-                    <div className="flex items-center mb-2">
-                    <h2 className="text-l md:text-2xl font-semibold text-gray-800 mr-5">
-                        {userProfile.full_name ? userProfile.full_name : userProfile.username}
-                    </h2>
-                    <button
-                        onClick={() => router.push('/account/edit-profile')}
-                        className="px-2 py-1 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600 transition"
-                    >
-                        Edit Profile
-                    </button>
-                </div>
-                <div className="text-base md:text-xl text-gray-600 mb-4">
-                    {userProfile.full_name ? userProfile.username : ''}
-                </div>
-                    {userProfile.website && (
-                        <div className="text-sm md:text-md">
-                            <Linkify>
-                                <a className="text-blue-500">{userProfile.website}</a>
-                            </Linkify>
+        <div className="w-full min-h-screen bg-white">
+            {userProfile ? (
+                <div className="px-4 pt-6">
+                    <div className="flex flex-col items-center">
+                        <div className="w-24 h-24 mb-4">
+                            <Image
+                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                                alt="Profile"
+                                width={96}
+                                height={96}
+                                className="rounded-full object-cover"
+                            />
                         </div>
-                    )}
-
-                    {/* Bio Section */}
-                    <div className="mt-4">
-                        <p className="text-sm text-gray-500">{userProfile.bio || 'No bio available'}</p>
+                        
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-xl font-medium">
+                                {userProfile.full_name ? userProfile.full_name : userProfile.username}
+                            </h1>
+                            <button
+                                onClick={() => router.push('/account/edit-profile')}
+                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                            >
+                                Edit Profile
+                            </button>
+                        </div>
+    
+                        <p className="text-gray-500 text-sm mb-4">{userProfile.username || ''}</p>
+                        
+                        {userProfile.website && (
+                            <div className="text-sm mb-4">
+                                <Linkify>
+                                    <a className="text-blue-500 hover:text-blue-600">{userProfile.website}</a>
+                                </Linkify>
+                            </div>
+                        )}
+                        
+                        <p className="text-gray-600 text-sm mb-4">{userProfile.bio || 'No bio yet'}</p>
                     </div>
+    
+                    <div className="flex justify-center border-b"></div>
                 </div>
-            </div>
-        ) : (
-            <p className="text-gray-500">Loading...</p>
-        )}
-    </div>
+            ) : (
+                <div className="flex justify-center items-center h-screen">
+                    <p className="text-gray-500">Loading...</p>
+                </div>
+            )}
+        </div>
     );
-} 
+    
+}
