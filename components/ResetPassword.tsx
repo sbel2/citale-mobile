@@ -34,12 +34,13 @@ return (
   <div className="flex items-center justify-center min-h-screen p-4 relative">
       {/* Go Back Button */}
       <a
-          href="/log-in"
-          aria-label="Go back to login"
-          className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1"
+        href="/"
+        aria-label="Go back home"
+        className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1"
       >
-          &#x2190; Back to Login
+        &#x2190; Home
       </a>
+
 
       {/* Form Container */}
       <div className="w-full h-full p-8 bg-white flex flex-col items-center justify-center md:h-[60%] md:w-[40%] rounded-lg md:border border-gray-200">
