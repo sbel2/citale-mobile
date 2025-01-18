@@ -17,10 +17,10 @@ export const metadata = {
     return (
       <html lang="en">
         <body className={`${inter.className} bg-white`}>
-        <div>
+        <div className="md:w-64">
           <Toolbar />
         </div>
-        <main>
+        <main className="flex-1 mb-64 md:ml-64">
           <div>
             {children}
           </div>

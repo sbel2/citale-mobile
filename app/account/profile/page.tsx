@@ -36,7 +36,7 @@ export default function ProfilePage() {
     return (
         <div className="w-full min-h-screen bg-white">
             {userProfile ? (
-                <div className="px-4 pt-6">
+                <div className="px-4 pt-3">
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4">
                             <Image
@@ -60,7 +60,9 @@ export default function ProfilePage() {
                             </button>
                         </div>
     
-                        <p className="text-gray-500 text-sm mb-4">{userProfile.username || ''}</p>
+                        <div className="text-gray-500 text-sm mb-4">
+                        {userProfile.full_name && userProfile.username ? userProfile.username : ''}
+                        </div>
                         
                         {userProfile.website && (
                             <div className="text-sm mb-4">
