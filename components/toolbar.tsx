@@ -40,6 +40,16 @@ const Toolbar = () => {
         />
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
+      <button onClick={() => push('/createpost')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
+        <Image
+          src={pathname === '/createpost' ? "/plus_s.svg" : "/plus.svg"}
+          alt="Plus Icon"
+          width={25}
+          height={25}
+          priority
+        />
+        <span className="ml-5 hidden md:inline">Create a Post</span>
+      </button>
     </nav>
   );
 };

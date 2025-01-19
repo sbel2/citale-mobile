@@ -1,5 +1,6 @@
 import React, { useState, useEffect , Suspense } from 'react';
 import {useSearchParams, usePathname} from 'next/navigation';
+import { categoryList } from '@/components/constants';
 
 interface FilterProps {
     onFilter: (option: string) => Promise<void>;
@@ -9,11 +10,6 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterOption, setFilterOption] = useState('');
   const filterParams = useSearchParams();
   const pathname = usePathname();
-
-  const categories = [
-    'All','Outdoor', 'Sport', 'Photography', 'Back Bay', 'Beacon Hill', 'Shopping', 'Market',
-    'Music', 'Dating', 'Performance', 'Event', 'Museum', 'Food', 'Art'
-  ];
 
   useEffect(() => {
     const option = filterParams.get('option');
@@ -45,7 +41,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
         }
       `}</style>
     <div className="flex m-2 xl:justify-center hide-scrollbar">
-      {categories.map((category) => (
+      {categoryList.map((category) => (
           <button
               key={category}
               type="button"
