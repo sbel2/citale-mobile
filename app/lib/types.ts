@@ -11,5 +11,7 @@ export interface Post {
     created_at: string;
     category?: string;
     user_id?: number;
+    username?: string;
+    avatar_url?: string;
   }
   

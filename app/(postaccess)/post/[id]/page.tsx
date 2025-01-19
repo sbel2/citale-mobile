@@ -51,6 +51,19 @@ export default function Page({ params }: { params: { id: string } }) {
     );
   }
 
+  const fetchUserProfile = async (userId: string) => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("username, avatar_url")
+      .eq("id", userId)
+      .single();
+    if(data){
+      postData.username = data.username;
+      postData.avatar_url = data.avatar_url;
+    }
+  };
+
   return (
     <div className="post-container md:w-[750px] md:h-[600px] lg:w-[850px] lg:h-[678px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
       <PostComponent post={postData} context="static" />
