@@ -62,7 +62,7 @@ export default function LogInForm({ onSignIn}: LogInFormProps) {
         <form onSubmit={handleSubmit} className="w-full flex flex-col">
           <input
             type="email"
-            placeholder="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"

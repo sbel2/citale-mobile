@@ -13,6 +13,8 @@ const Toolbar: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true); // Track loading state
   const { push } = useRouter();
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Check localStorage for avatar and set it initially
   useEffect(() => {
@@ -92,19 +94,35 @@ const Toolbar: React.FC = () => {
         </Link>
       )}
 
-      {/* Show Log out button when user is logged in */}
-      {!loading && user ? (
-        <a href="#" onClick={handleLogout} className="p-3 w-[88%] text-center bg-[#fd0000] text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all mx-auto mt-4 hidden md:block">
-          Log out
-        </a>
-      ) : null}
-
       {/* Show Log in button when user is not logged in */}
       {!loading && !user ? (
         <Link href="/log-in" className="p-3 w-[88%] text-center bg-[#fd0000] text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all mx-auto mt-4 hidden md:block">
           Log in
         </Link>
       ) : null}
+
+    {/* Menu Button */}
+      <div className="md:mt-auto w-full relative">
+        {/* Dropdown Menu */}
+        {isMenuOpen && (
+          <div className="absolute bottom-full mb-2 left-0 md:left-0 bg-white shadow-md rounded-lg w-full md:w-64">
+            {user ? (
+              <>
+                <a href="#" onClick={handleLogout} className="block p-4 hover:bg-gray-200 text-red-600">Log out</a>
+              </>
+            ) : (
+              <Link href="/log-in" className="block p-4 hover:bg-gray-200 text-black-600">Log in</Link>
+            )}
+          </div>
+        )}
+        <button
+          onClick={toggleMenu}
+          className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"
+        >
+          <Image src="/menu.svg" alt="Menu Icon" width={25} height={25} priority />
+          <span className="ml-5 hidden md:inline">Menu</span>
+        </button>
+      </div>
     </nav>
   );
 };
