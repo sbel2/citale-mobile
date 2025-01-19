@@ -13,7 +13,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
   // Categories grouped into All, Events, and Locations
   const categories = {
-    All: ['All'],
+    All: ['All', 'Free'],
     Events: ['Event', 'Performance', 'Music', 'Dating', 'Sport', 'Market', 'Museum', 'Food', 'Art', 'Photography'],
     Locations: ['Back Bay', 'Beacon Hill'],
   };
