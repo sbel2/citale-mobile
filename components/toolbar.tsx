@@ -10,6 +10,7 @@ import { useAuth } from 'app/context/AuthContext';
 const Toolbar: React.FC = () => {
   const { user, logout } = useAuth();
   const [userAvatar, setUserAvatar] = useState<string>('/account.svg');
+  const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // Track loading state
   const { push } = useRouter();
   const pathname = usePathname();
@@ -41,6 +42,7 @@ const Toolbar: React.FC = () => {
             const avatar = data?.avatar_url || '/account.svg';
             setUserAvatar(avatar);
             localStorage.setItem('userAvatar', avatar); // Store avatar in localStorage
+            setUserId(user.id);
           }
           setLoading(false);
         };
@@ -83,7 +85,7 @@ const Toolbar: React.FC = () => {
 
       {/* Profile Button always visible when user is logged in */}
       {user ? (
-        <Link href="/account/profile" className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
+        <Link href={`/account/${user.id}`} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
           <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`} alt="Profile Icon" width={25} height={25} className="rounded-full" priority />
           <span className="ml-5 hidden md:inline">Profile</span>
         </Link>

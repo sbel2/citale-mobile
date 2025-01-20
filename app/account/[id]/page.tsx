@@ -13,7 +13,8 @@ import { Button } from '@nextui-org/react';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
-export default function ProfilePage() {
+export default function ProfilePage({ params }: { params: { id: string } }) {
+    const { id: userId } = params;
     const { user, logout } = useAuth();
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<any>(null);
@@ -27,29 +28,25 @@ export default function ProfilePage() {
     const postButtons = ['My Posts', 'My likes', 'My Archived'];
     // Fetch user profile data from Supabase
     useEffect(() => {
-        if (user) {
-            const fetchUserData = async () => {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('username, email, avatar_url, website, bio, full_name')
-                    .eq('id', user.id)
-                    .single();
+        const fetchUserData = async () => {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, email, avatar_url, website, bio, full_name')
+                .eq('id', userId)
+                .single();
 
-                if (error) {
-                    console.error('Error fetching user profile:', error.message);
-                    return;
-                }
-                setUserAvatar(data.avatar_url || 'avatar.png');  // Set avatar URL
-                setUserProfile(data);  // Store the entire user profile
-                setFetchSuccess(true);
-                handleFetchUserPosts(user.id);
-            };
+            if (error) {
+                console.error('Error fetching user profile:', error.message);
+                return;
+            }
+            setUserAvatar(data.avatar_url || 'avatar.png');  // Set avatar URL
+            setUserProfile(data);  // Store the entire user profile
+            setFetchSuccess(true);
+            handleFetchUserPosts(userId);
+        };
 
-            fetchUserData();
-        } else {
-            console.error('User is not logged in');
-        }
-    }, [user]);
+        fetchUserData();
+    }, [userId]);
 
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
@@ -167,7 +164,7 @@ export default function ProfilePage() {
                             <button
                                 key={category}
                                 type="button"
-                                onClick={() => handleCategoryClick(category, user.id)}
+                                onClick={() => handleCategoryClick(category, userId)}
                                 className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
                             >
                             {category}
