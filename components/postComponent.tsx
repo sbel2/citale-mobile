@@ -5,6 +5,7 @@ import Image from 'next/image';
 import styles from "./postComponent.module.css";
 import {useRouter} from 'next/navigation';
 import { Post } from "@/app/lib/types";
+import { supabase } from "@/app/lib/definitions";
 
 //defining the variables
 interface PostComponentProps {
@@ -41,6 +42,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [username, setUsername] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const headerClass = context === 'popup' ? styles.popup : styles.static;
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
@@ -93,6 +96,27 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     }
   }
 
+  useEffect(() => {
+    const handleFetchUserProfile = async () => {
+      // Fetch user profile data from the server
+      const {data, error} = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', post.user_id)
+        .single();
+      if (error) {
+        console.error('Error fetching user profile:', error.message);
+        return;
+      }
+      if(data){
+        setUsername(data?.username || '');
+        setAvatarUrl(data?.avatar_url || '');
+        console.log(data);
+      }
+    };
+    handleFetchUserProfile();
+  }, [post.user_id]);
+
 
   return (
     <>
@@ -143,13 +167,13 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           <div className={styles.header}>
             <div className="flex items-center ml-8">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${post.avatar_url}`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
                 alt="Profile"
                 width={40}
                 height={40}
                 className="rounded-full mr-5"
               />
-              <p>{post.username}</p>
+              <p>{username}</p>
             </div>
           </div>
           <div className={`${styles.content} mt-8 mb-2`}>

@@ -49,19 +49,6 @@ export default function Page({ params }: { params: { id: string } }) {
         <p className="text-xl text-gray-600">No post found :(</p>
       </div>
     );
-  }
-
-  const fetchUserProfile = async (userId: string) => {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("username, avatar_url")
-      .eq("id", userId)
-      .single();
-    if(data){
-      postData.username = data.username;
-      postData.avatar_url = data.avatar_url;
-    }
   };
 
   return (

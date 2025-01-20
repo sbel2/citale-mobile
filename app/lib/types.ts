@@ -10,8 +10,10 @@ export interface Post {
     like_count: number;
     created_at: string;
     category?: string;
-    user_id?: number;
-    username?: string;
-    avatar_url?: string;
+    user_id?: string;
   }
   
+  export interface UserProfile {
+    username: string;
+    avatar_url: string;
+  }
