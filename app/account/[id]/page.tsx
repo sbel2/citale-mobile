@@ -135,12 +135,15 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             <h1 className="text-xl font-medium">
                                 {userProfile.full_name ? userProfile.full_name : userProfile.username}
                             </h1>
-                            <button
+                            {user && user.id === userId && (
+                                <button
                                 onClick={() => router.push('/account/edit-profile')}
                                 className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
                             >
                                 Edit Profile
                             </button>
+                            )}
+                            
                         </div>
     
                         <div className="text-gray-500 text-sm mb-4">
@@ -157,7 +160,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                         
                         <p className="text-gray-600 text-sm mb-4">{userProfile.bio || 'No bio yet'}</p>
                     </div>
-                            {user ? (
                         <div>
                             <div className="flex m-2 xl:justify-center hide-scrollbar">
                             {postButtons.map((category) => (
@@ -172,9 +174,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     ))}
                         </div>
                     </div>
-                    ) : (
-                        <p>Loading...</p>
-                    )}
                     
                     <div className={styles.container}>
                         {posts.length === 0 ? (
