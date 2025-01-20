@@ -43,7 +43,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [username, setUsername] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const headerClass = context === 'popup' ? styles.popup : styles.static;
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
