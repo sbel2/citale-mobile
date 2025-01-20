@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from 'app/context/AuthContext';  // Using the AuthContext
+import { useAuth } from 'app/context/AuthContext';
 import { supabase } from '@/app/lib/definitions';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -14,7 +14,7 @@ import { Button } from '@nextui-org/react';
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
 export default function ProfilePage() {
-    const { user, logout } = useAuth();  // Use context for user and logout
+    const { user, logout } = useAuth();
     const router = useRouter();
     const [userProfile, setUserProfile] = useState<any>(null);
     const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
@@ -120,23 +120,41 @@ export default function ProfilePage() {
     };
 
     return (
-        <div className="flex flex-col items-center max-w-md mx-auto p-8 bg-gray-100 rounded-lg shadow-md">
-            <div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                {userProfile ? (
-                    <div>
-                        <Image
-                            className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-                            alt="User Avatar"
-                            width={128}
-                            height={128}
-                        />
-                        <h2 className="text-lg font-bold">{userProfile.full_name || 'No Name'}</h2>
-                        <h2 className="text-lg font-bold">{userProfile.username || 'Loading...'}</h2>
-                        <p className="text-sm text-gray-300">{userProfile.email || 'Loading...'}</p>
+        <div className="w-full min-h-screen bg-white">
+            {userProfile ? (
+                <div className="px-4 pt-3">
+                    <div className="flex flex-col items-center">
+                        <div className="w-24 h-24 mb-4">
+                            <Image
+                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                                alt="Profile"
+                                width={128}
+                                height={128}
+                                className="rounded-full object-cover"
+                            />
+                        </div>
+                        
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="text-xl font-medium">
+                                {userProfile.full_name ? userProfile.full_name : userProfile.username}
+                            </h1>
+                            <button
+                                onClick={() => router.push('/account/edit-profile')}
+                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                            >
+                                Edit Profile
+                            </button>
+                        </div>
+    
+                        <div className="text-gray-500 text-sm mb-4">
+                        {userProfile.full_name && userProfile.username ? userProfile.username : ''}
+                        </div>
+                        
                         {userProfile.website && (
-                            <div className="mt-4 w-full">
-                                <Linkify componentDecorator={linkDecorator}>{userProfile.website}</Linkify>
+                            <div className="text-sm mb-4">
+                                <Linkify>
+                                    <a className="text-blue-500 hover:text-blue-600">{userProfile.website}</a>
+                                </Linkify>
                             </div>
                         )}
                         <p className="text-sm text-gray-300">{userProfile.bio || 'No bio available'}</p>
@@ -171,27 +189,16 @@ export default function ProfilePage() {
                     <MasonryGrid posts={posts} />
                 )}
             </div>
+            <div className="flex justify-center border-b"></div>
 
-            <div className="mt-4 w-full">
-                <button
-                    onClick={handleEditProfile}
-                    className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                    Edit Profile
-                </button>
-                <button
-                    onClick={handleLogout}
-                    className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                >
-                    LogOut
-                </button>
+            <div className="flex justify-center border-b"></div>
             </div>
-
-            <div className="mt-4 w-full">
-                <button onClick={handleReturn} className="p-4 w-full text-center md:text-left hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    Back
-                </button>
+        ) : (
+            <div className="flex justify-center items-center h-screen">
+                <p className="text-gray-500">Loading...</p>
             </div>
-        </div>
+        )}
+    </div>
     );
+    
 }

@@ -7,7 +7,8 @@ import { supabase } from '@/app/lib/definitions';
 import Image from 'next/image';
 import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
-import styles from '@/components/page.module.css';
+import { FaUser, FaGlobe, FaInfoCircle, FaUpload } from 'react-icons/fa';
+import Link from 'next/link';
 
 
 export default function ProfilePage() {
@@ -18,116 +19,110 @@ export default function ProfilePage() {
   const [userWebsite, setUserWebsite] = useState<string|null>(null);
   const [userBio, setUserBio] = useState<string|null>(null);
   const [fullName, setFullName] = useState<string|null>(null);
-	const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const cropperRef = useRef<ReactCropperElement>(null);
   const [cropWindow, setCropWindow] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-   // get user information
-    useEffect(() => {
-      const fetchUserData = async () => {
+  useEffect(() => {
+    const fetchUserData = async() => {
       const userId = await getUserId();
-      if(!userId){
+      if(!userId) {
         console.error('UserId not found');
         return;
-        }
+      }
       setUserId(userId);
 
-      // get user profile
-      const { data, error } = await supabase
+      const {data, error} = await supabase
         .from('profiles')
         .select('username, email, full_name, avatar_url, website, bio')
         .eq('id', userId)
         .single();
-      if (error) {
-        console.error('Error fetching user profile:', error.message);
+      if(error) {
+        console.error('Error fetching user profile:', error.message)
         return;
       }
-      setUserName(data?.username || '');
-      setUserEmail(data?.email || '');
-      setUserAvatar(data?.avatar_url || 'avatar.png');
-      setUserWebsite(data?.website || '');
-      setUserBio(data?.bio || '');
-      setFullName(data?.full_name || '');
-      };
-      fetchUserData();
-    }, []);
-
-    const handleEditProfile = async () => {
-      setError(null);
-      setMessage('Updating your password...');
-  
-      try {
-        const { success, message } = await updateProfile(
-          userId ?? '',
-          userName ?? '',
-          userEmail ?? '',
-          fullName ?? '',
-          userAvatar ?? '',
-          userWebsite ?? '',
-          userBio ?? ''
-        );
-        if (!success) {
-          setError(message);
-          setMessage('');
-          return;
-        }
-        setMessage(message);
-      } catch (e) {
-        console.error('Unexpected error during password update:', e);
-        setError('An unexpected error occurred.');
-        setMessage('');
-      }
+      setUserName(data?.username || null);
+      setUserEmail(data?.email || null);
+      setUserAvatar(data?.avatar_url || null);
+      setUserWebsite(data?.website || null);
+      setUserBio(data?.bio || null);
+      setFullName(data?.full_name || null);
     };
+    fetchUserData();
+  }, []);
 
-	const handleReturn = async () => {
-		router.back();
-	};
+  const handleEditProfile = async () => {
+    setError(null);
+    setMessage('Updating your profile...');
 
-	// Uploads a file to the storage bucket
-  const uploadPicToStorage = async (file: File) => {
-    if (!file) {
-      return;
+    try {
+      const { success, message } = await updateProfile(
+        userId ?? '',
+        userName ?? '',
+        userEmail ?? '',
+        fullName ?? '',
+        userAvatar ?? '',
+        userWebsite ?? '',
+        userBio ?? ''
+      );
+      if (!success) {
+        setError(message);
+        setMessage('');
+        return;
+      }
+      setMessage(message);
+      router.push('/account/profile');
+    } catch (e) {
+      console.error('Unexpected error during profile update:', e);
+      setError('An unexpected error occurred.');
+      setMessage('');
     }
-    const filePath = `${userId}/${Math.floor(Math.random() * 10000)}`;
+  };
+
+  const handleReturn = () => {
+    router.back();
+  };
+
+  const uploadPicToStorage = async (file: File) => {
+    if (!file) return;
+    const filePath = `${userId}/${Math.floor(Math.random() * 10000)}-${file.name}`;
     const { data, error } = await supabase.storage
       .from('profile-pic')
       .upload(filePath, file, {
         contentType: file.type,
         upsert: true,
       });
-      setUserAvatar(filePath);
-      console.log('filePath:', filePath);
     if (error) {
       console.error('Error uploading file:', error.message);
       return;
     }
+    setUserAvatar(filePath);
+	localStorage.setItem('userAvatar', filePath);
     return filePath;
   };
 
   const getCropData = async () => {
-    if (cropperRef.current) {
-      const croppedCanvas = (cropperRef.current?.cropper as any)?.getCroppedCanvas({
-        width: 128,
-        height: 128,
+    if (cropperRef.current && cropperRef.current.cropper) {
+      const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas({
+        width: 256,
+        height: 256,
       });
       croppedCanvas.toBlob(async (blob: Blob | null) => {
         if (blob) {
-          const file = new File([blob], 'cropped-image.png', { type: blob.type });
+          const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
           const filePath = await uploadPicToStorage(file);
           setPreviewUrl(URL.createObjectURL(file));
           setCropWindow(false);
-          return filePath;
         }
-      });
+      }, 'image/png');
     }
   };
 
-    // Handles Profile picture input
   const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
@@ -140,107 +135,147 @@ export default function ProfilePage() {
     }
   };
 
-        
-    return (
-			<div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-				<h2 className="text-2xl font-bold mb-6 text-center">Edit Profile</h2>
-				<div className="space-y-4">
-					<div className="p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-						<Image
-						className="h-32 w-32 rounded-full border-4 border-white mx-auto md:mx-0 mb-4"
-						src={previewUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
-						alt="User Avatar"
-						width={128}
-						height={128}
-						/>
-					</div>
-					<div>
-						<label htmlFor="avatar" className="block text-sm font-medium text-gray-700">Profile Picture</label>
-						<input
-							type="file" 
-							id="urldata"
-							name="mediaUrl" 
-							multiple
-							accept=".jpg, .jpeg, .png, .svg, .gif"
-							onChange={handleFileInput}
-							className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              ref={fileInputRef}
+  return (
+    <div>
+		<header className="shrink-0 border-b border-gray-200 bg-white md:hidden">
+        <div className="mx-auto px-4 py-2 flex justify-between items-center">
+          <a href="/" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
+            &#x2190; Home
+          </a>
+          <Link href="/" aria-label="Home" className="inline-block mt-1">
+            <Image
+              src="/citale_header.svg"
+              alt="Citale Logo"
+              width={90}
+              height={30}
+              priority
             />
-						{cropWindow && (
-              <div className={styles.popup}>
-                <div className={styles.popupInner}>
-                  <Cropper
-                    src={previewUrl || 'avatar.png'}
-                    style={{ height: 400, width: '100%' }}
-                    initialAspectRatio={1}
-                    guides={false}
-                    ref={cropperRef}
-                  />
-                  <button onClick={getCropData} 
-                  className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Crop Image</button>
+          </Link>
+        </div>
+      </header>
+      <div className="w-full mx-auto bg-white h-[100dvh] overflow-y-auto">
+        <div className="p-6 md:p-16">
+          <h2 className="text-base md:text-xl font-bold text-center text-gray-900 mb-8">Edit Profile</h2>
+          
+          <div className="space-y-8">
+            <div className="flex flex-col items-center">
+              <div className="relative group">
+                <Image
+                  className="h-32 w-32 rounded-full border-4 border-blue-500 transition-opacity group-hover:opacity-75"
+                  src={previewUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                  alt="User Avatar"
+                  width={128}
+                  height={128}
+                />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <label htmlFor="avatar" className="cursor-pointer bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300">
+                    <FaUpload className="inline mr-2" />
+                    Change
+                    <input
+                      type="file"
+                      id="avatar"
+                      name="mediaUrl"
+                      accept="image/*"
+                      onChange={handleFileInput}
+                      className="hidden"
+                      ref={fileInputRef}
+                    />
+                  </label>
                 </div>
               </div>
-            )}
-					</div>
-						<div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-              <input
-                id="username"
-                type="username"
-                placeholder="Enter your username"
-                value={userName || ""}
-                onChange={(e) => setUserName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-							<label htmlFor="fullname" className="block text-sm font-medium text-gray-700">Display Name</label>
-							<input
-								id="fullname"
-								type="fullname"
-								placeholder="Enter your fullname"
-								value={fullName || ""}
-								onChange={(e) => setFullName(e.target.value)}
-								className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-							/>
-						</div>
-						<div>
-							<label htmlFor="website" className="block text-sm font-medium text-gray-700">Website</label>
-							<input
-								id="website"
-								type="website"
-								placeholder="Enter your personal website"
-								value={userWebsite || ""}
-								onChange={(e) => setUserWebsite(e.target.value)}
-								className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-							/>
-						</div>
-							<div>
-								<label htmlFor="bio" className="block text-sm font-medium text-gray-700">Bio</label>
-								<input
-									id="bio"
-									type="bio"
-									placeholder="Enter your bio"
-									value={userBio || ""}
-									onChange={(e) => setUserBio(e.target.value)}
-									className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-								/>
-							</div>
             </div>
-            
-            {error && <p className="text-red-600">{error}</p>}
-            {message && <p className="text-green-600">{message}</p>}
-            {/* Navigation Links */}
-            <div className="mt-4 w-full">
-							<button onClick={handleEditProfile}>
-								Save
-							</button>
-            </div>
-			<div className="mt-4 w-full">
-				<button onClick={handleReturn}>
-					Back
-				</button>
-			</div>
-  </div>
 
-        
+            <div className="max-w-md mx-auto space-y-6">
+              <div>
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                  <FaUser className="inline mr-2" />Username
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={userName || ""}
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="fullname" className="block text-sm font-medium text-gray-700 mb-1">
+                  <FaUser className="inline mr-2" />Display Name
+                </label>
+                <input
+                  id="fullname"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={fullName || ""}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="website" className="block text-sm font-medium text-gray-700 mb-1">
+                  <FaGlobe className="inline mr-2" />Website
+                </label>
+                <input
+                  id="website"
+                  type="url"
+                  placeholder="Enter your personal website"
+                  value={userWebsite || ""}
+                  onChange={(e) => setUserWebsite(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">
+                  <FaInfoCircle className="inline mr-2" />Bio
+                </label>
+                <textarea
+                  id="bio"
+                  placeholder="Enter your bio"
+                  value={userBio || ""}
+                  onChange={(e) => setUserBio(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-4 py-3text-right sm:px-6">
+          {error && <p className="text-red-600 mb-2">{error}</p>}
+          {message && <p className="text-green-600 mb-2">{message}</p>}
+          <div className="flex justify-end space-x-3">
+            <button onClick={handleReturn} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+              Cancel
+            </button>
+            <button onClick={handleEditProfile} className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {cropWindow && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <Cropper
+              src={previewUrl || 'avatar.png'}
+              style={{ height: 300, width: '100%' }}
+              aspectRatio={1}
+              guides={false}
+              ref={cropperRef}
+            />
+            <div className="mt-4 flex justify-end space-x-4">
+              <button onClick={() => setCropWindow(false)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
+              <button onClick={getCropData} className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Crop Image</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

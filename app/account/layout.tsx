@@ -1,9 +1,11 @@
+import '../globals.css';
+
 export const metadata = {
   title: 'Citale | Explore Boston',
   description: 'Things to do in Boston',
 }
 
-export default function RootLayout({
+export default function RootAccLayout({
   children,
 }: {
   children: React.ReactNode

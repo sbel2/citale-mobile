@@ -9,18 +9,18 @@ export const metadata = {
     description: 'Profile Page',
   }
   
-  export default function RootLayout({
+  export default function EProfileLayout({
     children,
   }: {
     children: React.ReactNode
   }) {
     return (
       <html lang="en">
-        <body className={`${inter.className} bg-gray-100`}>
-        <div className="hidden lg:block">
+        <body className={`${inter.className} bg-white`}>
+        <div className="md:w-64">
           <Toolbar />
         </div>
-        <main>
+        <main className="flex-1 mb-64 md:ml-64">
           <div>
             {children}
           </div>
