@@ -157,48 +157,42 @@ export default function ProfilePage() {
                                 </Linkify>
                             </div>
                         )}
-                        <p className="text-sm text-gray-300">{userProfile.bio || 'No bio available'}</p>
+                        
+                        <p className="text-gray-600 text-sm mb-4">{userProfile.bio || 'No bio yet'}</p>
                     </div>
-                ) : (
-                    <p>Loading...</p>
-                )}
-            </div>
-            {user ? (
-                <div>
-                    <div className="flex m-2 xl:justify-center hide-scrollbar">
-                    {postButtons.map((category) => (
-                    <button
-                        key={category}
-                        type="button"
-                        onClick={() => handleCategoryClick(category, user.id)}
-                        className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
-                    >
-                    {category}
-                    </button>
-            ))}
+                            {user ? (
+                        <div>
+                            <div className="flex m-2 xl:justify-center hide-scrollbar">
+                            {postButtons.map((category) => (
+                            <button
+                                key={category}
+                                type="button"
+                                onClick={() => handleCategoryClick(category, user.id)}
+                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                            >
+                            {category}
+                            </button>
+                    ))}
+                        </div>
+                    </div>
+                    ) : (
+                        <p>Loading...</p>
+                    )}
+                    
+                    <div className={styles.container}>
+                        {posts.length === 0 ? (
+                            <p className="text-center">No posts found :) </p>
+                        ) : (
+                            <MasonryGrid posts={posts} />
+                        )}
+                    </div>
+                    <div className="flex justify-center border-b"></div>
                 </div>
-            </div>
             ) : (
-                <p>Loading...</p>
+                <div className="flex justify-center items-center h-screen">
+                    <p className="text-gray-500">Loading...</p>
+                </div>
             )}
-            
-            <div className={styles.container}>
-                {posts.length === 0 ? (
-                    <p className="text-center">No posts found :) </p>
-                ) : (
-                    <MasonryGrid posts={posts} />
-                )}
-            </div>
-            <div className="flex justify-center border-b"></div>
-
-            <div className="flex justify-center border-b"></div>
-            </div>
-        ) : (
-            <div className="flex justify-center items-center h-screen">
-                <p className="text-gray-500">Loading...</p>
-            </div>
-        )}
-    </div>
+        </div>
     );
-    
 }
