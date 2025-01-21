@@ -51,7 +51,7 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white">
-      <header className="shrink-0 border-b border-gray-200 bg-white md:hidden">
+      <header className="shrink-0 border-b border-gray-200 bg-white lg:hidden">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
           <a href="/" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
             &#x2190; Home

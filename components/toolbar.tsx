@@ -9,7 +9,7 @@ import { useAuth } from 'app/context/AuthContext';
 
 const Toolbar: React.FC = () => {
   const { user, logout } = useAuth();
-  const [userAvatar, setUserAvatar] = useState<string>('/account.svg');
+  const [userAvatar, setUserAvatar] = useState<string>('avatar.png');
   const [loading, setLoading] = useState<boolean>(true); // Track loading state
   const { push } = useRouter();
   const pathname = usePathname();
