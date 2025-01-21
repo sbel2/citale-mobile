@@ -143,7 +143,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           <div className={styles.header}>
             <div className="flex items-center ml-8">
               <Image
-                src={`https://qteefmlwxyvxjvehgjvp.supabase.co/storage/v1/object/public/profile-pic/citalelogo.jpg`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/citalelogo.jpg`}
                 alt="Profile"
                 width={40}
                 height={40}
