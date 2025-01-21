@@ -59,6 +59,18 @@ const Toolbar: React.FC = () => {
     };
 
     initializeAvatar();
+
+    // Clear localStorage when the tab is closed
+    const handleBeforeUnload = () => {
+      localStorage.removeItem('userAvatar');
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, [user]);
 
   const handleLogout = async () => {
