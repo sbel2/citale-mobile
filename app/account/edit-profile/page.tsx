@@ -75,6 +75,7 @@ export default function ProfilePage() {
         setMessage('');
         return;
       }
+      localStorage.setItem('userAvatar', userAvatar ?? '');
       setMessage(message);
       router.push('/account/profile');
     } catch (e) {
@@ -102,7 +103,6 @@ export default function ProfilePage() {
       return;
     }
     setUserAvatar(filePath);
-	localStorage.setItem('userAvatar', filePath);
     return filePath;
   };
 
