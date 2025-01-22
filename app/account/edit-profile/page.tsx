@@ -75,6 +75,7 @@ export default function ProfilePage() {
         setMessage('');
         return;
       }
+      localStorage.setItem('userAvatar', userAvatar ?? '');
       setMessage(message);
       router.push('/account/profile');
     } catch (e) {
@@ -102,7 +103,6 @@ export default function ProfilePage() {
       return;
     }
     setUserAvatar(filePath);
-	localStorage.setItem('userAvatar', filePath);
     return filePath;
   };
 
@@ -153,7 +153,7 @@ export default function ProfilePage() {
           </Link>
         </div>
       </header>
-      <div className="w-full mx-auto bg-white h-[100dvh] overflow-y-auto">
+      <div className="w-full mx-auto bg-white h-[100dvh] overflow-y-auto pb-30 md:pb-0">
         <div className="p-6 md:p-16">
           <h2 className="text-base md:text-xl font-bold text-center text-gray-900 mb-8">Edit Profile</h2>
           

@@ -13,6 +13,7 @@ const SignUpForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const supabase = createClient();
 
   const handleSignUp = async () => {
@@ -20,7 +21,7 @@ const SignUpForm = () => {
     setSuccess(false);
 
     try {
-      await signUpUser({ email, password, username});
+      await signUpUser({ email, password, username });
       setSuccess(true);
     } catch (err) {
       if (err instanceof Error) {
@@ -57,7 +58,7 @@ const SignUpForm = () => {
 
         {/* Sign Up Form */}
         <h1 className="text-2xl font-semibold mb-4 text-gray-800 text-center">Create an Account</h1>
-        
+
         {success && (
           <p className="text-green-600 text-sm mb-4 text-center">
             Sign-up successful! Please check your email to confirm your account.
@@ -80,19 +81,30 @@ const SignUpForm = () => {
             className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           />
+
+          {/* Show Password Checkbox */}
+          <label className="flex items-center mb-4 text-sm text-gray-600">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+              className="mr-2"
+            />
+            Show Password
+          </label>
 
           {password !== confirmPassword && confirmPassword.length > 0 && (
             <p className="text-red-600 text-sm mb-4 text-center">Passwords do not match</p>
@@ -105,8 +117,8 @@ const SignUpForm = () => {
             }}
             disabled={password !== confirmPassword}
             className={`p-2 text-white font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              password !== confirmPassword 
-                ? 'bg-gray-400 cursor-not-allowed' 
+              password !== confirmPassword
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600'
             }`}
           >
@@ -119,7 +131,10 @@ const SignUpForm = () => {
 
           {/* Login link */}
           <p className="mt-4 text-center">
-            Already have an account? <Link href="/log-in" className="text-blue-600 hover:underline">Log in</Link>
+            Already have an account?{' '}
+            <Link href="/log-in" className="text-blue-600 hover:underline">
+              Log in
+            </Link>
           </p>
         </form>
       </div>
