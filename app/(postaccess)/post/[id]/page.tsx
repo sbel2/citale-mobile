@@ -49,7 +49,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <p className="text-xl text-gray-600">No post found :(</p>
       </div>
     );
-  }
+  };
 
   return (
     <div className="post-container md:w-[750px] md:h-[600px] lg:w-[850px] lg:h-[678px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
