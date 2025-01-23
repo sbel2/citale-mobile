@@ -117,9 +117,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     };
 
     return (
-        <div className="w-full min-h-screen bg-white">
+        <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
             {userProfile ? (
-                <div className="px-4 pt-3">
+                <div className="px-4 pt-5">
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4">
                             <Image
@@ -182,7 +182,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             <MasonryGrid posts={posts} />
                         )}
                     </div>
-                    <div className="flex justify-center border-b"></div>
                 </div>
             ) : (
                 <div className="flex justify-center items-center h-screen">

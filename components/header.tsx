@@ -53,9 +53,11 @@ export default function Header({ font }: { font?: string }) {
         </div>
       </div>
       
-      {pathname !== "/search-results" && pathname !== "/account/profile" && !fromSearch && (
+      {!pathname.startsWith("/search-results") &&
+        !pathname.startsWith("/account/profile/") &&
+        !fromSearch && (
           <div className="w-full p-1">
-              <FilterButton onFilter={filterRoute} />
+            <FilterButton onFilter={filterRoute} />
           </div>
       )}
       
