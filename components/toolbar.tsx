@@ -60,16 +60,18 @@ const Toolbar: React.FC = () => {
 
     initializeAvatar();
 
-    // Clear localStorage when the tab is closed
-    const handleBeforeUnload = () => {
-      localStorage.removeItem('userAvatar');
+    // Clear localStorage when the tab becomes hidden
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        localStorage.removeItem('userAvatar');
+      }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Cleanup the event listener on component unmount
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user]);
 
@@ -78,6 +80,7 @@ const Toolbar: React.FC = () => {
     localStorage.removeItem('userAvatar'); // Clear cached avatar
     push('/');
   };
+
 
   return (
     <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
@@ -105,7 +108,7 @@ const Toolbar: React.FC = () => {
 
       {/* Profile Button */}
       {user ? (
-        <Link href={`/account/${user.id}`} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
+        <Link href={`/account/profile/${user.id}`} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
           <Image
             src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
             alt="Profile Icon"
