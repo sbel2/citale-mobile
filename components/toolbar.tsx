@@ -60,16 +60,18 @@ const Toolbar: React.FC = () => {
 
     initializeAvatar();
 
-    // Clear localStorage when the tab is closed
-    const handleBeforeUnload = () => {
-      localStorage.removeItem('userAvatar');
+    // Clear localStorage when the tab becomes hidden
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        localStorage.removeItem('userAvatar');
+      }
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Cleanup the event listener on component unmount
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [user]);
 
@@ -78,6 +80,7 @@ const Toolbar: React.FC = () => {
     localStorage.removeItem('userAvatar'); // Clear cached avatar
     push('/');
   };
+
 
   return (
     <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
