@@ -6,6 +6,7 @@ import styles from "./postComponent.module.css";
 import {useRouter} from 'next/navigation';
 import { Post } from "@/app/lib/types";
 import { supabase } from "@/app/lib/definitions";
+import { useAuth } from 'app/context/AuthContext';
 
 //defining the variables
 interface PostComponentProps {
@@ -50,6 +51,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const router = useRouter();
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
+  const { user, logout } = useAuth();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const handlePrevious = () => {
     const newIndex =
@@ -63,14 +66,73 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     setCurrentImageIndex(newIndex);
   };
 
-  const handleLike = () => {
-    if (!liked) {
-      setLikesCount(likesCount + 1);
-    } else {
-      setLikesCount(likesCount - 1);
+  const handleLike = async () => {
+    if (!user) {
+      // Show login popup if the user is not authenticated
+      setShowLoginPopup(true);
+      return;
     }
-    setLiked(!liked);
+  
+    try {
+      if (!liked) {
+        // Increment the like count in the 'likes' table
+        const { error: insertError } = await supabase
+          .from('likes')
+          .insert([{ user_id: user.id, post_id: post.post_id }]);
+  
+        if (insertError) {
+          console.error('Error adding like:', insertError.message);
+          return;
+        }
+  
+        // Increment the like count in the 'posts' table
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ like_count: likesCount + 1 })
+          .eq('post_id', post.post_id);
+  
+        if (updateError) {
+          console.error('Error updating post like count:', updateError.message);
+          return;
+        }
+  
+        // Update state
+        setLikesCount((prev) => prev + 1);
+      } else {
+        // Remove the like from the 'likes' table
+        const { error: deleteError } = await supabase
+          .from('likes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('post_id', post.post_id);
+  
+        if (deleteError) {
+          console.error('Error removing like:', deleteError.message);
+          return;
+        }
+  
+        // Decrement the like count in the 'posts' table
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ like_count: likesCount - 1 })
+          .eq('post_id', post.post_id);
+  
+        if (updateError) {
+          console.error('Error updating post like count:', updateError.message);
+          return;
+        }
+  
+        // Update state
+        setLikesCount((prev) => prev - 1);
+      }
+  
+      // Toggle the like state
+      setLiked(!liked);
+    } catch (error) {
+      console.error('Error handling like:', error);
+    }
   };
+  
 
   const handleBack = () => {
     setTimeout(() => {
@@ -116,6 +178,53 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     };
     handleFetchUserProfile();
   }, [post.user_id]);
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('likes')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('post_id', post.post_id)
+          .single();
+  
+        if (error) {
+          console.error('Error fetching like status:', error.message);
+          return;
+        }
+  
+        setLiked(!!data);
+      }
+    };
+  
+    fetchLikeStatus();
+  }, [user, post.post_id]);
+
+  useEffect(() => {
+    const fetchUpdatedLikeCount = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('like_count')
+          .eq('post_id', post.post_id)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching updated like count:', error.message);
+          return;
+        }
+  
+        if (data) {
+          setLikesCount(data.like_count); // Update the likesCount state with the latest value
+        }
+      } catch (err) {
+        console.error('Error fetching updated like count:', err);
+      }
+    };
+  
+    fetchUpdatedLikeCount();
+  }, [post.post_id]);  
 
 
   return (
@@ -203,18 +312,58 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           <div className={styles.footer}>
             <button className="flex items-center p-1 pr-8" onClick={handleLike}>
               {liked ? (
-                <svg fill='red' stroke="red" viewBox='0 0 24 24' className={styles.icon}>
-                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                <svg
+                  fill="red"
+                  stroke="red"
+                  viewBox="0 0 24 24"
+                  className={styles.icon}
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               ) : (
-                <svg fill='none' stroke='black' viewBox='0 0 24 24' className={styles.icon}>
-                  <path d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z' />
+                <svg
+                  fill="none"
+                  stroke="black"
+                  viewBox="0 0 24 24"
+                  className={styles.icon}
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               )}
               <span className="text-xs inline-block w-4 text-center">{likesCount}</span>
             </button>
+
+            {/* Login popup */}
+            {showLoginPopup && (
+              <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <div className="flex justify-center mb-3">
+                  <Image src="/citale_header.svg" alt="Citale Logo" width={100} height={60} priority />
+                </div>
+                  <p className="text-sm text-gray-600 mb-6">
+                    We are so glad you like Citale! <br /><br />
+                    Please sign in or sign up to interact with the community.
+                  </p>
+                  <div className="flex justify-center gap-6">
+                    <button
+                      className="bg-[#fd0000] hover:bg-[#fd0000] text-white px-4 py-2 rounded mr-2"
+                      onClick={() => router.push('/log-in')}
+                    >
+                      Log in
+                    </button>
+                    <button
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                      onClick={() => setShowLoginPopup(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
+
+          </div>
         </div>
         {context === 'static' && (
               <button

@@ -25,7 +25,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
 
-    const postButtons = ['My Posts'];
+    const postButtons = ['My Posts', 'My Likes'];
     // Fetch user profile data from Supabase
     useEffect(() => {
         const fetchUserData = async () => {
@@ -64,7 +64,32 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
     };
 
-    const handleFetchLikePosts = async (userId: string) => {
+    const handleFetchLikedPosts = async (userId: string) => {
+        const { data, error } = await supabase
+            .from('likes') // Assuming there's a 'likes' table
+            .select('post_id')
+            .eq('user_id', userId);
+    
+        if (error || !data) {
+            console.error('Error fetching liked posts:', error);
+            setPosts([]);
+            setloading(false);
+        } else {
+            const likedPostIds = data.map((like) => like.post_id);
+            const { data: postsData, error: postsError } = await supabase
+                .from('posts')
+                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at')
+                .in('post_id', likedPostIds);
+    
+            if (postsError || !postsData) {
+                console.error('Error fetching liked posts data:', postsError);
+                setPosts([]);
+                setloading(false);
+            } else {
+                setPosts(postsData);
+                setloading(false);
+            }
+        }
     };
 
     const handleArchivePosts = async (postId: string) => {
@@ -73,11 +98,13 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
-        if (option === 'My Posts'){
+        if (option === 'My Posts') {
             await handleFetchUserPosts(userId);
-            console.log(posts)
+        } else if (option === 'My Likes') {
+            await handleFetchLikedPosts(userId);
         }
     };
+    
 
 
     // Link decorator for clickable URLs in bio
@@ -158,10 +185,10 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             </div>
                         )}
                         
-                        <p className="text-gray-600 text-sm mb-4">{userProfile.bio || 'No bio yet'}</p>
+                        <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
                     </div>
                         <div>
-                            <div className="flex m-2 xl:justify-center hide-scrollbar">
+                            <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
                             {postButtons.map((category) => (
                             <button
                                 key={category}
@@ -174,6 +201,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     ))}
                         </div>
                     </div>
+
+                    <div className="border-b border-gray-300 mb-5"></div>
                     
                     <div className={styles.container}>
                         {posts.length === 0 ? (
