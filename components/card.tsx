@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
 import styles from "./card.module.css";
@@ -27,7 +27,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     } else {
       document.title = "Citale | Explore Boston";
     }
-  
+
     return () => {
       document.title = "Citale | Explore Boston"; // Cleanup on unmount
     };
@@ -41,38 +41,38 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   const handleClose = () => {
     setIsOpen(false); // Close the post dialog or component
     router.back();
-};
+  };
 
-const handleLike = async () => {
+  const handleLike = async () => {
     if (!user) {
       // Show login popup if the user is not authenticated
       setShowLoginPopup(true);
       return;
     }
-  
+
     try {
       if (!liked) {
         // Increment the like count in the 'likes' table
         const { error: insertError } = await supabase
           .from('likes')
           .insert([{ user_id: user.id, post_id: post.post_id }]);
-  
+
         if (insertError) {
           console.error('Error adding like:', insertError.message);
           return;
         }
-  
+
         // Increment the like count in the 'posts' table
         const { error: updateError } = await supabase
           .from('posts')
           .update({ like_count: likesCount + 1 })
           .eq('post_id', post.post_id);
-  
+
         if (updateError) {
           console.error('Error updating post like count:', updateError.message);
           return;
         }
-  
+
         // Update state
         setLikesCount((prev) => prev + 1);
       } else {
@@ -82,27 +82,27 @@ const handleLike = async () => {
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.post_id);
-  
+
         if (deleteError) {
           console.error('Error removing like:', deleteError.message);
           return;
         }
-  
+
         // Decrement the like count in the 'posts' table
         const { error: updateError } = await supabase
           .from('posts')
           .update({ like_count: likesCount - 1 })
           .eq('post_id', post.post_id);
-  
+
         if (updateError) {
           console.error('Error updating post like count:', updateError.message);
           return;
         }
-  
+
         // Update state
         setLikesCount((prev) => prev - 1);
       }
-  
+
       // Toggle the like state
       setLiked(!liked);
     } catch (error) {
@@ -110,73 +110,45 @@ const handleLike = async () => {
     }
   };
 
+  // Added effect to fetch profile data and like status concurrently
   useEffect(() => {
-      const handleFetchUserProfile = async () => {
-        // Fetch user profile data from the server
-        const {data, error} = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', post.user_id)
-          .single();
-        if (error) {
-          console.error('Error fetching user profile:', error.message);
+    const fetchData = async () => {
+      try {
+        const [profileData, likeData] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('username, avatar_url')
+            .eq('id', post.user_id)
+            .single(),
+          user
+            ? supabase
+                .from('likes')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('post_id', post.post_id)
+                .single()
+            : Promise.resolve(null), // Return null for unauthenticated users
+        ]);
+
+        if (profileData.error) {
+          console.error('Error fetching profile:', profileData.error.message);
           return;
         }
-        if(data){
-          setUsername(data?.username || '');
-          setAvatarUrl(data?.avatar_url || '');
-          console.log(data);
+        setUsername(profileData.data.username || '');
+        setAvatarUrl(profileData.data.avatar_url || '');
+
+        if (likeData?.error) {
+          console.error('Error fetching like status:', likeData.error.message);
+          return;
         }
-      };
-      handleFetchUserProfile();
-    }, [post.user_id]);
-  
-    useEffect(() => {
-      const fetchLikeStatus = async () => {
-        if (user) {
-          const { data, error } = await supabase
-            .from('likes')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('post_id', post.post_id)
-            .single();
-    
-          if (error) {
-            console.error('Error fetching like status:', error.message);
-            return;
-          }
-    
-          setLiked(!!data);
-        }
-      };
-    
-      fetchLikeStatus();
-    }, [user, post.post_id]);
-  
-    useEffect(() => {
-      const fetchUpdatedLikeCount = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('posts')
-            .select('like_count')
-            .eq('post_id', post.post_id)
-            .single();
-            
-          if (error) {
-            console.error('Error fetching updated like count:', error.message);
-            return;
-          }
-    
-          if (data) {
-            setLikesCount(data.like_count); // Update the likesCount state with the latest value
-          }
-        } catch (err) {
-          console.error('Error fetching updated like count:', err);
-        }
-      };
-    
-      fetchUpdatedLikeCount();
-    }, [post.post_id]);  
+        setLiked(!!likeData?.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, [user, post.user_id, post.post_id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -189,67 +161,66 @@ const handleLike = async () => {
     }}>
       <DialogTrigger asChild>
         <div>
-        <div onClick={handleClick} className="cursor-pointer">
-          <div className={styles['image-container']}>
-            {post.is_video ? (
-              <>
-                <video
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.thumbnailUrl}`}
+          <div onClick={handleClick} className="cursor-pointer">
+            <div className={styles['image-container']}>
+              {post.is_video ? (
+                <>
+                  <video
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.thumbnailUrl}`}
+                    width={300}
+                    height={200}
+                    autoPlay
+                    loop
+                    muted
+                    className="transition-transform duration-500 ease-in-out transform filter brightness-95"
+                    playsInline
+                  />
+                  <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="white"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      height="24"
+                      className="text-white"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                </>
+              ) : (
+                // Otherwise, display the image
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
+                  alt={post.title}
                   width={300}
                   height={200}
-                  autoPlay
-                  loop
-                  muted
-                  className="transition-transform duration-500 ease-in-out transform filter brightness-95"
-                  playsInline
+                  className="transition-transform duration-500 ease-in-out transform"
                 />
-                <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="text-white"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </>
-            ) : (
-              // Otherwise, display the image
-                <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
-                alt={post.title}
-                width={300}
-                height={200}
-                className="transition-transform duration-500 ease-in-out transform"
-              />
-            )}
-            <div className={styles['overlay']}></div>
-          </div>
+              )}
+              <div className={styles['overlay']}></div>
+            </div>
             <div className="px-2 pt-3">
               <div className="text-xs sm:text-sm line-clamp-3 text-black">
                 {post.title}
               </div>
             </div>
+          </div>
         </div>
-      </div>
       </DialogTrigger>
-      
+
       <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <VisuallyHidden>
           <DialogTitle>{post.title}</DialogTitle>
           <DialogDescription>
-          {post.description}
-        </DialogDescription>
+            {post.description}
+          </DialogDescription>
         </VisuallyHidden>
-        <PostComponent post={post} context="popup"/>
+        <PostComponent post={post} context="popup" />
         <DialogClose 
           onClick={handleClose}
           aria-label="Close"
-        >
-        </DialogClose>
+        />
       </DialogContent>
       <div className="flex items-center justify-between px-2 py-3">
         {/* Profile section */}
@@ -287,38 +258,38 @@ const handleLike = async () => {
           )}
           <span className="text-xs">{likesCount}</span>
         </button>
-        {/* Login popup */}
-        {showLoginPopup && (
-          <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+      </div>
+
+      {/* Login popup */}
+      {showLoginPopup && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <div className="flex justify-center mb-3">
               <Image src="/citale_header.svg" alt="Citale Logo" width={100} height={60} priority />
             </div>
-              <p className="text-sm text-gray-600 mb-6">
-                We are so glad you like Citale! <br /><br />
-                Please sign in or sign up to interact with the community.
-              </p>
-              <div className="flex justify-center gap-6">
-                <button
-                  className="bg-[#fd0000] hover:bg-[#fd0000] text-white px-4 py-2 rounded mr-2"
-                  onClick={() => router.push('/log-in')}
-                >
-                  Log in
-                </button>
-                <button
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
-                  onClick={() => setShowLoginPopup(false)}
-                >
-                  Cancel
-                </button>
-              </div>
+            <p className="text-sm text-gray-600 mb-6">
+              We are so glad you like Citale! <br /><br />
+              Please sign in or sign up to interact with the community.
+            </p>
+            <div className="flex justify-center gap-6">
+              <button
+                className="bg-[#fd0000] hover:bg-[#fd0000] text-white px-4 py-2 rounded mr-2"
+                onClick={() => router.push('/log-in')}
+              >
+                Log in
+              </button>
+              <button
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </Dialog>
   );
 };
 
 export default Card;
-
