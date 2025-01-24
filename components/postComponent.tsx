@@ -41,7 +41,9 @@ function isValidUrl(string: string): boolean {
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   const [liked, setLiked] = useState(false);
+  const [favorited, setFavorited] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
+  const [favoritesCount, setFavoritesCount] = useState(post.favorite_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
@@ -226,6 +228,121 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     fetchUpdatedLikeCount();
   }, [post.post_id]);  
 
+  const handleFavorite = async () => {
+    if (!user) {
+      // Show login popup if the user is not authenticated
+      setShowLoginPopup(true);
+      return;
+    }
+  
+    try {
+      if (!favorited) {
+        // Increment the like count in the 'likes' table
+        const { error: insertError } = await supabase
+          .from('favorites')
+          .insert([{ user_id: user.id, post_id: post.post_id }]);
+  
+        if (insertError) {
+          console.error('Error adding favorite:', insertError.message);
+          return;
+        }
+  
+        // Increment the like count in the 'posts' table
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ favorite_count: favoritesCount + 1 })
+          .eq('post_id', post.post_id);
+  
+        if (updateError) {
+          console.error('Error updating post favorite count:', updateError.message);
+          return;
+        }
+  
+        // Update state
+        setFavoritesCount((prev) => prev + 1);
+      } else {
+        // Remove the like from the 'likes' table
+        const { error: deleteError } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('post_id', post.post_id);
+  
+        if (deleteError) {
+          console.error('Error removing favorite:', deleteError.message);
+          return;
+        }
+  
+        // Decrement the like count in the 'posts' table
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ favorite_count: favoritesCount - 1 })
+          .eq('post_id', post.post_id);
+  
+        if (updateError) {
+          console.error('Error updating post favorite count:', updateError.message);
+          return;
+        }
+  
+        // Update state
+        setFavoritesCount((prev) => prev - 1);
+      }
+  
+      // Toggle the favorite state
+      setFavorited(!favorited);
+    } catch (error) {
+      console.error('Error handling favorite:', error);
+    }
+  };
+  
+
+  useEffect(() => {
+    const fetchFavoriteStatus = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('favorites')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('post_id', post.post_id)
+          .single();
+  
+        if (error) {
+          console.error('Error fetching favorite status:', error.message);
+          return;
+        }
+  
+        setFavorited(!!data);
+      }
+    };
+  
+    fetchFavoriteStatus();
+  }, [user, post.post_id]);
+
+  useEffect(() => {
+    const fetchUpdatedFavoriteCount = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('favorite_count')
+          .eq('post_id', post.post_id)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching updated like count:', error.message);
+          return;
+        }
+  
+        if (data) {
+          setFavoritesCount(data.favorite_count);
+        }
+      } catch (err) {
+        console.error('Error fetching updated favorite count:', err);
+      }
+    };
+  
+    fetchUpdatedFavoriteCount();
+  }, [post.post_id]); 
+
 
   return (
     <>
@@ -310,7 +427,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
             <div className='text-xs text-gray-500 mt-10 mb-20'>{post.created_at}</div>
           </div>
           <div className={styles.footer}>
-            <button className="flex items-center p-1 pr-8" onClick={handleLike}>
+            <button className="flex items-center p-1 pr-3" onClick={handleLike}>
               {liked ? (
                 <svg
                   fill="red"
@@ -331,6 +448,29 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
                 </svg>
               )}
               <span className="text-xs inline-block w-4 text-center">{likesCount}</span>
+            </button>
+
+            <button className="flex items-center p-1 pr-7" onClick={handleFavorite}>
+              {favorited ? (
+                <svg
+                  fill="#FFD700"
+                  stroke="#FFD700"
+                  viewBox="0 0 24 24"
+                  className={styles.icon}
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              ) : (
+                <svg
+                  fill="none"
+                  stroke="black"
+                  viewBox="0 0 24 24"
+                  className={styles.icon}
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              )}
+              <span className="text-xs inline-block w-4 text-center">{favoritesCount}</span>
             </button>
 
             {/* Login popup */}
