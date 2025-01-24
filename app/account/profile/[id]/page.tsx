@@ -25,7 +25,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
 
-    const postButtons = ['My Posts', 'My Likes'];
+    const postButtons = ['My Posts', 'My Likes', 'My Favs'];
     // Fetch user profile data from Supabase
     useEffect(() => {
         const fetchUserData = async () => {
@@ -51,7 +51,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
         .from("posts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at")
+            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at")
             .eq('user_id', userId);
         if (error || !data) {
             console.error('Error fetching post data:', error);
@@ -78,7 +78,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at')
+                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
                 .in('post_id', likedPostIds);
     
             if (postsError || !postsData) {
@@ -92,7 +92,32 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
     };
 
-    const handleArchivePosts = async (postId: string) => {
+    const handleFetchFavoritePosts = async (userId: string) => {
+        const { data, error } = await supabase
+            .from('favorites') // Assuming there's a 'likes' table
+            .select('post_id')
+            .eq('user_id', userId);
+    
+        if (error || !data) {
+            console.error('Error fetching favorited posts:', error);
+            setPosts([]);
+            setloading(false);
+        } else {
+            const FavoritedPostIds = data.map((like) => like.post_id);
+            const { data: postsData, error: postsError } = await supabase
+                .from('posts')
+                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .in('post_id', FavoritedPostIds);
+    
+            if (postsError || !postsData) {
+                console.error('Error fetching faved posts data:', postsError);
+                setPosts([]);
+                setloading(false);
+            } else {
+                setPosts(postsData);
+                setloading(false);
+            }
+        }
     };
 
     //check if user entered a query and calling onsearch to fetch results
@@ -102,10 +127,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             await handleFetchUserPosts(userId);
         } else if (option === 'My Likes') {
             await handleFetchLikedPosts(userId);
+        } else if (option === 'My Favs') {
+            await handleFetchFavoritePosts(userId);
         }
     };
     
-
 
     // Link decorator for clickable URLs in bio
     const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
@@ -129,19 +155,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
         return true;
     }
-
-    const handleLogout = async () => {
-        await logout();  // Use logout from context
-        router.push('/');
-    };
-
-    const handleEditProfile = () => {
-        router.push('/account/edit-profile');
-    };
-
-    const handleReturn = () => {
-        router.push('/');
-    };
 
     return (
         <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
