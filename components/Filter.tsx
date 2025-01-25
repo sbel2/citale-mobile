@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';  // Import styles for react-datepicker
 
 interface FilterProps {
-  onFilter: (option: string) => Promise<void>;
+  onFilter: (option: string, category: string) => Promise<void>;
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterEvents, setFilterEvents] = useState('Event');
-  const [filterLocations, setFilterLocations] = useState('Back Bay');
+  const [filterEvents, setFilterEvents] = useState('All');
+  const [filterLocations, setFilterLocations] = useState('All');
+  const [filterDate, setFilterDate] = useState<Date | null>(null);  // State for date
   const filterParams = useSearchParams();
   const pathname = usePathname();
 
-  // Categories grouped into All, Events, and Locations
   const categories = {
     All: ['All', 'Free'],
     Events: ['Event', 'Performance', 'Music', 'Dating', 'Sport', 'Market', 'Museum', 'Food', 'Art', 'Photography'],
@@ -20,34 +22,50 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
   useEffect(() => {
     const option = filterParams.get('option');
-
-    // Default to 'All' if on home page (this won't affect "All" filter button)
     if (pathname === '/') {
-      setFilterEvents('Event'); // Default event filter
-      setFilterLocations('Back Bay'); // Default location filter
+      setFilterEvents('All');
+      setFilterLocations('All');
+      setFilterDate(null);  // Reset date filter on home page load
     } else if (option) {
-      // Keep the "All" filter display static while updating the others
-      // Do not change the "All" filter when the URL changes.
+      // Example logic to update filters based on URL params
+      if (categories.Events.includes(option)) {
+        setFilterEvents(option);
+      } else if (categories.Locations.includes(option)) {
+        setFilterLocations(option);
+      }
     }
   }, [filterParams, pathname]);
 
-  // Handle when a dropdown option is selected for Events or Locations
-  const handleFilterChange = async (option: string, category: string) => {
-    if (category === 'Events') setFilterEvents(option);
-    if (category === 'Locations') setFilterLocations(option);
-    
+  const handleFilterChange = useCallback(async (option: string, category: string) => {
+    if (category === 'Events') {
+      setFilterEvents(option);
+    }
+    if (category === 'Locations') {
+      setFilterLocations(option);
+    }
+
     try {
-      await onFilter(option); // Trigger the filter logic after updating the option
+      await onFilter(option, category);  // Pass category along with option for flexibility
     } catch (error) {
       console.error('Filter error:', error);
     }
+  }, [onFilter]);
+
+  const handleResetFilters = async () => {
+    setFilterEvents('All');
+    setFilterLocations('All');
+    setFilterDate(null);  // Reset date filter
+    await onFilter('All', 'All');
   };
 
-  // Reset filters to "All" when clicking the "All" button
-  const handleResetFilters = async () => {
-    setFilterEvents('Event');  // Reset event filter
-    setFilterLocations('Back Bay');  // Reset location filter
-    await onFilter('All');  // Trigger the filter logic for "All"
+  const handleDateChange = async (date: Date | null) => {
+    setFilterDate(date);
+    // Optionally call onFilter with the selected date
+    if (date) {
+      await onFilter(date.toISOString(), 'Date');
+    } else {
+      await onFilter('All', 'Date');  // Reset date filter if no date is selected
+    }
   };
 
   return (
@@ -57,107 +75,75 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          position: relative;
-          width: 100%;
-          max-width: 100%;
           margin: 20px;
           padding: 10px;
-          background-color: #ffffff; /* White background */
+          background-color: #ffffff;
         }
-
         .dropdown-container {
           position: relative;
           flex: 1;
-          margin-right: 10px;
         }
-
         .dropdown-button {
           width: 100%;
           padding: 10px;
           background-color: white;
-          border: none; /* Removed border */
-          text-align: center;
-          font-weight: normal;
+          border: none;
           font-size: 16px;
           cursor: pointer;
           border-radius: 8px;
-          background-color: #ffffff; /* White background to match */
         }
-
         .dropdown-button:focus {
           outline: none;
         }
-
         .dropdown {
           display: none;
           position: absolute;
-          top: 0; /* No separation */
+          top: 0;
           left: 0;
           right: 0;
           background-color: white;
           border-radius: 8px;
-          box-shadow: none; /* No box shadow */
+          box-shadow: none;
           z-index: 10;
           min-width: 100%;
-          padding: 0;
         }
-
         .dropdown-container:hover .dropdown {
           display: block;
         }
-
         .dropdown-item {
           padding: 10px;
           cursor: pointer;
-          transition: background-color 0.3s;
         }
-
         .dropdown-item:hover {
           background-color: #f0f0f0;
         }
-
         .dropdown-header {
           padding: 8px 10px;
-          background-color: #f9f9f9; /* Light gray background */
+          background-color: #f9f9f9;
           font-weight: bold;
-          text-transform: uppercase;
           font-size: 14px;
-          color: #333;
         }
-
-        .hidden-select {
-          position: absolute;
-          opacity: 0;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          z-index: 5;
+        .date-picker-container {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
       `}</style>
 
       <div className="filter-bar">
         {/* Dropdown for All */}
         <div className="dropdown-container">
-          <select
-            className="hidden-select"
-            value="All"  // This is now static as "All"
-            onChange={handleResetFilters} // When "All" is clicked, reset the other filters
-          >
-            {categories.All.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <button className="dropdown-button" onClick={handleResetFilters}>{'All'}</button>
+          <button className="dropdown-button" onClick={handleResetFilters}>
+            {filterEvents === 'All' && filterLocations === 'All' ? 'All' : 'All'}
+          </button>
           <div className="dropdown">
             <div className="dropdown-header">All</div>
             {categories.All.map((option) => (
               <div
                 key={option}
                 className="dropdown-item"
-                onClick={handleResetFilters} // Reset the filters when clicking "All"
+                onClick={() => handleResetFilters()}
               >
                 {option}
               </div>
@@ -167,16 +153,9 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
         {/* Dropdown for Events */}
         <div className="dropdown-container">
-          <select
-            className="hidden-select"
-            value={filterEvents}
-            onChange={(e) => handleFilterChange(e.target.value, 'Events')}
-          >
-            {categories.Events.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          <button className="dropdown-button">{filterEvents}</button>
+          <button className="dropdown-button">
+            {filterEvents === 'All' ? 'Events' : filterEvents}
+          </button>
           <div className="dropdown">
             <div className="dropdown-header">Events</div>
             {categories.Events.map((option) => (
@@ -193,16 +172,9 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
         {/* Dropdown for Locations */}
         <div className="dropdown-container">
-          <select
-            className="hidden-select"
-            value={filterLocations}
-            onChange={(e) => handleFilterChange(e.target.value, 'Locations')}
-          >
-            {categories.Locations.map((option) => (
-              <option key={option} value={option}>{option}</option>
-            ))}
-          </select>
-          <button className="dropdown-button">{filterLocations}</button>
+          <button className="dropdown-button">
+            {filterLocations === 'All' ? 'Locations' : filterLocations}
+          </button>
           <div className="dropdown">
             <div className="dropdown-header">Locations</div>
             {categories.Locations.map((option) => (
@@ -215,6 +187,17 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Date Picker */}
+        <div className="date-picker-container">
+          <DatePicker
+            selected={filterDate}
+            onChange={handleDateChange}
+            placeholderText="Select a Date"
+            dateFormat="MMMM d, yyyy"
+            className="dropdown-button"
+          />
         </div>
       </div>
     </>
