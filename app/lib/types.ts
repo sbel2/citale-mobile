@@ -8,8 +8,13 @@ export interface Post {
     mapUrl: string;
     thumbnailUrl: string;
     like_count: number;
+    favorite_count: number;
     created_at: string;
     category?: string;
-    user_id?: number;
+    user_id?: string;
   }
   
+  export interface UserProfile {
+    username: string;
+    avatar_url: string;
+  }

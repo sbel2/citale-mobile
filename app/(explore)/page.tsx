@@ -20,7 +20,7 @@ export default function Home() {
       const supabase = createClient();
       const { data, error } = await supabase
         .from('posts')
-        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at')
+        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
 
@@ -33,7 +33,6 @@ export default function Home() {
       setPosts(data);
       setLoading(false);
     };
-
     fetchPosts();
   }, []);
 
@@ -56,6 +55,7 @@ export default function Home() {
       <div className={styles.container}>
           <MasonryGrid posts={posts}/>
       </div>
+      {/* block to for mobile toolbar to appear full */}
       <div className="fixed bottom-0 left-0 w-full h-12 bg-white p-4 shadow-md z-10 md:hidden"></div>
     </main>
   );
