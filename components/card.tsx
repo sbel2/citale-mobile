@@ -7,19 +7,22 @@ import styles from "./card.module.css";
 import Image from "next/image";
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
+import { usePathname, useRouter } from "next/navigation";
 
 const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+
 
   useEffect(() => {
     if (isOpen) {
@@ -40,6 +43,11 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
   const handleClose = () => {
     setIsOpen(false); // Close the post dialog or component
+    
+    if (pathname.startsWith('/account/profile/')) {
+      router.push(pathname);
+      return;
+    }
     router.back();
   };
 
@@ -224,16 +232,18 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
       </DialogContent>
       <div className="flex items-center justify-between px-2 py-3">
         {/* Profile section */}
-        <div className="flex items-center">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
-            alt="Profile"
-            width={20}
-            height={20}
-            className="rounded-full"
-          />
-          <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
-        </div>
+        <button onClick={()=>router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
+          <div className="flex items-center">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+              alt="Profile"
+              width={20}
+              height={20}
+              className="rounded-full"
+            />
+            <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
+          </div>
+        </button>
 
         {/* Like button */}
         <button className="flex items-center p-1" onClick={handleLike}>

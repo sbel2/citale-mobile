@@ -392,14 +392,16 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
           <div className={styles.header}>
             <div className="flex items-center ml-8">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
-                alt="Profile"
-                width={40}
-                height={40}
-                className="rounded-full mr-5"
-              />
-              <p>{username}</p>
+              <button onClick={()=>router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+                  alt="Profile"
+                  width={40}
+                  height={40}
+                  className="rounded-full mr-5"
+                />
+                <p>{username}</p>
+              </button>
             </div>
           </div>
           <div className={`${styles.content} mt-8 mb-2`}>
