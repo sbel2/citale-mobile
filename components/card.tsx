@@ -232,16 +232,18 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
       </DialogContent>
       <div className="flex items-center justify-between px-2 py-3">
         {/* Profile section */}
-        <div className="flex items-center">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
-            alt="Profile"
-            width={20}
-            height={20}
-            className="rounded-full"
-          />
-          <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
-        </div>
+        <button onClick={()=>router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
+          <div className="flex items-center">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+              alt="Profile"
+              width={20}
+              height={20}
+              className="rounded-full"
+            />
+            <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
+          </div>
+        </button>
 
         {/* Like button */}
         <button className="flex items-center p-1" onClick={handleLike}>
