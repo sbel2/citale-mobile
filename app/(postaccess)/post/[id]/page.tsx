@@ -15,8 +15,13 @@ export default function Page({ params }: { params: { id: string } }) {
 
     const fetchPostData = async () => {
       const { data, error } = await supabase
+<<<<<<< HEAD
         .from("testPost")
         .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at, video_type")
+=======
+        .from("posts")
+        .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count,created_at")
+>>>>>>> origin/main
         .eq("post_id", post_id)
         .single();
 
@@ -49,7 +54,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <p className="text-xl text-gray-600">No post found :(</p>
       </div>
     );
-  }
+  };
 
   return (
     <div className="post-container md:w-[750px] md:h-[600px] lg:w-[850px] lg:h-[678px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">

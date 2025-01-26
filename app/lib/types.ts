@@ -8,9 +8,18 @@ export interface Post {
     mapUrl: string;
     thumbnailUrl: string;
     like_count: number;
+    favorite_count: number;
     created_at: string;
     category?: string;
+<<<<<<< HEAD
     user_id?: number;
     video_type: boolean[];
+=======
+    user_id?: string;
+>>>>>>> origin/main
   }
   
+  export interface UserProfile {
+    username: string;
+    avatar_url: string;
+  }
