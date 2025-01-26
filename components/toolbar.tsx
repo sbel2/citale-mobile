@@ -106,6 +106,14 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
 
+      {/* <button
+        onClick={() => push('/help')}
+        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/help' ? 'font-semibold' : ''}`}
+      >
+        <Image src={pathname === '/help' ? "/question_mark_s.svg" : "/question_mark.svg"} alt="Help Icon" width={25} height={25} priority />
+        <span className="ml-5 hidden md:inline">Help</span>
+      </button> */}
+
       {/* Profile Button */}
       {user ? (
         <Link href={`/account/profile/${user.id}`} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>
