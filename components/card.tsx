@@ -7,11 +7,12 @@ import styles from "./card.module.css";
 import Image from "next/image";
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isOpen) {
@@ -32,6 +33,11 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
   const handleClose = () => {
     setIsOpen(false); // Close the post dialog or component
+    
+    if (pathname.startsWith('/account/profile/')) {
+      router.push(pathname);
+      return;
+    }
     router.back();
 };
 
