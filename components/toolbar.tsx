@@ -72,16 +72,7 @@ const Toolbar: React.FC = () => {
         <Image src={pathname === '/' ? "/home_s.svg" : "/home.svg"} alt="Home Icon" width={25} height={25} priority />
         <span className="ml-5 hidden md:inline">Home</span>
       </button>
-      <button onClick={() => push('/createpost')} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
-        <Image
-          src={pathname === '/createpost' ? "/plus_s.svg" : "/plus.svg"}
-          alt="Plus Icon"
-          width={25}
-          height={25}
-          priority
-        />
-        <span className="ml-5 hidden md:inline">Create a Post</span>
-      </button>
+      
       <button
         onClick={() => push('/talebot')}
         className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'font-semibold' : ''}`}
@@ -89,7 +80,17 @@ const Toolbar: React.FC = () => {
         <Image src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"} alt="Robot Icon" width={25} height={25} priority />
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
-      
+
+      <button onClick={() => {user ? push('/createpost') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
+        <Image
+          src={pathname === '/createpost' ? "/plus_s.svg" : "/plus.svg"}
+          alt="Plus Icon"
+          width={25}
+          height={25}
+          priority
+        />
+        <span className="ml-5 hidden md:inline">Create Post</span>
+      </button>
 
       {/* Profile Button always visible when user is logged in */}
       {user ? (
@@ -99,7 +100,7 @@ const Toolbar: React.FC = () => {
         </Link>
       ) : (
         <Link href="/log-in" className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all`}>
-          <Image src="/plus.svg" alt="Profile Icon" width={25} height={25} priority />
+          <Image src="/account.svg" alt="Profile Icon" width={25} height={25} priority />
           <span className="ml-5 hidden md:inline">Profile</span>
         </Link>
       )}

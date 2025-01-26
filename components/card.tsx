@@ -50,7 +50,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
             {post.is_video ? (
               <>
                 <video
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.thumbnailUrl}`}
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/video/${post.thumbnailUrl}`}
                   width={300}
                   height={200}
                   autoPlay
@@ -75,7 +75,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
             ) : (
               // Otherwise, display the image
                 <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/images/${post.mediaUrl[0]}`}
                 alt={post.title}
                 width={300}
                 height={200}

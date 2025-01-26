@@ -61,11 +61,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   };
 
   const handleLike = () => {
-    if (!liked) {
-      setLikesCount(likesCount + 1);
-    } else {
-      setLikesCount(likesCount - 1);
-    }
     setLiked(!liked);
   };
 
@@ -106,7 +101,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           {post.video_type[currentImageIndex] ? (
             // Video display if the post is a video
             <video
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/videos/${post.mediaUrl[currentImageIndex]}`}
+              src={`${post.mediaUrl[currentImageIndex]}`}
               controls
               autoPlay
               loop
@@ -116,7 +111,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           ) : (
             // Image display if the post is an image
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/images/${post.mediaUrl[currentImageIndex]}`}
+              src={`${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
               style={{ objectFit: "contain" }}

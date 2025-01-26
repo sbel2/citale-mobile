@@ -20,8 +20,8 @@ export default function Home() {
     const fetchPosts = async () => {
       const supabase = createClient();
       const { data, error } = await supabase
-        .from('posts')
-        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at')
+        .from('testPost')
+        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at, video_type')
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
 

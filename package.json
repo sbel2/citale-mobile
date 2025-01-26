@@ -15,6 +15,7 @@
     "@nextui-org/react": "^2.6.8",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-visually-hidden": "^1.1.0",
+    "@react-google-maps/api": "^2.20.5",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.44.2",
     "ai": "^4.0.13",

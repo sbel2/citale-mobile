@@ -11,5 +11,6 @@ export interface Post {
     created_at: string;
     category?: string;
     user_id?: number;
+    video_type: boolean[];
   }
   
