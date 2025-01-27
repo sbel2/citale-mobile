@@ -44,6 +44,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const [favorited, setFavorited] = useState(false);
   const [likesCount, setLikesCount] = useState(post.like_count);
   const [favoritesCount, setFavoritesCount] = useState(post.favorite_count);
+  const [commentsCount, setCommentsCount] = useState(post.comment_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
@@ -67,6 +68,51 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
       currentImageIndex < post.mediaUrl.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
   };
+
+  const handleBack = () => {
+    setTimeout(() => {
+        router.push('/');
+    }, 0);
+};
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX.current - touchEndX.current > 50) {
+      handleNext(); // Swipe left to move to the next image
+    }
+
+    if (touchEndX.current - touchStartX.current > 50) {
+      handlePrevious(); // Swipe right to move to the previous image
+    }
+  }
+
+  useEffect(() => {
+    const handleFetchUserProfile = async () => {
+      // Fetch user profile data from the server
+      const {data, error} = await supabase
+        .from('profiles')
+        .select('username, avatar_url')
+        .eq('id', post.user_id)
+        .single();
+      if (error) {
+        console.error('Error fetching user profile:', error.message);
+        return;
+      }
+      if(data){
+        setUsername(data?.username || '');
+        setAvatarUrl(data?.avatar_url || '');
+        console.log(data);
+      }
+    };
+    handleFetchUserProfile();
+  }, [post.user_id]);
 
   const handleLike = async () => {
     if (!user) {
@@ -134,52 +180,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
       console.error('Error handling like:', error);
     }
   };
-  
-
-  const handleBack = () => {
-    setTimeout(() => {
-        router.push('/');
-    }, 0);
-};
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.changedTouches[0].screenX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.changedTouches[0].screenX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current - touchEndX.current > 50) {
-      handleNext(); // Swipe left to move to the next image
-    }
-
-    if (touchEndX.current - touchStartX.current > 50) {
-      handlePrevious(); // Swipe right to move to the previous image
-    }
-  }
-
-  useEffect(() => {
-    const handleFetchUserProfile = async () => {
-      // Fetch user profile data from the server
-      const {data, error} = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', post.user_id)
-        .single();
-      if (error) {
-        console.error('Error fetching user profile:', error.message);
-        return;
-      }
-      if(data){
-        setUsername(data?.username || '');
-        setAvatarUrl(data?.avatar_url || '');
-        console.log(data);
-      }
-    };
-    handleFetchUserProfile();
-  }, [post.user_id]);
 
   useEffect(() => {
     const fetchLikeStatus = async () => {
@@ -341,7 +341,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     };
   
     fetchUpdatedFavoriteCount();
-  }, [post.post_id]); 
+  }, [post.post_id]);
 
 
   return (
