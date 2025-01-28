@@ -10,6 +10,7 @@ import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
 import { Button } from '@nextui-org/react';
+import { set } from 'zod';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -24,10 +25,16 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
-
+    const [following, setFollowing] = useState<boolean>(false);
+    const [followingCount, setFollowingCount] = useState<number>(0);
+    const [followersCount, setFollowersCount] = useState<number>(0);
+    // display buttons on profile pages
     const postButtons = ['My Posts', 'My Likes', 'My Favs'];
+    const relationshipButtons = ['Following', 'Followers'];
+
     // Fetch user profile data from Supabase
     useEffect(() => {
+        
         const fetchUserData = async () => {
             const { data, error } = await supabase
                 .from('profiles')
@@ -46,6 +53,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         };
 
         fetchUserData();
+        
     }, [userId]);
 
     const handleFetchUserPosts = async (userId: string) => {
@@ -131,8 +139,15 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             await handleFetchFavoritePosts(userId);
         }
     };
-    
 
+    const handleRelationshipClick = async (option: string, userId: string) => {
+        if (option === 'Following') {
+            router.push(`/account/profile/${userId}/follows`);
+        } else if (option === 'Followers') {
+            router.push(`/account/profile/${userId}/follows`);
+        }
+    };
+    
     // Link decorator for clickable URLs in bio
     const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
         if (!isValidUrl(href)) {
@@ -155,6 +170,94 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
         return true;
     }
+
+    const handleFollowButton = async () => {
+        const {data, error}  = await supabase
+        .from('relationships')
+        .select('user_id, follower_id')
+        .eq('user_id', user?.id) // the user that is logged in
+        .eq('follower_id',userId); // the user that is displaying on this profile page
+        console.log(data);
+        console.log(user?.id);
+        console.log(userId);
+        if(data && data.length > 0){
+            // unfollow
+            setFollowing(true);
+        } else {
+            // follow
+            setFollowing(false);
+        }
+    };
+
+    useEffect(() => {
+
+        const handleCalcFollowers = async () => {
+            const { data, error } = await supabase
+            .from('relationships')
+            .select('user_id, follower_id')
+            .eq('follower_id', userId);
+            console.log(data);
+    
+            if (error) {
+                console.error('Error fetching followers:', error.message);
+            }
+            if (data){
+                setFollowersCount(data.length);
+            }
+            
+        };
+        const handleCalcFollowings = async () => {
+            const { data, error } = await supabase
+            .from('relationships')
+            .select('user_id, follower_id')
+            .eq('user_id', userId);
+            console.log(data);
+    
+            if (error) {
+                console.error('Error fetching followers:', error.message);
+            }
+            if (data){
+                setFollowingCount(data.length);
+            }
+    
+        };
+        handleCalcFollowers();
+        handleCalcFollowings();
+
+    }, [following]);
+
+    
+
+    const handleFollow = async () => {
+        const { error } = await supabase
+        .from('relationships')
+        .insert([
+            {
+                user_id: user?.id,
+                follower_id: userId,
+            },
+        ]);
+        if (error) {
+            console.error('Error following user:', error.message);
+            return;
+        }
+        setFollowing(true);
+    };
+
+    const handleUnFollow = async () => {
+        const { error } = await supabase
+        .from('relationships')
+        .delete()
+        .eq('user_id', user?.id)
+        .eq('follower_id', userId);
+
+        if (error) {
+            console.error('Error unfollowing user:', error.message);
+            return;
+        }
+        setFollowing(false);
+    };
+
 
     return (
         <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
@@ -179,9 +282,18 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 <button
                                 onClick={() => router.push('/account/edit-profile')}
                                 className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                            >
+                                >   
                                 Edit Profile
-                            </button>
+                                </button>
+                            )}
+                            {user && user.id !== userId && (
+                                handleFollowButton(),
+                                <button
+                                onClick={() => following ? handleUnFollow() : handleFollow()}
+                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                                >   
+                                {following ? 'Unfollow' : 'Follow'}
+                                </button>
                             )}
                             
                         </div>
@@ -199,6 +311,18 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                         )}
                         
                         <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
+
+                        {/* Display followers and following counts*/}
+                        <div className="flex space-x-10 mb-6">
+                            <button onClick={() => handleRelationshipClick('Following', userId)} className="flex items-center">
+                                <p className="text-sm text-gray-500 mr-2">Following</p>
+                                <p className="text-sm font-medium">{followingCount}</p>
+                            </button>
+                            <button onClick={() => handleRelationshipClick('Followers', userId)} className="flex items-center">
+                                <p className="text-sm text-gray-500 mr-2">Follower</p>
+                                <p className="text-sm font-medium">{followersCount}</p>
+                            </button>
+                        </div>
                     </div>
                         <div>
                             <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
