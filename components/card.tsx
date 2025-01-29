@@ -10,19 +10,16 @@ import { Post } from "@/app/lib/types";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
 import { usePathname, useRouter } from "next/navigation";
+import { useLike } from "@/app/lib/useLikes";
 
 const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.like_count);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-
-
 
   useEffect(() => {
     if (isOpen) {
@@ -51,112 +48,41 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     router.back();
   };
 
-  const handleLike = async () => {
+  const { liked, likesCount, toggleLike } = useLike({
+    postId: post.post_id,
+    userId: user?.id,
+    initialLikeCount: post.like_count
+  });
+
+  const handleLike = () => {
     if (!user) {
-      // Show login popup if the user is not authenticated
       setShowLoginPopup(true);
       return;
     }
-
-    try {
-      if (!liked) {
-        // Increment the like count in the 'likes' table
-        const { error: insertError } = await supabase
-          .from('likes')
-          .insert([{ user_id: user.id, post_id: post.post_id }]);
-
-        if (insertError) {
-          console.error('Error adding like:', insertError.message);
-          return;
-        }
-
-        // Increment the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount + 1 })
-          .eq('post_id', post.post_id);
-
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-
-        // Update state
-        setLikesCount((prev) => prev + 1);
-      } else {
-        // Remove the like from the 'likes' table
-        const { error: deleteError } = await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('post_id', post.post_id);
-
-        if (deleteError) {
-          console.error('Error removing like:', deleteError.message);
-          return;
-        }
-
-        // Decrement the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount - 1 })
-          .eq('post_id', post.post_id);
-
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-
-        // Update state
-        setLikesCount((prev) => prev - 1);
-      }
-
-      // Toggle the like state
-      setLiked(!liked);
-    } catch (error) {
-      console.error('Error handling like:', error);
-    }
+    toggleLike();
   };
 
-  // Added effect to fetch profile data and like status concurrently
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfileData = async () => {
       try {
-        const [profileData, likeData] = await Promise.all([
-          supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('id', post.user_id)
-            .single(),
-          user
-            ? supabase
-                .from('likes')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('post_id', post.post_id)
-                .single()
-            : Promise.resolve(null), // Return null for unauthenticated users
-        ]);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('id', post.user_id)
+          .single();
 
-        if (profileData.error) {
-          console.error('Error fetching profile:', profileData.error.message);
-          return;
-        }
-        setUsername(profileData.data.username || '');
-        setAvatarUrl(profileData.data.avatar_url || '');
-
-        if (likeData?.error) {
-          console.error('Error fetching like status:', likeData.error.message);
-          return;
-        }
-        setLiked(!!likeData?.data);
+        if (error) throw error;
+        
+        setUsername(data.username || '');
+        setAvatarUrl(data.avatar_url || '');
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching profile:', error);
       }
     };
 
-    fetchData();
-  }, [user, post.user_id, post.post_id]);
+    fetchProfileData();
+  }, [post.user_id]);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
