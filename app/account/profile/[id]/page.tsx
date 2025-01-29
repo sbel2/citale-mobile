@@ -177,9 +177,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         .select('user_id, follower_id')
         .eq('user_id', user?.id) // the user that is logged in
         .eq('follower_id',userId); // the user that is displaying on this profile page
-        console.log(data);
-        console.log(user?.id);
-        console.log(userId);
+
         if(data && data.length > 0){
             // unfollow
             setFollowing(true);
@@ -196,7 +194,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             .from('relationships')
             .select('user_id, follower_id')
             .eq('follower_id', userId);
-            console.log(data);
     
             if (error) {
                 console.error('Error fetching followers:', error.message);
@@ -211,7 +208,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             .from('relationships')
             .select('user_id, follower_id')
             .eq('user_id', userId);
-            console.log(data);
     
             if (error) {
                 console.error('Error fetching followers:', error.message);
