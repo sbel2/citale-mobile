@@ -23,7 +23,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
+    const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
 
     const postButtons = ['Posts', 'Likes', 'Favs'];
     // Fetch user profile data from Supabase
@@ -207,7 +207,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 key={category}
                                 type="button"
                                 onClick={() => handleCategoryClick(category, userId)}
-                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'Posts' && category === 'Posts') ? 'bg-gray-300' : 'bg-white'}`}
                             >
                             {category}
                             </button>
