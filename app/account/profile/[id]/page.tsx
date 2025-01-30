@@ -123,11 +123,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
-        if (option === 'My Posts') {
+        if (option === 'Posts') {
             await handleFetchUserPosts(userId);
-        } else if (option === 'My Likes') {
+        } else if (option === 'Likes') {
             await handleFetchLikedPosts(userId);
-        } else if (option === 'My Favs') {
+        } else if (option === 'Favs') {
             await handleFetchFavoritePosts(userId);
         }
     };
