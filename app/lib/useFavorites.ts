@@ -1,8 +1,5 @@
-// hooks/useLikes.ts
-
 import { supabase } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
-// hooks/useFavorites.ts
 
 interface UseFavoriteProps {
     postId: number;
@@ -13,6 +10,34 @@ interface UseFavoriteProps {
 export const useFavorite = ({ postId, userId, initialFavoriteCount }: UseFavoriteProps) => {
     const [favorited, setFavorited] = useState(false);
     const [favoritesCount, setFavoritesCount] = useState(initialFavoriteCount);
+
+    const fetchFavoriteStatus = async () => {
+        if (!userId) return;
+
+        try {
+            // Fetch favorite status for the user
+            const { data: favoriteData, error: favoriteError } = await supabase
+                .from('favorites')
+                .select()
+                .match({ user_id: userId, post_id: postId })
+                .maybeSingle();
+
+            if (favoriteError) throw favoriteError;
+            setFavorited(!!favoriteData);
+
+            // Fetch latest favorite count
+            const { data: postData, error: postError } = await supabase
+                .from('posts')
+                .select('favorite_count')
+                .eq('post_id', postId)
+                .single();
+
+            if (postError) throw postError;
+            setFavoritesCount(postData.favorite_count);
+        } catch (error) {
+            console.error('Error fetching favorite status:', error);
+        }
+    };
 
     const updatePostFavoriteCount = async (count: number) => {
         const { error } = await supabase
@@ -31,10 +56,9 @@ export const useFavorite = ({ postId, userId, initialFavoriteCount }: UseFavorit
             .insert([{ user_id: userId, post_id: postId }]);
         
         if (error) throw new Error(`Failed to add favorite: ${error.message}`);
-        
+
         await updatePostFavoriteCount(favoritesCount + 1);
-        setFavoritesCount(prev => prev + 1);
-        setFavorited(true);
+        fetchFavoriteStatus(); // Ensure the UI updates across components
     };
 
     const removeFavorite = async () => {
@@ -46,10 +70,9 @@ export const useFavorite = ({ postId, userId, initialFavoriteCount }: UseFavorit
             .match({ user_id: userId, post_id: postId });
         
         if (error) throw new Error(`Failed to remove favorite: ${error.message}`);
-        
+
         await updatePostFavoriteCount(favoritesCount - 1);
-        setFavoritesCount(prev => prev - 1);
-        setFavorited(false);
+        fetchFavoriteStatus(); // Ensure the UI updates across components
     };
 
     const toggleFavorite = async () => {
@@ -64,26 +87,24 @@ export const useFavorite = ({ postId, userId, initialFavoriteCount }: UseFavorit
         }
     };
 
+    // Fetch favorite status when the component mounts or `postId`/`userId` changes
     useEffect(() => {
-        const fetchFavoriteStatus = async () => {
-            if (!userId) return;
-
-            try {
-                const { data, error } = await supabase
-                    .from('favorites')
-                    .select()
-                    .match({ user_id: userId, post_id: postId })
-                    .maybeSingle();
-
-                if (error) throw error;
-                setFavorited(!!data);
-            } catch (error) {
-                console.error('Error fetching favorite status:', error);
-            }
-        };
-
         fetchFavoriteStatus();
     }, [userId, postId]);
+
+    // Subscribe to Supabase Realtime updates for this post's favorite count
+    useEffect(() => {
+        const channel = supabase
+            .channel(`favorites_update_${postId}`)
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'posts', filter: `post_id=eq.${postId}` }, (payload) => {
+                setFavoritesCount(payload.new.favorite_count);
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [postId]);
 
     return { favorited, favoritesCount, toggleFavorite };
 };
