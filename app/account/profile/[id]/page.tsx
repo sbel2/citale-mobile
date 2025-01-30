@@ -21,10 +21,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
 
-    const postButtons = ['My Posts', 'My Likes', 'My Favs'];
+    const postButtons = ['Posts', 'Likes', 'Favs'];
     // Fetch user profile data from Supabase
     useEffect(() => {
         const fetchUserData = async () => {
