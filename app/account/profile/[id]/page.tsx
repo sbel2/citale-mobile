@@ -9,7 +9,6 @@ import Image from 'next/image';
 import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
-import { Button } from '@nextui-org/react';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -51,7 +50,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
         .from("posts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at")
+            .select("*")
             .eq('user_id', userId);
         if (error || !data) {
             console.error('Error fetching post data:', error);
@@ -78,7 +77,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .select('*')
                 .in('post_id', likedPostIds);
     
             if (postsError || !postsData) {
@@ -106,7 +105,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const FavoritedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .select('*')
                 .in('post_id', FavoritedPostIds);
     
             if (postsError || !postsData) {
