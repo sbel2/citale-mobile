@@ -72,6 +72,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               handleFavorite={handleFavorite}
               showLoginPopup={showLoginPopup}
               setShowLoginPopup={setShowLoginPopup}
+              post_id={post.post_id}
+              user_id={user?.id || ''}
           />
           </div>
         </div>
