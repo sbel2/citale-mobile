@@ -64,12 +64,14 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           <PostHeader post={post} />
           <PostContent post={post} />
           <PostFooter 
-            liked={liked}
-            likesCount={likesCount}
-            handleLike={handleLike}
-            favorited={favorited}
-            favoritesCount={favoritesCount}
-            handleFavorite={handleFavorite}
+              liked={liked}
+              likesCount={likesCount}
+              handleLike={handleLike}
+              favorited={favorited}
+              favoritesCount={favoritesCount}
+              handleFavorite={handleFavorite}
+              showLoginPopup={showLoginPopup}
+              setShowLoginPopup={setShowLoginPopup}
           />
           </div>
         </div>
