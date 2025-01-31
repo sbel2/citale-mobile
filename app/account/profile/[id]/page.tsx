@@ -30,6 +30,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [followersCount, setFollowersCount] = useState<number>(0);
     // display buttons on profile pages
     const postButtons = ['My Posts', 'My Likes', 'My Favs'];
+    const postButtons_others = ['My Posts']
     const relationshipButtons = ['Following', 'Followers'];
 
     // Fetch user profile data from Supabase
@@ -322,16 +323,30 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     </div>
                         <div>
                             <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
-                            {postButtons.map((category) => (
-                            <button
-                                key={category}
-                                type="button"
-                                onClick={() => handleCategoryClick(category, userId)}
-                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
-                            >
-                            {category}
-                            </button>
-                    ))}
+                                {user && user.id === userId && (
+                                    postButtons.map((category) => (
+                                        <button
+                                            key={category}
+                                            type="button"
+                                            onClick={() => handleCategoryClick(category, userId)}
+                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                        >
+                                        {category}
+                                        </button>
+                                    ))
+                                )}
+                                {user && user.id !== userId && (
+                                    postButtons_others.map((category) => (
+                                        <button
+                                            key={category}
+                                            type="button"
+                                            onClick={() => handleCategoryClick(category, userId)}
+                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                        >
+                                        {category}
+                                        </button>
+                                    ))
+                                )}
                         </div>
                     </div>
 
