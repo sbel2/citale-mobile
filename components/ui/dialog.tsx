@@ -54,6 +54,30 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
+const DialogContentForFollow = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "dialog-content fixed inset-0 z-50 grid transform-none overflow-hidden bg-white duration-200 sm:rounded-lg",
+        "max-w-[500px] max-h-[80vh] p-5",
+        "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogClose className="fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-2 rounded-full cursor-pointer">
+        <X className="h-6 w-6" />
+      </DialogClose>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContentForFollow.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({
   className,
@@ -117,6 +141,7 @@ export {
   DialogClose,
   DialogTrigger,
   DialogContent,
+  DialogContentForFollow,
   DialogHeader,
   DialogFooter,
   DialogTitle,
