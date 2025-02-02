@@ -12,6 +12,7 @@ import styles from '@/components/postComponent.module.css'
 import { Button } from '@nextui-org/react';
 import { set } from 'zod';
 import FollowingPopup from "./following/page";
+import FollowerPopup from "./follower/page";
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -29,7 +30,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [following, setFollowing] = useState<boolean>(false);
     const [followingCount, setFollowingCount] = useState<number>(0);
     const [followersCount, setFollowersCount] = useState<number>(0);
+    // open follow detail pop up
     const [isFollowingOpen, setIsFollowingOpen] = useState(false);
+    const [isFollowerOpen, setIsFollowerOpen] = useState(false);
     // display buttons on profile pages
     const postButtons = ['My Posts', 'My Likes', 'My Favs'];
     const postButtons_others = ['My Posts']
@@ -318,10 +321,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 <p className="text-sm font-medium">{followingCount}</p>
                             </button>
                             <FollowingPopup isOpen={isFollowingOpen} setIsOpen={setIsFollowingOpen} />
-                            <button onClick={() => handleRelationshipClick('Followers', userId)} className="flex items-center">
+                            <button onClick={() => setIsFollowerOpen(true)} className="btn">
                                 <p className="text-sm text-gray-500 mr-2">Follower</p>
                                 <p className="text-sm font-medium">{followersCount}</p>
                             </button>
+                            <FollowerPopup isOpen={isFollowerOpen} setIsOpen={setIsFollowerOpen} />
                         </div>
                     </div>
                         <div>
