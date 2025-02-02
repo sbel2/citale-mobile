@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/supabase/client';
 
@@ -13,7 +13,8 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterEvents, setFilterEvents] = useState('All');
   const [filterLocations, setFilterLocations] = useState('All');
   const [filterPrice, setFilterPrice] = useState('All');
-  const filterParams = useSearchParams(); // This is where the issue lies without Suspense
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const filterParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const [categories, setCategories] = useState<{
@@ -25,6 +26,35 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     Events: [],
     Locations: [],
   });
+
+  const eventsDropdownRef = useRef<HTMLDivElement | null>(null);
+  const locationsDropdownRef = useRef<HTMLDivElement | null>(null);
+  const priceDropdownRef = useRef<HTMLDivElement | null>(null);
+  const eventsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const locationsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const priceButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Detect clicks outside the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        (eventsDropdownRef.current && !eventsDropdownRef.current.contains(event.target as Node)) &&
+        (eventsButtonRef.current && !eventsButtonRef.current.contains(event.target as Node)) &&
+        (locationsDropdownRef.current && !locationsDropdownRef.current.contains(event.target as Node)) &&
+        (locationsButtonRef.current && !locationsButtonRef.current.contains(event.target as Node)) &&
+        (priceDropdownRef.current && !priceDropdownRef.current.contains(event.target as Node)) &&
+        (priceButtonRef.current && !priceButtonRef.current.contains(event.target as Node))
+      ) {
+        setDropdownOpen(null); // Close any open dropdown if clicked outside
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -49,22 +79,19 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
         setCategories({
           Events: eventsData
             ? [...new Set(eventsData.map((item: { categories_short: string }) => item.categories_short).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            .sort((a, b) => a.localeCompare(b))
             : [],
           Locations: locationsData
             ? [...new Set(locationsData.map((item: { location_short: string }) => item.location_short).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            .sort((a, b) => a.localeCompare(b))
             : [],
           Price: priceData
             ? [
                 ...new Set(priceData.map((item: { price: string }) => item.price).filter(Boolean))
               ]
                 .sort((a, b) => {
-                  // Move "Free" to the top
                   if (a === 'Free') return -1;
                   if (b === 'Free') return 1;
-
-                  // Otherwise, sort alphabetically
                   return a.localeCompare(b);
                 })
             : [],
@@ -125,124 +152,189 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     router.push(`${pathname}?${queryParams.toString()}`);
   };
 
+  // Toggle dropdown visibility
+  const toggleDropdown = (category: string) => {
+    setDropdownOpen(dropdownOpen === category ? null : category);
+  };
+
   return (
     <>
       <style jsx>{`
         .filter-bar {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          margin: 10px;
-          padding: 10px;
-          background-color: #ffffff;
+          padding: 15px 0;
+          background-color: #fff;
+          border-bottom: 1px solid #ddd;
+          margin-bottom: 20px;
         }
-        .dropdown-container {
+
+        .filter-dropdown {
           position: relative;
-          flex: 1;
+          margin: 0 15px;
         }
-        .dropdown-button {
-          width: 100%;
-          padding: 10px;
-          background-color: white;
-          border: none;
+
+        .filter-button {
+          padding: 10px 20px;
           font-size: 16px;
           cursor: pointer;
-          border-radius: 8px;
+          border: 2px solid #ccc;
+          border-radius: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: background-color 0.3s, border-color 0.3s;
+          width: 180px; /* Fixed width for consistency */
+          text-align: center; /* Ensure text is centered */
+          background-color: #f1f1f1; /* Light grey background */
         }
-        .dropdown-button:focus {
-          outline: none;
+
+        .filter-button:hover {
+          background-color: #b0b0b0; /* Dark grey on hover */
         }
-        .dropdown {
-          display: none;
+
+        .filter-button.active {
+          background-color: rgb(122, 122, 122);
+          color: white;
+          border-color:rgb(122, 122, 122);
+        }
+
+        .filter-button span {
+          font-size: 10px; /* Smaller arrow */
+          margin-left: 8px; /* Push arrow to the right */
+        }
+
+        .dropdown-options {
           position: absolute;
-          top: 0;
+          top: 40px;
           left: 0;
           right: 0;
           background-color: white;
+          border: 2px solid #ccc;
           border-radius: 8px;
-          box-shadow: none;
-          z-index: 10;
-          min-width: 100%;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+          z-index: 100;
+          max-height: 200px;
+          overflow-y: auto;
         }
-        .dropdown-container:hover .dropdown {
-          display: block;
-        }
+
         .dropdown-item {
           padding: 10px;
           cursor: pointer;
         }
+
         .dropdown-item:hover {
           background-color: #f0f0f0;
         }
-        .dropdown-header {
-          padding: 8px 10px;
-          background-color: #f9f9f9;
-          font-weight: bold;
-          font-size: 14px;
-        }
+
         .reset-button {
-          margin-left: 10px;
-          padding: 10px 15px;
+          margin-left: 20px;
+          padding: 10px 20px; /* Same padding as filter button */
           background-color: #fd0000;
           color: white;
           border: none;
-          border-radius: 8px;
+          border-radius: 20px;
           cursor: pointer;
+          font-size: 16px;
+          width: 180px; /* Fixed width to match the filter buttons */
+          text-align: center; /* Center text */
+          display: flex;
+          justify-content: center; /* Ensure text is centered */
+          align-items: center;
         }
+
         .reset-button:hover {
           background-color: #ff2222;
         }
       `}</style>
+
       <div className="filter-bar">
-        {/* Dropdown for Events */}
-        <div className="dropdown-container">
-          <button className="dropdown-button">{filterEvents === 'All' ? 'Events' : filterEvents}</button>
-          <div className="dropdown">
-            <div className="dropdown-header">Events</div>
-            {categories.Events.map((option) => (
-              <div key={option} className="dropdown-item" onClick={() => handleFilterChange(option, filterLocations, filterPrice, 'Events')}>
-                {option}
-              </div>
-            ))}
-          </div>
+        {/* Events Dropdown */}
+        <div className="filter-dropdown" ref={eventsDropdownRef}>
+          <button
+            className={`filter-button ${dropdownOpen === 'Events' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('Events')}
+            ref={eventsButtonRef}
+          >
+            {filterEvents === 'All' ? 'Events' : filterEvents}
+            <span>▼</span>
+          </button>
+          {dropdownOpen === 'Events' && (
+            <div className="dropdown-options">
+              {categories.Events.map((option) => (
+                <div
+                  key={option}
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange(option, filterLocations, filterPrice, 'Events')}
+                >
+                  {option}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Dropdown for Locations */}
-        <div className="dropdown-container">
-          <button className="dropdown-button">{filterLocations === 'All' ? 'Locations' : filterLocations}</button>
-          <div className="dropdown">
-            <div className="dropdown-header">Locations</div>
-            {categories.Locations.map((location) => (
-              <div key={location} className="dropdown-item" onClick={() => handleFilterChange(filterEvents, location, filterPrice, 'Locations')}>
-                {location}
-              </div>
-            ))}
-          </div>
+        {/* Locations Dropdown */}
+        <div className="filter-dropdown" ref={locationsDropdownRef}>
+          <button
+            className={`filter-button ${dropdownOpen === 'Locations' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('Locations')}
+            ref={locationsButtonRef}
+          >
+            {filterLocations === 'All' ? 'Locations' : filterLocations}
+            <span>▼</span>
+          </button>
+          {dropdownOpen === 'Locations' && (
+            <div className="dropdown-options">
+              {categories.Locations.map((location) => (
+                <div
+                  key={location}
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange(filterEvents, location, filterPrice, 'Locations')}
+                >
+                  {location}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Dropdown for Price */}
-        <div className="dropdown-container">
-          <button className="dropdown-button">{filterPrice === 'All' ? 'Price' : filterPrice}</button>
-          <div className="dropdown">
-            <div className="dropdown-header">Price</div>
-            {categories.Price.map((price) => (
-              <div key={price} className="dropdown-item" onClick={() => handleFilterChange(filterEvents, filterLocations, price, 'Price')}>
-                {price}
-              </div>
-            ))}
-          </div>
+        {/* Price Dropdown */}
+        <div className="filter-dropdown" ref={priceDropdownRef}>
+          <button
+            className={`filter-button ${dropdownOpen === 'Price' ? 'active' : ''}`}
+            onClick={() => toggleDropdown('Price')}
+            ref={priceButtonRef}
+          >
+            {filterPrice === 'All' ? 'Price' : filterPrice}
+            <span>▼</span>
+          </button>
+          {dropdownOpen === 'Price' && (
+            <div className="dropdown-options">
+              {categories.Price.map((price) => (
+                <div
+                  key={price}
+                  className="dropdown-item"
+                  onClick={() => handleFilterChange(filterEvents, filterLocations, price, 'Price')}
+                >
+                  {price}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Reset Button */}
         <button className="reset-button" onClick={resetFilters}>
-          Reset All Filters
+          Reset Filters
         </button>
       </div>
     </>
   );
 };
 
-// Wrap FilterButton in Suspense boundary
 const FilterComponent: React.FC<FilterProps> = (props) => {
   return (
     <Suspense fallback={<div>Loading filters...</div>}>
