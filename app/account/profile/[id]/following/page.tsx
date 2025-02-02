@@ -72,7 +72,7 @@ export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean;
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContentForFollow className="w-full max-w-xs h-64">
+            <DialogContentForFollow className="w-full max-w-xs h-64 overflow-y-auto rounded-lg">
                 <div className="p-6 text-center">
                     <div className="flex items-center justify-between">
                         <p className="text-lg font-semibold">Show Followings : {followingCount}</p>
