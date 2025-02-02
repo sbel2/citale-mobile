@@ -26,27 +26,27 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     Events: [],
     Locations: [],
   });
-  
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data: eventsData, error: eventsError } = await supabase
           .from('posts')
           .select('categories_short');
-    
+
         const { data: locationsData, error: locationsError } = await supabase
           .from('posts')
           .select('location_short');
-    
+
         const { data: priceData, error: priceError } = await supabase
           .from('posts')
           .select('price');
-    
+
         if (eventsError || locationsError || priceError) {
           console.error('Error fetching categories:', eventsError || locationsError || priceError);
           return;
         }
-    
+
         setCategories({
           Events: eventsData
             ? [...new Set(eventsData.map((item: { categories_short: string }) => item.categories_short).filter(Boolean))]
@@ -56,7 +56,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
             ? [...new Set(locationsData.map((item: { location_short: string }) => item.location_short).filter(Boolean))]
             .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
             : [],
-            Price: priceData
+          Price: priceData
             ? [
                 ...new Set(priceData.map((item: { price: string }) => item.price).filter(Boolean))
               ]
@@ -64,23 +64,19 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
                   // Move "Free" to the top
                   if (a === 'Free') return -1;
                   if (b === 'Free') return 1;
-          
+
                   // Otherwise, sort alphabetically
                   return a.localeCompare(b);
                 })
             : [],
-          
         });
       } catch (error) {
         console.error('Unexpected error:', error);
       }
     };
-  
+
     fetchCategories();
   }, []);
-  
-  
-  
 
   const updateFilterParams = (newOption: string, newLocation: string, newPrice: string) => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -119,14 +115,25 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     [onFilter]
   );
 
+  // Reset all filters
+  const resetFilters = () => {
+    setFilterEvents('All');
+    setFilterLocations('All');
+    setFilterPrice('All');
+
+    // Remove all query parameters
+    const queryParams = new URLSearchParams();
+    router.push(`${pathname}?${queryParams.toString()}`);
+  };
+
   return (
     <>
-    <style jsx>{`
+      <style jsx>{`
         .filter-bar {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin: 20px;
+          margin: 10px;
           padding: 10px;
           background-color: #ffffff;
         }
@@ -174,11 +181,17 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
           font-weight: bold;
           font-size: 14px;
         }
-        .date-picker-container {
-          flex: 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
+        .reset-button {
+          margin-left: 10px;
+          padding: 10px 15px;
+          background-color: #fd0000;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+        .reset-button:hover {
+          background-color: #ff2222;
         }
       `}</style>
       <div className="filter-bar">
@@ -220,6 +233,11 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
             ))}
           </div>
         </div>
+
+        {/* Reset Button */}
+        <button className="reset-button" onClick={resetFilters}>
+          Reset All Filters
+        </button>
       </div>
     </>
   );
