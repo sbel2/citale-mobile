@@ -31,7 +31,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     // display buttons on profile pages
     const postButtons = ['My Posts', 'My Likes', 'My Favs'];
     const postButtons_others = ['My Posts']
-    const relationshipButtons = ['Following', 'Followers'];
+    // const relationshipButtons = ['Following', 'Followers'];
 
     // Fetch user profile data from Supabase
     useEffect(() => {
@@ -143,9 +143,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleRelationshipClick = async (option: string, userId: string) => {
         if (option === 'Following') {
-            router.push(`/account/profile/${userId}/follows`);
+            router.push(`/account/profile/${userId}/following`);
         } else if (option === 'Followers') {
-            router.push(`/account/profile/${userId}/follows`);
+            router.push(`/account/profile/${userId}/follower`);
         }
     };
     
