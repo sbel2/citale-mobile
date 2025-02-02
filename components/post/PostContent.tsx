@@ -3,15 +3,18 @@ import React from "react";
 import Linkify from 'react-linkify';
 import { Post } from "@/app/lib/types";
 import styles from "@/components/postComponent.module.css";
+import { useComments } from '@/app/lib/useComments';
 
 interface PostContentProps {
   post: Post;
+  user_id?: string;
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post }) => {
+const PostContent: React.FC<PostContentProps> = ({ post, user_id }) => {
     
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
+  const { comments } = useComments({ post_id: post.post_id, user_id });
 
   function isValidUrl(href: string): boolean {
     try {
@@ -58,7 +61,20 @@ const PostContent: React.FC<PostContentProps> = ({ post }) => {
             })()}
             </div>
         )}
-        <div className='text-xs text-gray-500 mt-10 mb-20'>{post.created_at}</div>
+        <div className='text-xs text-gray-500 mt-10'>{post.created_at}</div>
+
+        {/* Comments section */}
+        <div className="mt-8 mb-20">
+          <h5 className="text-lg font-bold mb-4">Comments</h5>
+          {comments.map((comment) => (
+            <div key={comment.id} className="mb-4 p-3 bg-gray-100 rounded-lg">
+              <p>{comment.content}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                {new Date(comment.comment_at).toLocaleString()}
+              </p>
+            </div>
+          ))}
+        </div>
     </div>
   );
 };
