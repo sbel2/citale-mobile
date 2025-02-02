@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/supabase/client';
 
@@ -13,7 +13,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const [filterEvents, setFilterEvents] = useState('All');
   const [filterLocations, setFilterLocations] = useState('All');
   const [filterPrice, setFilterPrice] = useState('All');
-  const filterParams = useSearchParams();
+  const filterParams = useSearchParams(); // This is where the issue lies without Suspense
   const pathname = usePathname();
   const router = useRouter();
   const [categories, setCategories] = useState<{
@@ -242,8 +242,13 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   );
 };
 
-const Filter: React.FC<FilterProps> = (props) => {
-  return <FilterButton {...props} />;
+// Wrap FilterButton in Suspense boundary
+const FilterComponent: React.FC<FilterProps> = (props) => {
+  return (
+    <Suspense fallback={<div>Loading filters...</div>}>
+      <FilterButton {...props} />
+    </Suspense>
+  );
 };
 
-export default Filter;
+export default FilterComponent;
