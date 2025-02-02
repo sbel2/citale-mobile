@@ -15,7 +15,7 @@ export async function handleFilter(option: string, location: string, price: stri
       query = query.ilike('location_short', `%${location}%`);
     }
     if (price !== 'All') {
-      query = query.ilike('price', `%${price}%`);
+      query = query.eq('price',price);
     }
 
     // Apply ordering

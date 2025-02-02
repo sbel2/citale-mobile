@@ -56,10 +56,20 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
             ? [...new Set(locationsData.map((item: { location_short: string }) => item.location_short).filter(Boolean))]
             .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
             : [],
-          Price: priceData
-            ? [...new Set(priceData.map((item: { price: string }) => item.price).filter(Boolean))]
-            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            Price: priceData
+            ? [
+                ...new Set(priceData.map((item: { price: string }) => item.price).filter(Boolean))
+              ]
+                .sort((a, b) => {
+                  // Move "Free" to the top
+                  if (a === 'Free') return -1;
+                  if (b === 'Free') return 1;
+          
+                  // Otherwise, sort alphabetically
+                  return a.localeCompare(b);
+                })
             : [],
+          
         });
       } catch (error) {
         console.error('Unexpected error:', error);
