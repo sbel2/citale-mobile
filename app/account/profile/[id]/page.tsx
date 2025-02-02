@@ -26,7 +26,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
+    const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
     const [following, setFollowing] = useState<boolean>(false);
     const [followingCount, setFollowingCount] = useState<number>(0);
     const [followersCount, setFollowersCount] = useState<number>(0);
