@@ -1,12 +1,14 @@
 // app/lib/useComments.ts
 import { supabase } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
+import { UserProfile } from "./types";
 
 interface Comment {
   id: number;
   content: string;
   comment_at: string;
   user_id: string;
+  profiles?: UserProfile;
 }
 
 interface UseCommentsProps {
@@ -16,25 +18,37 @@ interface UseCommentsProps {
 
 export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
 
   const fetchComments = async () => {
-    const { data, error } = await supabase
-      .from('comments')
-      .select('*')
-      .eq('post_id', post_id)
-      .order('comment_at', { ascending: false });
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("comments")
+        .select(`
+          *,
+          profiles (username, avatar_url)
+        `)
+        .eq("post_id", post_id)
+        .order("comment_at", { ascending: false });
 
-    if (error) {
-      console.error('Error fetching comments:', error);
-    } else {
-      setComments(data || []);
+      if (error) {
+        console.error("Error fetching comments:", error);
+      } else {
+        const formattedData: Comment[] = data.map(comment => ({
+          ...comment,
+          profiles: Array.isArray(comment.profiles) 
+            ? comment.profiles[0] 
+            : comment.profiles
+        }));
+
+        setComments(formattedData || []);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, [post_id]);
 
   const saveComment = async (content: string) => {
     if (!user_id || !content.trim()) return;
@@ -62,5 +76,9 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     }
   };
 
-  return { saveComment, isSubmitting, comments };
+  useEffect(() => {
+    fetchComments();
+  }, [post_id]);
+
+  return { saveComment, isSubmitting, isLoading, comments };
 };

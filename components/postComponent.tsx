@@ -1,15 +1,17 @@
 "use client";
-import React, { useState} from "react";
+import React, { useState } from "react";
 import styles from "./postComponent.module.css";
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Post } from "@/app/lib/types";
 import { useAuth } from 'app/context/AuthContext';
 import { useLike } from 'app/lib/useLikes';
 import { useFavorite } from 'app/lib/useFavorites';
+import { useComments } from 'app/lib/useComments'; // Add this import
 import PostHeader from "./post/PostHeader";
 import PostMedia from "./post/PostMedia";
 import PostContent from "./post/PostContent";
 import PostFooter from "./post/PostFooter";
+import CommentPopup from "./post/CommentPopup";
 
 interface PostComponentProps {
   post: Post; 
@@ -21,6 +23,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [showCommentPopup, setShowCommentPopup] = useState(false);
+
+  const { 
+    comments, 
+    isLoading: commentsLoading, 
+    saveComment, 
+    isSubmitting: isCommentSubmitting 
+  } = useComments({ 
+    post_id: post.post_id, 
+    user_id: user?.id 
+  });
 
   const handleBack = () => {
     setTimeout(() => {
