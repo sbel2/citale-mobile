@@ -70,8 +70,10 @@ export default function FollowingPage() {
                 <ul>
                 {followingDetails.map((user: any, index: number) => (
                     <li key={index}>
-                        <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url}`} />
-                        {user.username}
+                        <button onClick={() => router.push(`/account/profile/${user.id}`)}>
+                            <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url}`} />
+                            {user.username}
+                        </button>
                     </li>
                 ))}
                 </ul>   

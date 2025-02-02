@@ -69,10 +69,10 @@ export default function FollowerPage() {
                 
                 <ul>
                 {followingDetails.map((user: any, index: number) => (
-                    <li key={index}>
+                    <button onClick={() => router.push(`/account/profile/${user.id}`)}>
                         <img src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url}`} />
                         {user.username}
-                    </li>
+                    </button>
                 ))}
                 </ul>   
             </div>
