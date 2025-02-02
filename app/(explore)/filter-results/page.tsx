@@ -13,24 +13,33 @@ const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: fal
 
 const Filter = () => {
   const searchParams = useSearchParams(); 
-  const selectedOption = searchParams.get('option');
+  const selectedOption = searchParams.get('option') || 'All';
+  const selectedLocation = searchParams.get('location') || 'All';
+  const selectedLocationTemp = 'Boston';
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+
+  console.log("selectedLocation: " + selectedLocation)
+  console.log("option: " + selectedOption)
+
+  console.log("🔄 Full searchParams:", searchParams.toString());
+  console.log("📌 selectedLocation:", selectedLocation);
+
 
   useEffect(() => {
     document.title = selectedOption ? `${selectedOption} - Citale Search` : 'Citale Search';
   
     return () => {
     };
-  }, [selectedOption]);
+  }, [selectedOption, selectedLocation]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedOption) {
+      if (selectedOption || selectedLocation) {
         setLoading(true);
-        const data = await handleFilter(selectedOption);
+        const data = await handleFilter(selectedOption, selectedLocation);
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);
@@ -39,7 +48,7 @@ const Filter = () => {
     };
 
     fetchData();
-  }, [selectedOption]);
+  }, [selectedOption, selectedLocation]);
 
   if (loading && firstLoad) {
     return (

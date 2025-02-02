@@ -5,8 +5,8 @@ import { useState } from 'react';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'Citale | Talebot',
-  description: 'recommendation bot',
+  title: 'Help Button',
+  description: 'Discord Help button',
 };
 
 export default function HelpButton({ children }: { children: React.ReactNode }) {

@@ -1,72 +1,90 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';  // Import styles for react-datepicker
 
 interface FilterProps {
-  onFilter: (option: string, category: string) => Promise<void>;
+  onFilter: (option: string, location: string, category: string) => Promise<void>;
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterEvents, setFilterEvents] = useState('All');
-  const [filterLocations, setFilterLocations] = useState('All');
-  const [filterDate, setFilterDate] = useState<Date | null>(null);  // State for date
+  const [filterEvents, setFilterEvents] = useState('');
+  const [filterLocations, setFilterLocations] = useState('');
   const filterParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
 
   const categories = {
     All: ['All', 'Free'],
-    Events: ['Event', 'Performance', 'Music', 'Dating', 'Sport', 'Market', 'Museum', 'Food', 'Art', 'Photography'],
-    Locations: ['Back Bay', 'Beacon Hill'],
+    Events: ['Outdoor', 'Date', 'Shopping'],
+    Locations: ['Boston', 'Cambridge'],
   };
 
-  useEffect(() => {
-    const option = filterParams.get('option');
-    if (pathname === '/') {
-      setFilterEvents('All');
-      setFilterLocations('All');
-      setFilterDate(null);  // Reset date filter on home page load
-    } else if (option) {
-      // Example logic to update filters based on URL params
-      if (categories.Events.includes(option)) {
-        setFilterEvents(option);
-      } else if (categories.Locations.includes(option)) {
-        setFilterLocations(option);
-      }
+  const updateFilterParams = (newOption: string, newLocation: string) => {
+    const queryParams = new URLSearchParams(window.location.search);
+  
+    // Update the 'option' query parameter if it's not 'All'
+    if (newOption !== 'All') {
+      queryParams.set('option', newOption);
+    } else {
+      queryParams.delete('option');
     }
-  }, [filterParams, pathname]);
+  
+    // Update the 'location' query parameter if it's not 'All'
+    if (newLocation !== 'All') {
+      queryParams.set('location', newLocation);
+    } else {
+      queryParams.delete('location');
+    }
+  
+    const newUrl = `${pathname}?${queryParams.toString()}`;
+    console.log("Updated URL:", newUrl);  // Log for debugging
+  
+    // Update the URL without triggering a page reload
+    router.push(newUrl);
+    router.refresh();
+  };
+  
+  // Fetch the current filter values from the URL
+  useEffect(() => {
+    const option = filterParams.get('option') || 'All';
+    const location = filterParams.get('location') || 'All';
 
-  const handleFilterChange = useCallback(async (option: string, category: string) => {
-    if (category === 'Events') {
+    // Set the current filter state based on URL parameters
+    if (categories.Events.includes(option)) {
       setFilterEvents(option);
+    } else {
+      setFilterEvents('All');
+    }
+
+    if (categories.Locations.includes(location)) {
+      setFilterLocations(location);
+    } else {
+      setFilterLocations('All');
+    }
+  }, [filterParams]);
+  
+  const handleFilterChange = useCallback(async (option: string, location: string, category: string) => {
+    // Update the respective filter states based on the selected category
+    if (category === 'Events') {
+      setFilterEvents(option);  // Update the event filter
     }
     if (category === 'Locations') {
-      setFilterLocations(option);
+      setFilterLocations(location);  // Update the location filter
     }
-
+  
+    // Update the URL with both the selected option (event filter) and location
+    updateFilterParams(option, location);
+  
     try {
-      await onFilter(option, category);  // Pass category along with option for flexibility
+      // Trigger the filtering logic with the selected option and location
+      await onFilter(option, location, category);
     } catch (error) {
       console.error('Filter error:', error);
     }
   }, [onFilter]);
-
-  const handleResetFilters = async () => {
-    setFilterEvents('All');
-    setFilterLocations('All');
-    setFilterDate(null);  // Reset date filter
-    await onFilter('All', 'All');
-  };
-
-  const handleDateChange = async (date: Date | null) => {
-    setFilterDate(date);
-    // Optionally call onFilter with the selected date
-    if (date) {
-      await onFilter(date.toISOString(), 'Date');
-    } else {
-      await onFilter('All', 'Date');  // Reset date filter if no date is selected
-    }
-  };
+  
+  
 
   return (
     <>
@@ -132,25 +150,6 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
       `}</style>
 
       <div className="filter-bar">
-        {/* Dropdown for All */}
-        <div className="dropdown-container">
-          <button className="dropdown-button" onClick={handleResetFilters}>
-            {filterEvents === 'All' && filterLocations === 'All' ? 'All' : 'All'}
-          </button>
-          <div className="dropdown">
-            <div className="dropdown-header">All</div>
-            {categories.All.map((option) => (
-              <div
-                key={option}
-                className="dropdown-item"
-                onClick={() => handleResetFilters()}
-              >
-                {option}
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Dropdown for Events */}
         <div className="dropdown-container">
           <button className="dropdown-button">
@@ -162,7 +161,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
               <div
                 key={option}
                 className="dropdown-item"
-                onClick={() => handleFilterChange(option, 'Events')}
+                onClick={() => handleFilterChange(option, filterLocations, 'Events')}
               >
                 {option}
               </div>
@@ -177,27 +176,16 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
           </button>
           <div className="dropdown">
             <div className="dropdown-header">Locations</div>
-            {categories.Locations.map((option) => (
+            {categories.Locations.map((location) => (
               <div
-                key={option}
+                key={location}
                 className="dropdown-item"
-                onClick={() => handleFilterChange(option, 'Locations')}
+                onClick={() => handleFilterChange(filterEvents, location, 'Locations')}
               >
-                {option}
+                {location}
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Date Picker */}
-        <div className="date-picker-container">
-          <DatePicker
-            selected={filterDate}
-            onChange={handleDateChange}
-            placeholderText="Select a Date"
-            dateFormat="MMMM d, yyyy"
-            className="dropdown-button"
-          />
         </div>
       </div>
     </>
