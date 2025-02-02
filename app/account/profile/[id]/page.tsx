@@ -11,8 +11,8 @@ import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
 import { Button } from '@nextui-org/react';
 import { set } from 'zod';
-import FollowingPopup from "./following/page";
-import FollowerPopup from "./follower/page";
+import FollowingPopup from "./following/following";
+import FollowerPopup from "./follower/follower";
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 

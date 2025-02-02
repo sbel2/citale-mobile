@@ -7,18 +7,23 @@ import { supabase } from '@/app/lib/definitions';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Dialog, DialogTrigger, DialogContentForFollow, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
-export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean; setIsOpen: (open: boolean) => void }) {
+interface FollowerPopupProps {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+}
+
+const FollowerPopup: React.FC<FollowerPopupProps> = ({ isOpen, setIsOpen }) => {
     const router = useRouter();
     const pathname = usePathname();
     const userId = pathname.split('/')[3];
     const { user, logout } = useAuth();
-    const [followingDetails, setFollowingDetails] = useState<{ id: string; username: string; avatar_url: string }[]>([]);
-    const [followingCount, setFollowingCount] = useState<number>(0)
+    const [followerDetails, setFollowerDetails] = useState<{ id: string; username: string; avatar_url: string }[]>([]);
+    const [followerCount, setFollowerCount] = useState<number>(0)
 
 
     useEffect(() => {
         if (isOpen) {
-            handleDisplayFollowings();
+            handleDisplayFollowers();
         }
     }, [isOpen]);
     
@@ -28,22 +33,22 @@ export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean;
     };
 
 
-    const handleDisplayFollowings = async () => {
-        setFollowingDetails([])
+    const handleDisplayFollowers = async () => {
+        setFollowerDetails([])
         const { data, error } = await supabase
         .from('relationships')
         .select('user_id, follower_id')
-        .eq('user_id', userId);
+        .eq('follower_id', userId);
 
         if (error) {
             console.error('Error fetching followings:', error.message);
         }
         if (data){
             if (data.length > 0) {
-                setFollowingCount(data.length)
-                setFollowingDetails([])
+                setFollowerCount(data.length)
+                setFollowerDetails([])
                 for (let i = 0; i < data.length; i++) {
-                    handleFetchUser(data[i].follower_id);
+                    handleFetchUser(data[i].user_id);
                 }
             }
         }
@@ -60,7 +65,7 @@ export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean;
             console.error('Error fetching user:', error.message);
         }
         if (data) {
-            setFollowingDetails(prevDetails => {
+            setFollowerDetails(prevDetails => {
                 // Check again before updating the state to avoid race conditions
                 if (!prevDetails.some(user => user.id === userId)) {
                     return [...prevDetails, data];
@@ -72,14 +77,14 @@ export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean;
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContentForFollow className="w-full max-w-xs h-64 overflow-y-auto rounded-lg">
+            <DialogContentForFollow className="w-full max-w-xs h-64">
                 <div className="p-6 text-center">
                     <div className="flex items-center justify-between">
-                        <p className="text-lg font-semibold">Show Followings : {followingCount}</p>
+                        <p className="text-lg font-semibold">Show Followings : {followerCount}</p>
                         <DialogClose onClick={handleClose} className="p-2 rounded-full"></DialogClose>
                     </div>
                     <ul className="mt-4 space-y-4">
-                        {followingDetails.map((user, index) => (
+                        {followerDetails.map((user, index) => (
                             <li key={`${index}-${user.id}`} className="flex items-center space-x-2">
                                 <button className="flex items-center space-x-2" onClick={() => router.push(`/account/profile/${user.id}`)}>
                                     <img
@@ -99,3 +104,5 @@ export default function FollowingPopup({ isOpen, setIsOpen }: { isOpen: boolean;
         </Dialog>
     );
 }
+
+export default FollowerPopup;
