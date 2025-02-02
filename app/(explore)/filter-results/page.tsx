@@ -15,31 +15,24 @@ const Filter = () => {
   const searchParams = useSearchParams(); 
   const selectedOption = searchParams.get('option') || 'All';
   const selectedLocation = searchParams.get('location') || 'All';
-  const selectedLocationTemp = 'Boston';
+  const selectedPrice = searchParams.get('price') || 'All';
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
-
-  console.log("selectedLocation: " + selectedLocation)
-  console.log("option: " + selectedOption)
-
-  console.log("🔄 Full searchParams:", searchParams.toString());
-  console.log("📌 selectedLocation:", selectedLocation);
-
 
   useEffect(() => {
     document.title = selectedOption ? `${selectedOption} - Citale Search` : 'Citale Search';
   
     return () => {
     };
-  }, [selectedOption, selectedLocation]);
+  }, [selectedOption, selectedLocation, selectedPrice]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedOption || selectedLocation) {
+      if (selectedOption || selectedLocation || selectedPrice) {
         setLoading(true);
-        const data = await handleFilter(selectedOption, selectedLocation);
+        const data = await handleFilter(selectedOption, selectedLocation, selectedPrice);
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);
@@ -48,7 +41,7 @@ const Filter = () => {
     };
 
     fetchData();
-  }, [selectedOption, selectedLocation]);
+  }, [selectedOption, selectedLocation, selectedPrice]);
 
   if (loading && firstLoad) {
     return (

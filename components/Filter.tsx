@@ -1,94 +1,117 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';  // Import styles for react-datepicker
+import 'react-datepicker/dist/react-datepicker.css';
+import { createClient } from '@/supabase/client';
+
+// Initialize Supabase client
+const supabase = createClient();
 
 interface FilterProps {
-  onFilter: (option: string, location: string, category: string) => Promise<void>;
+  onFilter: (option: string, location: string, price: string, category: string) => Promise<void>;
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterEvents, setFilterEvents] = useState('');
-  const [filterLocations, setFilterLocations] = useState('');
+  const [filterEvents, setFilterEvents] = useState('All');
+  const [filterLocations, setFilterLocations] = useState('All');
+  const [filterPrice, setFilterPrice] = useState('All');
   const filterParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
+  const [categories, setCategories] = useState<{
+    Price: string[];
+    Events: string[];
+    Locations: string[];
+  }>({
+    Price: [],
+    Events: [],
+    Locations: [],
+  });
+  
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data: eventsData, error: eventsError } = await supabase
+          .from('posts')
+          .select('categories_short');
+    
+        const { data: locationsData, error: locationsError } = await supabase
+          .from('posts')
+          .select('location_short');
+    
+        const { data: priceData, error: priceError } = await supabase
+          .from('posts')
+          .select('price');
+    
+        if (eventsError || locationsError || priceError) {
+          console.error('Error fetching categories:', eventsError || locationsError || priceError);
+          return;
+        }
+    
+        setCategories({
+          Events: eventsData
+            ? [...new Set(eventsData.map((item: { categories_short: string }) => item.categories_short).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            : [],
+          Locations: locationsData
+            ? [...new Set(locationsData.map((item: { location_short: string }) => item.location_short).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            : [],
+          Price: priceData
+            ? [...new Set(priceData.map((item: { price: string }) => item.price).filter(Boolean))]
+            .sort((a, b) => a.localeCompare(b)) // Sort alphabetically
+            : [],
+        });
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      }
+    };
+  
+    fetchCategories();
+  }, []);
+  
+  
+  
 
-  const categories = {
-    All: ['All', 'Free'],
-    Events: ['Outdoor', 'Date', 'Shopping'],
-    Locations: ['Boston', 'Cambridge'],
-  };
-
-  const updateFilterParams = (newOption: string, newLocation: string) => {
+  const updateFilterParams = (newOption: string, newLocation: string, newPrice: string) => {
     const queryParams = new URLSearchParams(window.location.search);
-  
-    // Update the 'option' query parameter if it's not 'All'
-    if (newOption !== 'All') {
-      queryParams.set('option', newOption);
-    } else {
-      queryParams.delete('option');
-    }
-  
-    // Update the 'location' query parameter if it's not 'All'
-    if (newLocation !== 'All') {
-      queryParams.set('location', newLocation);
-    } else {
-      queryParams.delete('location');
-    }
-  
-    const newUrl = `${pathname}?${queryParams.toString()}`;
-    console.log("Updated URL:", newUrl);  // Log for debugging
-  
-    // Update the URL without triggering a page reload
-    router.push(newUrl);
-    router.refresh();
+
+    newOption !== 'All' ? queryParams.set('option', newOption) : queryParams.delete('option');
+    newLocation !== 'All' ? queryParams.set('location', newLocation) : queryParams.delete('location');
+    newPrice !== 'All' ? queryParams.set('price', newPrice) : queryParams.delete('price');
+
+    router.push(`${pathname}?${queryParams.toString()}`);
   };
-  
-  // Fetch the current filter values from the URL
+
   useEffect(() => {
     const option = filterParams.get('option') || 'All';
     const location = filterParams.get('location') || 'All';
+    const price = filterParams.get('price') || 'All';
 
-    // Set the current filter state based on URL parameters
-    if (categories.Events.includes(option)) {
-      setFilterEvents(option);
-    } else {
-      setFilterEvents('All');
-    }
+    setFilterEvents(categories.Events.includes(option) ? option : 'All');
+    setFilterLocations(categories.Locations.includes(location) ? location : 'All');
+    setFilterPrice(categories.Price.includes(price) ? price : 'All');
+  }, [filterParams, categories]);
 
-    if (categories.Locations.includes(location)) {
-      setFilterLocations(location);
-    } else {
-      setFilterLocations('All');
-    }
-  }, [filterParams]);
-  
-  const handleFilterChange = useCallback(async (option: string, location: string, category: string) => {
-    // Update the respective filter states based on the selected category
-    if (category === 'Events') {
-      setFilterEvents(option);  // Update the event filter
-    }
-    if (category === 'Locations') {
-      setFilterLocations(location);  // Update the location filter
-    }
-  
-    // Update the URL with both the selected option (event filter) and location
-    updateFilterParams(option, location);
-  
-    try {
-      // Trigger the filtering logic with the selected option and location
-      await onFilter(option, location, category);
-    } catch (error) {
-      console.error('Filter error:', error);
-    }
-  }, [onFilter]);
-  
-  
+  const handleFilterChange = useCallback(
+    async (option: string, location: string, price: string, category: string) => {
+      category === 'Events' && setFilterEvents(option);
+      category === 'Locations' && setFilterLocations(location);
+      category === 'Price' && setFilterPrice(price);
+
+      updateFilterParams(option, location, price);
+
+      try {
+        await onFilter(option, location, price, category);
+      } catch (error) {
+        console.error('Filter error:', error);
+      }
+    },
+    [onFilter]
+  );
 
   return (
     <>
-      <style jsx>{`
+    <style jsx>{`
         .filter-bar {
           display: flex;
           justify-content: space-between;
@@ -148,21 +171,14 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
           align-items: center;
         }
       `}</style>
-
       <div className="filter-bar">
         {/* Dropdown for Events */}
         <div className="dropdown-container">
-          <button className="dropdown-button">
-            {filterEvents === 'All' ? 'Events' : filterEvents}
-          </button>
+          <button className="dropdown-button">{filterEvents === 'All' ? 'Events' : filterEvents}</button>
           <div className="dropdown">
             <div className="dropdown-header">Events</div>
             {categories.Events.map((option) => (
-              <div
-                key={option}
-                className="dropdown-item"
-                onClick={() => handleFilterChange(option, filterLocations, 'Events')}
-              >
+              <div key={option} className="dropdown-item" onClick={() => handleFilterChange(option, filterLocations, filterPrice, 'Events')}>
                 {option}
               </div>
             ))}
@@ -171,18 +187,25 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
         {/* Dropdown for Locations */}
         <div className="dropdown-container">
-          <button className="dropdown-button">
-            {filterLocations === 'All' ? 'Locations' : filterLocations}
-          </button>
+          <button className="dropdown-button">{filterLocations === 'All' ? 'Locations' : filterLocations}</button>
           <div className="dropdown">
             <div className="dropdown-header">Locations</div>
             {categories.Locations.map((location) => (
-              <div
-                key={location}
-                className="dropdown-item"
-                onClick={() => handleFilterChange(filterEvents, location, 'Locations')}
-              >
+              <div key={location} className="dropdown-item" onClick={() => handleFilterChange(filterEvents, location, filterPrice, 'Locations')}>
                 {location}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dropdown for Price */}
+        <div className="dropdown-container">
+          <button className="dropdown-button">{filterPrice === 'All' ? 'Price' : filterPrice}</button>
+          <div className="dropdown">
+            <div className="dropdown-header">Price</div>
+            {categories.Price.map((price) => (
+              <div key={price} className="dropdown-item" onClick={() => handleFilterChange(filterEvents, filterLocations, price, 'Price')}>
+                {price}
               </div>
             ))}
           </div>

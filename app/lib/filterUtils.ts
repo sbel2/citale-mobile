@@ -3,63 +3,35 @@ import { Post } from './types';
 
 const supabase = createClient();
 
-export async function handleFilter(option: string, location: string) : Promise<Post[] | null> {
+export async function handleFilter(option: string, location: string, price: string): Promise<Post[] | null> {
   try {
-    if (option === 'All' && location === 'All') {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+    let query = supabase.from('posts').select('*');
+
+    // Apply filters dynamically
+    if (option !== 'All') {
+      query = query.ilike('categories_short', `%${option}%`);
     }
-    if (location === 'All' && option != 'All') {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .ilike('categories_short', `%${option}%`)
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+    if (location !== 'All') {
+      query = query.ilike('location_short', `%${location}%`);
     }
-    if (option === 'All' && location != 'All') {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .ilike('location', `%${location}%`)
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+    if (price !== 'All') {
+      query = query.ilike('price', `%${price}%`);
     }
-    else{
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .ilike('location', `%${location}%`)
-        .ilike('categories_short', `%${option}%`)
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+
+    // Apply ordering
+    query = query.order('created_at', { ascending: false }).order('like_count', { ascending: false });
+
+    // Fetch data
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching posts:', error);
+      return null;
     }
-  }
-  catch (error) {
+
+    return data || [];
+  } catch (error) {
     console.error('Unexpected error:', error);
     return null;
   }
-};  
+}
