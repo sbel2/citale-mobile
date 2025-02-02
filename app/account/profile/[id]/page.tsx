@@ -34,8 +34,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [isFollowingOpen, setIsFollowingOpen] = useState(false);
     const [isFollowerOpen, setIsFollowerOpen] = useState(false);
     // display buttons on profile pages
-    const postButtons = ['My Posts', 'My Likes', 'My Favs'];
-    const postButtons_others = ['My Posts']
+    const postButtons = ['Posts', 'Likes', 'Favs'];
+    const postButtons_others = ['Posts']
     // const relationshipButtons = ['Following', 'Followers'];
 
     // Fetch user profile data from Supabase
@@ -137,11 +137,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
-        if (option === 'My Posts') {
+        if (option === 'Posts') {
             await handleFetchUserPosts(userId);
-        } else if (option === 'My Likes') {
+        } else if (option === 'Likes') {
             await handleFetchLikedPosts(userId);
-        } else if (option === 'My Favs') {
+        } else if (option === 'Favs') {
             await handleFetchFavoritePosts(userId);
         }
     };
