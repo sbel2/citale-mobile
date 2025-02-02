@@ -5,7 +5,7 @@ const supabase = createClient();
 
 export async function handleFilter(option: string, location: string, price: string): Promise<Post[] | null> {
   try {
-    let query = supabase.from('posts').select('*');
+    let query = supabase.from('posts').select('*').or('expired_dates.is.null,expired_dates.gte.' + new Date().toISOString().split('T')[0]);
 
     // Apply filters dynamically
     if (option !== 'All') {
