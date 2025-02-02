@@ -23,9 +23,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
+    const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
 
-    const postButtons = ['My Posts', 'My Likes', 'My Favs'];
+    const postButtons = ['Posts', 'Likes', 'Favs'];
     // Fetch user profile data from Supabase
     useEffect(() => {
         const fetchUserData = async () => {
@@ -123,11 +123,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
-        if (option === 'My Posts') {
+        if (option === 'Posts') {
             await handleFetchUserPosts(userId);
-        } else if (option === 'My Likes') {
+        } else if (option === 'Likes') {
             await handleFetchLikedPosts(userId);
-        } else if (option === 'My Favs') {
+        } else if (option === 'Favs') {
             await handleFetchFavoritePosts(userId);
         }
     };
@@ -207,7 +207,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 key={category}
                                 type="button"
                                 onClick={() => handleCategoryClick(category, userId)}
-                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'Posts' && category === 'Posts') ? 'bg-gray-300' : 'bg-white'}`}
                             >
                             {category}
                             </button>
