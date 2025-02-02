@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import 'react-datepicker/dist/react-datepicker.css';
 import { createClient } from '@/supabase/client';
 
 // Initialize Supabase client
