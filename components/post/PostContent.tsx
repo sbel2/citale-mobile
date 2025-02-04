@@ -3,21 +3,17 @@ import React from "react";
 import Linkify from 'react-linkify';
 import { Post } from "@/app/lib/types";
 import styles from "@/components/postComponent.module.css";
-import { useComments } from '@/app/lib/useComments';
 import Image from 'next/image';
-import { useRouter } from "next/navigation";
 
 interface PostContentProps {
   post: Post;
-  user_id?: string;
+  comments: any[];
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, user_id }) => {
+const PostContent: React.FC<PostContentProps> = ({ post, comments }) => {
     
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
-  const { comments } = useComments({ post_id: post.post_id, user_id });
-  const router = useRouter();
 
   function isValidUrl(href: string): boolean {
     try {
@@ -70,18 +66,18 @@ const PostContent: React.FC<PostContentProps> = ({ post, user_id }) => {
       <div className="mt-8 mb-20">
         <h5 className="text-lg font-bold mb-4">Comments</h5>
         {comments.map((comment) => {
-          const profile = comment.profiles;
+          const profile = comment.profiles || {};
           return (
             <div key={comment.id} className="mb-4 p-3 bg-gray-100 rounded-lg flex items-start">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile?.avatar_url || "avatar.png"}`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile.avatar_url || "avatar.png"}`}
                 alt="Profile"
                 width={40}
                 height={40}
                 className="rounded-full mr-3"
               />
               <div>
-                <p className="font-semibold">{profile?.username || "Unknown User"}</p>
+                <p className="font-semibold">{profile.username || "Unknown User"}</p>
                 <p>{comment.content}</p>
                 <p className="text-xs text-gray-500 mt-1">
                   {new Date(comment.comment_at).toLocaleString()}

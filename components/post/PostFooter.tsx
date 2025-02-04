@@ -17,9 +17,10 @@ interface PostFooterProps {
     setShowLoginPopup: (value: boolean) => void;
     post_id: number;
     user_id: string;
+    onNewComment: (comment: any) => void;
 }
 
-const PostFooter: React.FC<PostFooterProps> = ({ liked, likesCount, handleLike, favorited, favoritesCount, handleFavorite, showLoginPopup, setShowLoginPopup, post_id, user_id }) => {
+const PostFooter: React.FC<PostFooterProps> = ({ liked, likesCount, handleLike, favorited, favoritesCount, handleFavorite, showLoginPopup, setShowLoginPopup, post_id, user_id, onNewComment }) => {
   const router = useRouter();
   const [showCommentPopup, setShowCommentPopup] = useState(false);
 
@@ -42,7 +43,7 @@ const PostFooter: React.FC<PostFooterProps> = ({ liked, likesCount, handleLike, 
           onFocus={() => handleCommentClick()}
         />
       ) : (
-        <CommentPopup onClose={() => setShowCommentPopup(false)} post_id={post_id} user_id={user_id}/>
+        <CommentPopup onClose={() => setShowCommentPopup(false)} post_id={post_id} user_id={user_id} onNewComment={onNewComment} />
       )}
     <button className="flex items-center p-1 pr-2 gap-1" onClick={handleLike}>
         {liked ? (

@@ -1,4 +1,3 @@
-// app/lib/useComments.ts
 import { supabase } from "@/app/lib/definitions";
 import { useState, useEffect } from "react";
 import { UserProfile } from "./types";
@@ -21,6 +20,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
 
+  // Fetch comments initially
   const fetchComments = async () => {
     setIsLoading(true);
     try {
@@ -35,49 +35,43 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
 
       if (error) {
         console.error("Error fetching comments:", error);
-      } else {
-        const formattedData: Comment[] = data.map(comment => ({
-          ...comment,
-          profiles: Array.isArray(comment.profiles) 
-            ? comment.profiles[0] 
-            : comment.profiles
-        }));
-
-        setComments(formattedData || []);
+        return;
       }
+
+      setComments(data || []);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Save a new comment and manually update comments list
   const saveComment = async (content: string) => {
     if (!user_id || !content.trim()) return;
-    
+
     setIsSubmitting(true);
     try {
       const { data, error } = await supabase
-        .from('comments')
-        .insert([{
-          post_id: post_id,
-          user_id: user_id,
-          content: content.trim()
-        }])
-        .select()
+        .from("comments")
+        .insert([{ post_id, user_id, content: content.trim() }])
+        .select(`*, profiles (username, avatar_url)`) // Fetch inserted comment with profile data
         .single();
 
       if (error) throw error;
-      await fetchComments();  // Refresh comments after submission
+
+      if (data) {
+        setComments((prev) => [data, ...prev]);
+      }
+
       return data;
     } catch (error) {
-      console.error('Error saving comment:', error);
-      throw error;
+      console.error("Error saving comment:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   useEffect(() => {
-    fetchComments();
+    fetchComments(); // Load existing comments when component mounts
   }, [post_id]);
 
   return { saveComment, isSubmitting, isLoading, comments };

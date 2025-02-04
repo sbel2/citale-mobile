@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./postComponent.module.css";
 import { useRouter } from 'next/navigation';
 import { Post } from "@/app/lib/types";
@@ -11,7 +11,6 @@ import PostHeader from "./post/PostHeader";
 import PostMedia from "./post/PostMedia";
 import PostContent from "./post/PostContent";
 import PostFooter from "./post/PostFooter";
-import CommentPopup from "./post/CommentPopup";
 
 interface PostComponentProps {
   post: Post; 
@@ -23,23 +22,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
-  const [showCommentPopup, setShowCommentPopup] = useState(false);
 
-  const { 
-    comments, 
-    isLoading: commentsLoading, 
-    saveComment, 
-    isSubmitting: isCommentSubmitting 
-  } = useComments({ 
-    post_id: post.post_id, 
-    user_id: user?.id 
-  });
-
-  const handleBack = () => {
-    setTimeout(() => {
-        router.push('/');
-    }, 0);
-  };
+  const { comments: initialComments } = useComments({ post_id: post.post_id, user_id: user?.id });
+  const [comments, setComments] = useState(initialComments);
 
   const { liked, likesCount, toggleLike } = useLike({
     postId: post.post_id,
@@ -69,13 +54,21 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     toggleFavorite();
   };
 
+  useEffect(() => {
+    setComments(initialComments);
+  }, [initialComments]);
+
+  const handleNewComment = (newComment: any) => {
+    setComments((prevComments) => [...prevComments, newComment]);
+  };
+
   return (
     <>
       <div className={`${styles.card} ${headerClass}`}>
         <PostMedia post={post} />
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
           <PostHeader post={post} />
-          <PostContent post={post} />
+          <PostContent post={post} comments={comments}/>
           <PostFooter 
               liked={liked}
               likesCount={likesCount}
@@ -87,6 +80,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               setShowLoginPopup={setShowLoginPopup}
               post_id={post.post_id}
               user_id={user?.id || ''}
+              onNewComment={handleNewComment}
           />
           </div>
         </div>
@@ -94,7 +88,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               <button
                 className='fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
                 style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-                onClick={handleBack}
+                onClick={() => router.push('/')}
                 aria-label='Close Post'
               >
                 &#x2715;
