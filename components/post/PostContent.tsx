@@ -70,12 +70,11 @@ const PostContent: React.FC<PostContentProps> = ({ post, user_id }) => {
       <div className="mt-8 mb-20">
         <h5 className="text-lg font-bold mb-4">Comments</h5>
         {comments.map((comment) => {
-          const profile = comment.profiles; // Ensure profiles is a single object
-
+          const profile = comment.profiles;
           return (
             <div key={comment.id} className="mb-4 p-3 bg-gray-100 rounded-lg flex items-start">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile?.avatar_url || "default-avatar.png"}`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile?.avatar_url || "avatar.png"}`}
                 alt="Profile"
                 width={40}
                 height={40}
@@ -92,8 +91,6 @@ const PostContent: React.FC<PostContentProps> = ({ post, user_id }) => {
           );
         })}
       </div>
-
-
     </div>
   );
 };
