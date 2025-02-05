@@ -47,29 +47,44 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   // Save a new comment and manually update comments list
   const saveComment = async (content: string) => {
     if (!user_id || !content.trim()) return;
-
+  
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
+      // Insert the new comment
+      const { data: newComment, error } = await supabase
         .from("comments")
         .insert([{ post_id, user_id, content: content.trim() }])
-        .select(`*, profiles (username, avatar_url)`) // Fetch inserted comment with profile data
+        .select("*")
         .single();
-
+  
       if (error) throw error;
-
-      if (data) {
-        setComments((prev) => [data, ...prev]);
+  
+      if (newComment) {
+        // Fetch user profile
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("username, avatar_url")
+          .eq("id", user_id)
+          .single();
+  
+        if (profileError) throw profileError;
+  
+        const newCommentWithProfile = {
+          ...newComment,
+          profiles: profile || { username: "Unknown User", avatar_url: "avatar.png" },
+        };
+  
+        setComments((prev) => [newCommentWithProfile, ...prev]);
+  
+        return newCommentWithProfile;
       }
-
-      return data;
     } catch (error) {
       console.error("Error saving comment:", error);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
+  };  
+  
   useEffect(() => {
     fetchComments(); // Load existing comments when component mounts
   }, [post_id]);

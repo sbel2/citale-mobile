@@ -15,9 +15,8 @@ const CommentPopup: React.FC<CommentPopupProps> = ({ onClose, post_id, user_id, 
     const handleSubmit = async () => {
       if (comment.trim()) {
         try {
-          const newComment = await saveComment(comment);
+          await onNewComment(comment); 
           setComment("");
-          onNewComment(newComment);
           onClose();
         } catch (error) {
           console.error('Failed to submit comment:', error);

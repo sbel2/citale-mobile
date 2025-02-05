@@ -23,7 +23,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const { comments: initialComments } = useComments({ post_id: post.post_id, user_id: user?.id });
+  const { comments: initialComments, saveComment } = useComments({ post_id: post.post_id, user_id: user?.id });
   const [comments, setComments] = useState(initialComments);
 
   const { liked, likesCount, toggleLike } = useLike({
@@ -58,10 +58,6 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     setComments(initialComments);
   }, [initialComments]);
 
-  const handleNewComment = (newComment: any) => {
-    setComments((prevComments) => [...prevComments, newComment]);
-  };
-
   return (
     <>
       <div className={`${styles.card} ${headerClass}`}>
@@ -80,7 +76,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               setShowLoginPopup={setShowLoginPopup}
               post_id={post.post_id}
               user_id={user?.id || ''}
-              onNewComment={handleNewComment}
+              onNewComment={saveComment}
           />
           </div>
         </div>

@@ -17,7 +17,7 @@ interface PostFooterProps {
     setShowLoginPopup: (value: boolean) => void;
     post_id: number;
     user_id: string;
-    onNewComment: (comment: any) => void;
+    onNewComment: (content: string) => Promise<void>;
 }
 
 const PostFooter: React.FC<PostFooterProps> = ({ liked, likesCount, handleLike, favorited, favoritesCount, handleFavorite, showLoginPopup, setShowLoginPopup, post_id, user_id, onNewComment }) => {
