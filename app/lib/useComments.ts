@@ -19,6 +19,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
+  const [commentCount, setCommentCount] = useState(0);
 
   // Fetch comments initially
   const fetchComments = async () => {
@@ -39,6 +40,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
       }
 
       setComments(data || []);
+      setCommentCount(data?.length || 0);
     } finally {
       setIsLoading(false);
     }
@@ -75,6 +77,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
         };
   
         setComments((prev) => [newCommentWithProfile, ...prev]);
+        setCommentCount((prevCount) => prevCount + 1);
   
         return newCommentWithProfile;
       }
@@ -83,11 +86,15 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     } finally {
       setIsSubmitting(false);
     }
-  };  
+  };
+
+  useEffect(() => {
+    setCommentCount(comments.length);
+  }, [comments]);
   
   useEffect(() => {
     fetchComments(); // Load existing comments when component mounts
   }, [post_id]);
 
-  return { saveComment, isSubmitting, isLoading, comments };
+  return { saveComment, isSubmitting, isLoading, comments, commentCount};
 };

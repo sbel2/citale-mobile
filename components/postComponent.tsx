@@ -23,7 +23,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const { comments: initialComments, saveComment } = useComments({ post_id: post.post_id, user_id: user?.id });
+  const { comments: initialComments, saveComment, commentCount } = useComments({ post_id: post.post_id, user_id: user?.id });
   const [comments, setComments] = useState(initialComments);
 
   const { liked, likesCount, toggleLike } = useLike({
@@ -77,6 +77,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
               post_id={post.post_id}
               user_id={user?.id || ''}
               onNewComment={saveComment}
+              commentCount={commentCount}
           />
           </div>
         </div>
