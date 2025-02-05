@@ -171,13 +171,13 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
 
   return (
-    <div className="bg-white flex justify-center items-center pt-5">
+    <div className="bg-white flex justify-center items-center pt-5 pb-z2">
       <FilterDropdown category="Events" selected={filterEvents} options={categories.Events} />
       <FilterDropdown category="Locations" selected={filterLocations} options={categories.Locations} />
       <FilterDropdown category="Price" selected={filterPrice} options={categories.Price} />
 
       <button
-        className="ml-2 md:ml-5 w-25 md:w-32 px-3 py-2.5 bg-[#fd0000] text-white rounded-full cursor-pointer hover:bg-red-600 text-center text-xs md:text-sm flex justify-center items-center"
+        className="ml-2 md:ml-5 w-25 md:w-32 px-3 py-2.5 bg-[#fd0000] text-white rounded-full cursor-pointer hover:bg-[#fd0000] text-center text-xs md:text-sm flex justify-center items-center"
         onClick={resetFilters}
       >
         Reset
