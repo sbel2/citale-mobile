@@ -8,9 +8,11 @@ import Image from 'next/image';
 interface PostContentProps {
   post: Post;
   comments: any[];
+  deleteComment: (commentId: number) => void;
+  userId?: string;
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, comments }) => {
+const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment, userId }) => {
     
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
@@ -83,6 +85,15 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments }) => {
                   {new Date(comment.comment_at).toLocaleString()}
                 </p>
               </div>
+              {/* ✅ Show delete button only if user owns the comment */}
+              {comment.user_id === userId && (
+              <button 
+                onClick={() => deleteComment(comment.id)} 
+                className="ml-auto text-red-600 hover:text-red-800"
+              >
+                ❌ Delete
+              </button>
+            )}
             </div>
           );
         })}

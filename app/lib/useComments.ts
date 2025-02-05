@@ -88,6 +88,25 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     }
   };
 
+   // Delete a comment function
+   const deleteComment = async (commentId: number) => {
+    try {
+      // Delete the comment from Supabase
+      const { error } = await supabase
+        .from("comments")
+        .delete()
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      // Remove the deleted comment from state
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      setCommentCount((prevCount) => prevCount - 1); // Update comment count
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
   useEffect(() => {
     setCommentCount(comments.length);
   }, [comments]);
@@ -96,5 +115,5 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     fetchComments(); // Load existing comments when component mounts
   }, [post_id]);
 
-  return { saveComment, isSubmitting, isLoading, comments, commentCount};
+  return { saveComment, deleteComment, isSubmitting, isLoading, comments, commentCount};
 };

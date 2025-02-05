@@ -23,7 +23,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const { comments: initialComments, saveComment, commentCount } = useComments({ post_id: post.post_id, user_id: user?.id });
+  const { comments: initialComments, saveComment, commentCount, deleteComment } = useComments({ post_id: post.post_id, user_id: user?.id });
   const [comments, setComments] = useState(initialComments);
 
   const { liked, likesCount, toggleLike } = useLike({
@@ -64,7 +64,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         <PostMedia post={post} />
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
           <PostHeader post={post} />
-          <PostContent post={post} comments={comments}/>
+          <PostContent post={post} comments={comments} deleteComment={deleteComment} userId={user?.id}/>
           <PostFooter 
               liked={liked}
               likesCount={likesCount}
