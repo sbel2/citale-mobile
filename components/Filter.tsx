@@ -131,11 +131,11 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   };
 
   const FilterDropdown = ({ category, selected, options }: { category: string; selected: string; options: string[] }) => (
-    <div className="relative mx-4">
+    <div className="relative mx-2 md:mx-4">
       <button
-        className={`flex items-center justify-center w-32 px-3 py-2.5 text-center text-sm rounded-full transition-colors 
+        className={`flex items-center justify-center w-25 md:w-32 px-3 py-2.5 text-center text-xs md:text-sm rounded-full transition-colors 
           ${selected !== 'All' ? 'bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} 
-          gap-3`}
+          gap-1 md:gap-3`}
         onClick={() => toggleDropdown(category)}
         ref={buttonRefs[category as keyof typeof buttonRefs]}
       >
@@ -150,7 +150,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
           {options.map((option) => (
             <div
               key={option}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className="px-3 py-2.5 cursor-pointer hover:bg-gray-100 text-xs md:text-sm"
               onClick={() => {
                 handleFilterChange(
                   category === 'Events' ? option : filterEvents,
@@ -177,7 +177,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
       <FilterDropdown category="Price" selected={filterPrice} options={categories.Price} />
 
       <button
-        className="ml-5 w-32 px-4 py-2 bg-[#fd0000] text-white rounded-full cursor-pointer hover:bg-red-600 text-center flex justify-center items-center"
+        className="ml-2 md:ml-5 w-25 md:w-32 px-3 py-2.5 bg-[#fd0000] text-white rounded-full cursor-pointer hover:bg-red-600 text-center text-xs md:text-sm flex justify-center items-center"
         onClick={resetFilters}
       >
         Reset
