@@ -21,6 +21,7 @@ export default function Home() {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
+        .or('expired_dates.is.null,expired_dates.gte.' + new Date().toISOString().split('T')[0])
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
 
