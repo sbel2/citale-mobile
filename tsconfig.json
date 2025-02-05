@@ -24,6 +24,6 @@
       "components/*": ["./components/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/MasonryGrid.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/MasonryGrid.tsx"],
   "exclude": ["node_modules"]
 }

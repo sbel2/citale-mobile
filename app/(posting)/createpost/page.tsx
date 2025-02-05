@@ -7,7 +7,7 @@ import { categoryList, locationList } from '@/components/constants';
 import { useAuth } from 'app/context/AuthContext';
 import Card from '@/components/card';
 import { Post } from "@/app/lib/types";
-import { AutocompleteLocation, MultiSelectChipsInput, DatesInput } from '@/components/formComponents';
+import { AutocompleteLocation, MultiSelectChipsInput, DatesInput, FilesInput, FileItem } from '@/components/formComponents';
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 import { error } from 'console';
 import { boolean } from 'zod';
@@ -26,7 +26,7 @@ export default function CreatePostPage() {
         title: "",
         description: "",
         location: "",
-        mediaUrl: [""],
+        mediaUrl: [] as string[],
         category: "",
         price: "",
         user_id: user?.id,
@@ -104,10 +104,24 @@ export default function CreatePostPage() {
         console.log(formData)
     }
 
+    const handleFilesInput = (filesArray: FileItem[]) => {
+        console.log("fileshere!");
+        const fileNames = Array.from(filesArray).map((file) => file.name)
+        const fileTypes = Array.from(filesArray).map((file) => (file.type.startsWith("video/") ? true : false))
+        console.log(fileTypes)
+        console.log(fileNames)
+        setFormData((prevState) => ({
+            ...prevState,
+            mediaUrl: fileNames
+
+        }))
+      }
+
     const uploadFilesToBucket = async (blobUrls: string[], postAction: string) => {
         //const imageBucket = 'images';
         //const videoBucket = 'video';
-        const testBucket = 'test';
+        const testPostBucket = 'test';
+        const testDraftBucket = 'test-draft'
         
         const fileTypes: boolean[] = [];
         const uploadedFiles: string[] =[];
@@ -159,7 +173,7 @@ export default function CreatePostPage() {
                 }
                 
                 const { data, error } = await supabase.storage
-                        .from(testBucket)
+                        .from((postAction=="post") ? testPostBucket : testDraftBucket)
                         .upload(filePath, blob, {
                             upsert: false,
                         });
@@ -177,7 +191,7 @@ export default function CreatePostPage() {
                     continue;
                 }
 
-                const publicUrl = supabase.storage.from(testBucket).getPublicUrl(filePath);
+                const publicUrl = supabase.storage.from((postAction=="post") ? testPostBucket : testDraftBucket).getPublicUrl(filePath);
                 uploadedFiles.push(fileName);
                 console.log(`Uploaded ${blobUrl} to:`, publicUrl);}
             } catch (error) {
@@ -200,7 +214,7 @@ export default function CreatePostPage() {
             //upload images to supabase and get their new filenames and boolean[] of isVideo
             if (!formData.mediaUrl[0]) {
                 console.log("madeit", formDataUpdate)
-                let statusPost = (postAction === "post"? "post" : "draft");
+                let statusPost = "draft";
                 let draftFormData = {}
                 draftFormData = {
                     ...formDataUpdate,
@@ -211,7 +225,7 @@ export default function CreatePostPage() {
                 console.log(draftFormData);
                 //post data to posts database
                 const { data, error } = await supabase
-                .from('testPost')
+                .from('testDraft')
                 .insert([draftFormData]);
 
                 if (error) {
@@ -266,7 +280,7 @@ export default function CreatePostPage() {
                 console.log(finalFormData);
                 //post data to posts database
                 const { data, error } = await supabase
-                .from('testPost')
+                .from((postAction === "post")? "testPost" : "testDraft")
                 .insert([finalFormData]);
 
                 if (error) {
@@ -275,7 +289,7 @@ export default function CreatePostPage() {
                 }
 
                 console.log('Data posted!!')
-                window.location.href = '/account/profile'
+                //window.location.href = '/account/profile'
             }
 
             
@@ -297,107 +311,119 @@ export default function CreatePostPage() {
     console.log('Boom')
 
         return (
-            <div>
-                <form onSubmit={submitForm}  id="addpost" style={styles.form}>
-                    <p style={styles.title}>Post an Event!</p>
-                    <label htmlFor="eventdata" style={styles.label}> Title
-                        <input
-                            type="text"
-                            id="eventdata"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleInput}
-                            style={styles.input}
-                            required
-                        />
-                    </label>
-                    <DatesInput onSeasonChange={handleMultiSelect} onDateChange={handleDateInput} style={styles}/>
-                    <label htmlFor="locationdata" style={styles.specialLabel}> Area
-                        <select 
-                            name="location"
-                            id="location"
-                            onChange={handleInput}
-                            value={formData.location}
-                            style={styles.specialInput}
-                        >
-                            <option value="" disabled> Select Boston Area... </option>
-                            {locationList.map((location) => (
-                                <option key={location} value={location}>
-                                    {location}
+                <div>
+                    <form onSubmit={submitForm}  id="addpost" style={styles.form}>
+                        <p style={styles.title}>Post an Event!</p>
+                        <label htmlFor="eventdata" style={styles.label}> Title
+                            <input
+                                type="text"
+                                id="eventdata"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleInput}
+                                style={styles.input}
+                                required
+                            />
+                        </label>
+                        <DatesInput onSeasonChange={handleMultiSelect} onDateChange={handleDateInput} style={styles}/>
+                        <label htmlFor="locationdata" style={styles.specialLabel}> Area
+                            <select 
+                                name="location"
+                                id="location"
+                                onChange={handleInput}
+                                value={formData.location}
+                                style={styles.specialInput}
+                            >
+                                <option value="" disabled> Select Boston Area... </option>
+                                {locationList.map((location) => (
+                                    <option key={location} value={location}>
+                                        {location}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <label htmlFor="locationtitle" style={styles.label}> Location
+                            <input
+                                type="text"
+                                id="locationtitle"
+                                name="mapUrl"
+                                value={formData.mapUrl}
+                                onChange={handleInput}
+                                style={styles.input}
+                                required
+                            />
+                        </label>
+                        {/*<AutocompleteLocation onLocationChange={handleLocationChange} style={styles}/> FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX*/}
+                        <label htmlFor="price" style={styles.specialLabel}> Price
+                            <select 
+                                name="price"
+                                id="price"
+                                onChange={handleInput}
+                                value={formData.price}
+                                style={styles.specialInput}
+                            >
+                                <option value="" disabled> Select Price Range... </option>
+                                <option key='free' value='free'>
+                                    Free
                                 </option>
-                            ))}
-                        </select>
-                    </label>
-                    <AutocompleteLocation onLocationChange={handleLocationChange} style={styles}/> {/*/FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX*/}
-                    <label htmlFor="price" style={styles.specialLabel}> Price
-                        <select 
-                            name="price"
-                            id="price"
-                            onChange={handleInput}
-                            value={formData.price}
-                            style={styles.specialInput}
-                        >
-                            <option value="" disabled> Select Price Range... </option>
-                            <option key='free' value='free'>
-                                Free
-                            </option>
-                            <option key='$' value='$'>
-                                $
-                            </option>
-                            <option key='$$' value='$$'>
-                                $$
-                            </option>
-                            <option key='$$$' value='$$$'>
-                                $$$
-                            </option>
-                        </select>
-                    </label>
-                    <div className="flex">
-                        <label htmlFor="descriptiondata" style={styles.label}>Description</label>
-                        <textarea
-                            id="descriptiondata"
-                            style={styles.textarea} 
-                            rows={5}
-                            cols={40}
-                            name="description"
-                            value={formData.description}
-                            onChange={handleInput}
-                            required
-                            
-                        />
-                    </div>
-                    <div>
-                        <p style={styles.label}> Event Type(s)</p>
-                        {/*<input 
-                            type="text"
-                            id="require"
-                            name="require"
-                            value={isValid ? "full" : ''}
-                            style={{visibility: "hidden", height: "1px"}}
-                        />*/}
-                        <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="category" options={categoryList} />
-                    </div>
-                    <label htmlFor="urldata" style={styles.specialLabel}> Upload Images and Videos
-                        <input
-                            type="file"
-                            id="urldata"
-                            name="mediaUrl"
-                            multiple
-                            accept=".jpg, .jpeg, .png, .gif, .mp4, .mov"
-                            onChange={handleInput}
-                            style={styles.specialInput}
-                            required
-                        />
-                    </label>
-                </form>
-                <div className="flex justify-end">
-                    <button type="submit" form="addpost" value="post" style={styles.submit}>Post</button>
-                    <div className="flex">
-                        <button type="submit" form="addpost" value="draft" formNoValidate style={styles.submit}>Save as Draft</button>
-                        {/*<button type="submit" form="addpost" value="preview" formNoValidate style={styles.submit}>Preview Post</button>*/}
+                                <option key='$' value='$'>
+                                    $
+                                </option>
+                                <option key='$$' value='$$'>
+                                    $$
+                                </option>
+                                <option key='$$$' value='$$$'>
+                                    $$$
+                                </option>
+                            </select>
+                        </label>
+                        <div className="flex">
+                            <label htmlFor="descriptiondata" style={styles.label}>Description</label>
+                            <textarea
+                                id="descriptiondata"
+                                style={styles.textarea} 
+                                rows={5}
+                                cols={40}
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInput}
+                                required
+                                
+                            />
+                        </div>
+                        <div>
+                            <p style={styles.label}> Event Type(s)</p>
+                            {/*<input 
+                                type="text"
+                                id="require"
+                                name="require"
+                                value={isValid ? "full" : ''}
+                                style={{visibility: "hidden", height: "1px"}}
+                            />*/}
+                            <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="category" options={categoryList} />
+                        </div>
+                        {/* <label htmlFor="urldata" style={styles.specialLabel}> Upload Images and Videos
+                            <input
+                                type="file"
+                                id="urldata"
+                                name="mediaUrl"
+                                multiple
+                                accept=".jpg, .jpeg, .png, .gif, .mp4, .mov"
+                                onChange={handleInput}
+                                style={styles.specialInput}
+                                required
+                            />
+                        </label> */}
+                        <FilesInput style={styles} onFilesChange= {handleFilesInput}/>
+                    </form>
+                    <div className="flex justify-end">
+                        <button type="submit" form="addpost" value="post" style={styles.submit}>Post</button>
+                        <div className="flex">
+                            <button type="submit" form="addpost" value="draft" formNoValidate style={styles.submit}>Save as Draft</button>
+                            {/*<button type="submit" form="addpost" value="preview" formNoValidate style={styles.submit}>Preview Post</button>*/}
+                        </div>
                     </div>
                 </div>
-            </div>
         )
 }
 

@@ -42,8 +42,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   const [liked, setLiked] = useState(false);
   const [favorited, setFavorited] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.like_count);
-  const [favoritesCount, setFavoritesCount] = useState(post.favorite_count);
+  const [testLikesCount, setLikesCount] = useState(post.like_count);
+  const [testFavoritesCount, setFavoritesCount] = useState(post.favorite_count);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
@@ -55,6 +55,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const address = post.mapUrl;
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const postBucket = post.post_action == "post" ? "test" : post.post_action == "draft" ? "test-draft" : "";
+  const postTable = post.post_action == "post" ? "testPost" : post.post_action == "draft" ? "testDraft" : "";
+
 
   const handlePrevious = () => {
     const newIndex =
@@ -77,9 +80,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
     try {
       if (!liked) {
-        // Increment the like count in the 'likes' table
+        // Increment the like count in the 'testLikes' table
         const { error: insertError } = await supabase
-          .from('likes')
+          .from('testLikes')
           .insert([{ user_id: user.id, post_id: post.post_id }]);
   
         if (insertError) {
@@ -89,8 +92,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
         // Increment the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount + 1 })
+          .from(postTable)
+          .update({ like_count: testLikesCount + 1 })
           .eq('post_id', post.post_id);
   
         if (updateError) {
@@ -101,9 +104,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         // Update state
         setLikesCount((prev) => prev + 1);
       } else {
-        // Remove the like from the 'likes' table
+        // Remove the like from the 'testLikes' table
         const { error: deleteError } = await supabase
-          .from('likes')
+          .from('testLikes')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.post_id);
@@ -115,8 +118,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
         // Decrement the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount - 1 })
+          .from(postTable)
+          .update({ like_count: testLikesCount - 1 })
           .eq('post_id', post.post_id);
   
         if (updateError) {
@@ -185,7 +188,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     const fetchLikeStatus = async () => {
       if (user) {
         const { data, error } = await supabase
-          .from('likes')
+          .from('testLikes')
           .select('*')
           .eq('user_id', user.id)
           .eq('post_id', post.post_id)
@@ -207,7 +210,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     const fetchUpdatedLikeCount = async () => {
       try {
         const { data, error } = await supabase
-          .from('posts')
+          .from(postTable)
           .select('like_count')
           .eq('post_id', post.post_id)
           .single();
@@ -218,7 +221,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         }
   
         if (data) {
-          setLikesCount(data.like_count); // Update the likesCount state with the latest value
+          setLikesCount(data.like_count); // Update the testLikesCount state with the latest value
         }
       } catch (err) {
         console.error('Error fetching updated like count:', err);
@@ -226,7 +229,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     };
   
     fetchUpdatedLikeCount();
-  }, [post.post_id]);  
+  }, [post.post_id, postTable]);  
 
   const handleFavorite = async () => {
     if (!user) {
@@ -237,9 +240,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
     try {
       if (!favorited) {
-        // Increment the like count in the 'likes' table
+        // Increment the like count in the 'testLikes' table
         const { error: insertError } = await supabase
-          .from('favorites')
+          .from('testFavorites')
           .insert([{ user_id: user.id, post_id: post.post_id }]);
   
         if (insertError) {
@@ -249,8 +252,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
         // Increment the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ favorite_count: favoritesCount + 1 })
+          .from(postTable)
+          .update({ favorite_count: testFavoritesCount + 1 })
           .eq('post_id', post.post_id);
   
         if (updateError) {
@@ -261,9 +264,9 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         // Update state
         setFavoritesCount((prev) => prev + 1);
       } else {
-        // Remove the like from the 'likes' table
+        // Remove the like from the 'testLikes' table
         const { error: deleteError } = await supabase
-          .from('favorites')
+          .from('testFavorites')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.post_id);
@@ -275,8 +278,8 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   
         // Decrement the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ favorite_count: favoritesCount - 1 })
+          .from(postTable)
+          .update({ favorite_count: testFavoritesCount - 1 })
           .eq('post_id', post.post_id);
   
         if (updateError) {
@@ -300,7 +303,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     const fetchFavoriteStatus = async () => {
       if (user) {
         const { data, error } = await supabase
-          .from('favorites')
+          .from('testFavorites')
           .select('*')
           .eq('user_id', user.id)
           .eq('post_id', post.post_id)
@@ -322,7 +325,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     const fetchUpdatedFavoriteCount = async () => {
       try {
         const { data, error } = await supabase
-          .from('posts')
+          .from(postTable)
           .select('favorite_count')
           .eq('post_id', post.post_id)
           .single();
@@ -341,7 +344,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     };
   
     fetchUpdatedFavoriteCount();
-  }, [post.post_id]); 
+  }, [post.post_id, postTable]); 
 
 
   return (
@@ -356,7 +359,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           {post.video_type[currentImageIndex] ? (
             // Video display if the post is a video
             <video
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/videos/${post.mediaUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
               controls
               autoPlay
               loop
@@ -366,13 +369,13 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           ) : (
             // Image display if the post is an image
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/images/${post.mediaUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
               style={{ objectFit: "contain" }}
             />
           )}
-          {post.mediaUrl.length > 1 && !post.video_type[currentImageIndex] && (
+          {post.mediaUrl.length > 1 && (
             <div className={styles.navigation}>
               <button className={styles.navbutton} onClick={handlePrevious} aria-label="Previous Image">
                 &lt;
@@ -449,7 +452,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               )}
-              <span className="text-xs inline-block w-4 text-center">{likesCount}</span>
+              <span className="text-xs inline-block w-4 text-center">{testLikesCount}</span>
             </button>
 
             <button className="flex items-center p-1 pr-7" onClick={handleFavorite}>
@@ -472,7 +475,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               )}
-              <span className="text-xs inline-block w-4 text-center">{favoritesCount}</span>
+              <span className="text-xs inline-block w-4 text-center">{testFavoritesCount}</span>
             </button>
 
             {/* Login popup */}

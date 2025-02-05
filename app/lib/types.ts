@@ -1,6 +1,6 @@
 // all fields are optional and not requried to be read in for code
 export interface Post {
-    post_id: number;
+    post_id: string;
     title: string;
     description: string;
     is_video: boolean;
@@ -11,12 +11,9 @@ export interface Post {
     favorite_count: number;
     created_at: string;
     category?: string;
-<<<<<<< HEAD
-    user_id?: number;
-    video_type: boolean[];
-=======
     user_id?: string;
->>>>>>> origin/main
+    video_type: boolean[];
+    post_action: string;
   }
   
   export interface UserProfile {

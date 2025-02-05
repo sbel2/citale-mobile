@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
 import styles from "./card.module.css";
@@ -11,18 +11,21 @@ import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
 import { usePathname, useRouter } from "next/navigation";
 
-const Card: React.FC<{ post: Post }> = ({ post }) => {
+const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: string, postAction: string) => void }> = ({ post, managePost }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.like_count);
+  const [testLikesCount, setLikesCount] = useState(post.like_count);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [buttonClicked, setButtonClicked] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
 
+  
 
   useEffect(() => {
     if (isOpen) {
@@ -37,7 +40,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   }, [isOpen, post.title]);
 
   const handleClick = () => {
-    window.history.pushState(null, '', `/post/${post.post_id}`);
+    window.history.pushState(null, '', `/${post.post_action}/${post.post_id}`);
     setIsOpen(true);
   };
 
@@ -60,9 +63,9 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
     try {
       if (!liked) {
-        // Increment the like count in the 'likes' table
+        // Increment the like count in the 'testLikes' table
         const { error: insertError } = await supabase
-          .from('likes')
+          .from('testLikes')
           .insert([{ user_id: user.id, post_id: post.post_id }]);
 
         if (insertError) {
@@ -72,8 +75,8 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
         // Increment the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount + 1 })
+          .from('testPost')
+          .update({ like_count: testLikesCount + 1 })
           .eq('post_id', post.post_id);
 
         if (updateError) {
@@ -84,9 +87,9 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         // Update state
         setLikesCount((prev) => prev + 1);
       } else {
-        // Remove the like from the 'likes' table
+        // Remove the like from the 'testLikes' table
         const { error: deleteError } = await supabase
-          .from('likes')
+          .from('testLikes')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.post_id);
@@ -98,8 +101,8 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
         // Decrement the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount - 1 })
+          .from('testPost')
+          .update({ like_count: testLikesCount - 1 })
           .eq('post_id', post.post_id);
 
         if (updateError) {
@@ -130,7 +133,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
             .single(),
           user
             ? supabase
-                .from('likes')
+                .from('testLikes')
                 .select('*')
                 .eq('user_id', user.id)
                 .eq('post_id', post.post_id)
@@ -158,7 +161,32 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     fetchData();
   }, [user, post.user_id, post.post_id]);
 
+  const toggleButtonClick = () => {
+    setButtonClicked((prevState) => !prevState);
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setButtonClicked(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const manageDelete = () => {
+      managePost ? managePost("delete", post.post_id, post.post_action) : null;
+  }
+
+  const bucketName = post.post_action == "post" ? "test" : post.post_action == "draft" ? "test-draft" : null;
+
   return (
+    <div>
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (open !== isOpen) {
         setIsOpen(open);
@@ -168,21 +196,13 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
       }
     }}>
       <DialogTrigger asChild>
-<<<<<<< HEAD
-        <div onClick={handleClick} className="cursor-pointer">
-          <div className={styles['image-container']}>
-            {post.is_video ? (
-              <>
-                <video
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/video/${post.thumbnailUrl}`}
-=======
         <div>
           <div onClick={handleClick} className="cursor-pointer">
             <div className={styles['image-container']}>
               {post.is_video ? (
                 <>
                   <video
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.thumbnailUrl}`}
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/videos/${post.thumbnailUrl}`}
                     width={300}
                     height={200}
                     autoPlay
@@ -191,67 +211,75 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
                     className="transition-transform duration-500 ease-in-out transform filter brightness-95"
                     playsInline
                   />
-                  <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="white"
-                      viewBox="0 0 24 24"
-                      width="24"
-                      height="24"
-                      className="text-white"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+                  <div className="absolute top-4 right-4 flex flex-col items-center justify-center w-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        className="text-white  bg-black bg-opacity-35 rounded-full"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
                   </div>
                 </>
               ) : (
                 // Otherwise, display the image
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[0]}`}
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/images/${post.mediaUrl[0]}`}
                   alt={post.title}
->>>>>>> origin/main
                   width={300}
                   height={200}
                   className="transition-transform duration-500 ease-in-out transform"
                 />
-<<<<<<< HEAD
-                <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="white"
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    className="text-white"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </>
-            ) : (
-              // Otherwise, display the image
-                <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/test/images/${post.mediaUrl[0]}`}
-                alt={post.title}
-                width={300}
-                height={200}
-                className="transition-transform duration-500 ease-in-out transform"
-              />
-            )}
-            <div className={styles['overlay']}></div>
-          </div>
-            <div className="px-2 py-3">
-              <div className="text-sm sm:text-base mb-1 2xl:mb-2 line-clamp-3 text-black">
-=======
               )}
               <div className={styles['overlay']}></div>
             </div>
-            <div className="px-2 pt-3">
+            <div className="px-2 flex justify-between items-center pt-3">
               <div className="text-xs sm:text-sm line-clamp-3 text-black">
->>>>>>> origin/main
                 {post.title}
               </div>
+              {(post.user_id == user?.id) && (pathname == `/account/profile/${user?.id}`) && ( //ADDS more button if it's your post on your profile which can be used to edit/delete/archive posts
+                      <button
+                      className="pl-1 pr-1 focus:outline-none w-8 min-w-[32px] h-5"
+                      aria-label="More options"
+                      onClick={(e) => {
+                        console.log("clicked")
+                        e.stopPropagation(); // Prevents the click event from propagating to the parent div
+                        toggleButtonClick();  // Call your custom button function
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="gray"
+                        viewBox="0 0 24 24"
+                        className="text-gray-600 w-full h-full"
+                      >
+                        <circle cx="5" cy="12" r="1.5" />
+                        <circle cx="11" cy="12" r="1.5" />
+                        <circle cx="17" cy="12" r="1.5" />
+                      </svg>
+                    </button>
+                    )}
             </div>
+            {buttonClicked && ( //more button functions
+                    <div ref={dropdownRef} className="text-xs sm:text-sm right-0 mt-2 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
+                        <ul className="py-1">
+                            <li
+                            className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                            onClick={(e) => {manageDelete(); e.stopPropagation();}}
+                            >
+                            Delete {post.post_action}
+                            </li>
+                            {/*<li
+                            className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                            //onClick={() => handleCategoryClick('My Drafts', userId)}
+                            >
+                            Edit {post.post_action}
+                            </li>*/}
+                        </ul>
+                    </div>)}
           </div>
         </div>
       </DialogTrigger>
@@ -305,7 +333,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           )}
-          <span className="text-xs">{likesCount}</span>
+          <span className="text-xs">{testLikesCount}</span>
         </button>
       </div>
 
@@ -338,6 +366,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         </div>
       )}
     </Dialog>
+    </div>
   );
 };
 

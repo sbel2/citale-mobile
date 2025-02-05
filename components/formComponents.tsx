@@ -1,6 +1,10 @@
-import React, { useRef, forwardRef, useImperativeHandle, useState, useEffect, ChangeEvent, MouseEvent } from 'react';
+import React, { useRef, forwardRef, useImperativeHandle, useState, useCallback, useEffect, ChangeEvent, MouseEvent } from 'react';
 import { GoogleMap, useLoadScript, Marker, Autocomplete } from '@react-google-maps/api';
-import type { Libraries } from '@react-google-maps/api'
+import Image from "next/legacy/image";
+import type { Libraries } from '@react-google-maps/api';
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { useDrop, useDrag } from "react-dnd";
 import '@/components/formComponents.css';
 import { string } from 'zod';
 
@@ -47,6 +51,23 @@ interface DatesInputProps {
   }
 }
 
+
+interface FilesInputProps {
+  onFilesChange: (filesUpdate: FileItem[]) => void
+  
+  style: {
+    specialLabel: {},
+    specialInput: {},
+    input: {},
+  }
+
+}
+
+export type FileItem = {
+  name: string;
+  type: string;
+}
+
 export const AutocompleteLocation: React.FC<AutocompleteLocationProps> = ({ onLocationChange, style  }) => {
   const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null); 
@@ -87,7 +108,7 @@ export const AutocompleteLocation: React.FC<AutocompleteLocationProps> = ({ onLo
         })
       }
     }
-  }, [isLoaded, autocomplete, onLocationChange]);
+  }, [isLoaded, autocomplete, selectedPlace, onLocationChange]);
 
   if (loadError) return <p>Error loading maps</p>
   if (!isLoaded) return <p>Loading...</p>
@@ -179,6 +200,8 @@ export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options
   );
 
 });
+
+MultiSelectChipsInput.displayName = "MultiSelectChipsInput";
 
 export const DatesInput: React.FC<DatesInputProps> = ({ onSeasonChange, onDateChange, style }) => {
 
@@ -283,3 +306,127 @@ export const DatesInput: React.FC<DatesInputProps> = ({ onSeasonChange, onDateCh
         </div>
     )
 }
+
+
+const DraggableFile = ({ file, index, moveFile }: { file: FileItem; index: number; moveFile: (dragIndex: number, hoverIndex: number) => void }) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: "FILE",
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop({
+    accept: "FILE",
+    hover: (draggedItem: { index: number }) => {
+      if (draggedItem.index !== index) {
+        moveFile(draggedItem.index, index);
+        draggedItem.index = index; // Update dragged index
+      }
+    },
+  });
+
+  return (
+    <div //get rid of in future
+      ref={(node) => {drag(drop(node))}}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "10px",
+        marginBottom: "8px",
+        width: "fit-content",
+        backgroundColor: "#f2f3f4",
+        borderRadius: "16px",
+        opacity: isDragging ? 0.5 : 1,
+        cursor: "grab",
+        overflow: "hidden",
+      }}
+      className="hide-scrollbar"
+    >
+      {file.type.startsWith("image") ? (
+        <Image src={file.name} alt="File Preview" width={200} height={200} style={{ borderRadius: "16px"}} />
+      ) : file.type.startsWith("video") ? (
+        <video src={file.name} autoPlay loop muted style={{ borderRadius: "16px", height: "auto", width: "100%", maxWidth: "300px", objectFit: "cover", clipPath: "inset(0 round 16px)", }} />
+      ) : (
+        null
+      )}
+    </div>
+  );
+};
+
+const DragDropFileList = ( { filesUpload, onFilesChange }: {filesUpload: FileItem[], onFilesChange: (filesUpdate: FileItem[]) => void } ) => {
+  const [files, setFiles] = useState<FileItem[]>(filesUpload);
+
+  const moveFile = useCallback((dragIndex: number, hoverIndex: number) => {
+    setFiles((prevFiles) => {
+      const updatedFiles = [...prevFiles];
+      const [movedFile] = updatedFiles.splice(dragIndex, 1);
+      updatedFiles.splice(hoverIndex, 0, movedFile);
+      onFilesChange(updatedFiles);
+      console.log(updatedFiles)
+      return updatedFiles;
+    });
+  }, [onFilesChange]);
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div style={{ display: "flex", width: "fit-content", maxHeight: "400px", padding: "20px", borderRadius: "8px", backgroundColor: "#f2f3f4", marginLeft: "25px" }}>
+        {files.map((file, index) => (
+          <DraggableFile key={index} file={file} index={index} moveFile={moveFile} />
+        ))}
+      </div>
+    </DndProvider>
+  );
+};
+
+
+export const FilesInput:  React.FC<FilesInputProps> = ({ onFilesChange, style }) => {
+  console.log("its alive")
+  const [filesArray, setFilesArray] = useState<FileItem[]>([]);
+  const [showThumbs, setShowThumbs] = useState<boolean>(false);
+
+
+  const handleFileInput = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target instanceof HTMLInputElement && e.target.type === "file") {
+      const fileList = e.target.files;
+      console.log(fileList);
+      setFilesArray([])
+      let newFiles:FileItem[] = []
+      if (fileList) {
+        const fileNames = Array.from(fileList).map((file) => URL.createObjectURL(file))
+        const fileTypes = Array.from(filesArray).map((file) => (file.type.startsWith("video/") ? true : false))
+        for (const file of fileList) {
+          newFiles.push({name: URL.createObjectURL(file), type:file.type})
+        }
+      setFilesArray(newFiles)
+        
+      onFilesChange(newFiles)
+      setShowThumbs(true);
+      }
+    }
+  }
+
+return (
+  <div>
+    <label htmlFor="urldata" style={style.specialLabel}> Upload Images and Videos
+        <input
+            type="file"
+            id="urldata"
+            name="mediaUrl"
+            multiple
+            accept=".jpg, .jpeg, .png, .gif, .mp4, .mov"
+            onChange={handleFileInput}
+            style={style.specialInput}
+            required
+        />
+    </label>
+    {showThumbs && (
+
+      <DragDropFileList filesUpload={filesArray} onFilesChange={ onFilesChange }/>
+
+    )
+  }
+  </div>
+)
+};

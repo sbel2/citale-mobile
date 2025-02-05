@@ -10,6 +10,7 @@ import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
 import { Button } from '@nextui-org/react';
+import DeletePopup from '@/components/deletePopup';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -23,7 +24,10 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts')
+    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts');
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [deletePost, setDeletePost] = useState<boolean>(false);
+    const [managePostData, setManageData] = useState({id: "", postAction: ""})
 
     const postButtons = ['My Posts', 'My Likes', 'My Favs'];
     // Fetch user profile data from Supabase
@@ -50,8 +54,24 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
-        .from("posts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at")
+        .from("testPost")
+            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
+            .eq('user_id', userId);
+        if (error || !data) {
+            console.error('Error fetching post data:', error);
+            setPosts([]);
+            setloading(false);
+            } 
+        else {
+            setPosts(data);
+            setloading(false);
+        }
+    };
+
+    const handleFetchUserDrafts = async (userId: string) => {
+        const { data, error } = await supabase
+        .from("testDraft")
+            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
             .eq('user_id', userId);
         if (error || !data) {
             console.error('Error fetching post data:', error);
@@ -66,7 +86,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchLikedPosts = async (userId: string) => {
         const { data, error } = await supabase
-            .from('likes') // Assuming there's a 'likes' table
+            .from('testLikes') // Assuming there's a 'testLikes' table
             .select('post_id')
             .eq('user_id', userId);
     
@@ -77,8 +97,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         } else {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
-                .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .from('testPost')
+                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
                 .in('post_id', likedPostIds);
     
             if (postsError || !postsData) {
@@ -94,7 +114,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchFavoritePosts = async (userId: string) => {
         const { data, error } = await supabase
-            .from('favorites') // Assuming there's a 'likes' table
+            .from('testFavorites') // Assuming there's a 'testLikes' table
             .select('post_id')
             .eq('user_id', userId);
     
@@ -105,8 +125,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         } else {
             const FavoritedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
-                .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .from('testPost')
+                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
                 .in('post_id', FavoritedPostIds);
     
             if (postsError || !postsData) {
@@ -120,16 +140,51 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
     };
 
+    const toggleDropdown = () => {
+        setIsOpen((prevState) => !prevState)
+    }
+
+    const toggleDeletePopUp = () => {
+        console.log(managePostData)
+        setDeletePost((prevState) => !prevState);
+    }
+
+    const managePost = (manageType: string, postId: string, postAction: string) => {
+        if (manageType == "delete") {
+            setManageData({
+                id: postId,
+                postAction: postAction,
+            })
+            toggleDeletePopUp();
+        }
+    }
+
+    const resetPosts = (updatedPosts: Post[]) => {
+        setPosts(updatedPosts);
+    }
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
         if (option === 'My Posts') {
             await handleFetchUserPosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
         } else if (option === 'My Likes') {
             await handleFetchLikedPosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
         } else if (option === 'My Favs') {
             await handleFetchFavoritePosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
+        } else if (option === 'My Drafts') {
+            await handleFetchUserDrafts(userId);
+            toggleDropdown()
         }
+
     };
     
 
@@ -155,6 +210,13 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
         return true;
     }
+
+    const isMobile = () => {
+        return (
+          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          window.matchMedia("(max-width: 768px)").matches
+        );
+      };
 
     return (
         <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
@@ -200,8 +262,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                         
                         <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
                     </div>
-                        <div>
-                            <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
+                    <div>
+                        <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
                             {postButtons.map((category) => (
                             <button
                                 key={category}
@@ -211,17 +273,54 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             >
                             {category}
                             </button>
-                    ))}
+                            ))}
+                            <div className="flex">
+                                <button
+                                    key="more"
+                                    type="button"
+                                    onClick={toggleDropdown}
+                                    className={`px-3 py-3 rounded-full text-sm min-w-max ${isOpen ? 'bg-gray-300' : 'bg-white'}`}
+                                >
+                                ...
+                                </button>
+                                {isOpen && !isMobile() && (
+                                    <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
+                                        <ul className="py-1">
+                                            <li
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleCategoryClick('My Drafts', userId)}
+                                            >
+                                            My Drafts
+                                            </li>
+                                        </ul>
+                                    </div>)}
+                            </div>
+                            
                         </div>
+                        {isOpen && isMobile() && (
+                            <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
+                                <ul className="py-1">
+                                    <li
+                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleCategoryClick('My Drafts', userId)}
+                                    >
+                                    My Drafts
+                                    </li>
+                                </ul>
+                            </div>)}
                     </div>
-
                     <div className="border-b border-gray-300 mb-5"></div>
                     
                     <div className={styles.container}>
                         {posts.length === 0 ? (
                             <p className="text-center">No posts found :) </p>
                         ) : (
-                            <MasonryGrid posts={posts} />
+                            <div>
+                                {deletePost && (
+                                    <DeletePopup posts={posts} postStatus={managePostData.postAction} postId={managePostData.id} resetPosts={resetPosts} togglePopup={toggleDeletePopUp}/>
+                                )}
+                                <MasonryGrid posts={posts} managePost={managePost}/>
+                            </div>
                         )}
                     </div>
                 </div>

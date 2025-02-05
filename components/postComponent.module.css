@@ -31,7 +31,7 @@
     background: rgba(0, 0, 0, 0.05);
     }
 
-    .imagecontainer:hover .navigation {
+    .imagecontainer:hover .navigation, .videocontainer:hover .navigation {
     display: flex;
     }
 
