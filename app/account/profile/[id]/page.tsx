@@ -9,8 +9,6 @@ import Image from 'next/image';
 import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
-import { Button } from '@nextui-org/react';
-import { set } from 'zod';
 import FollowingPopup from "./following/following";
 import FollowerPopup from "./follower/follower";
 
@@ -25,7 +23,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
     const [following, setFollowing] = useState<boolean>(false);
     const [followingCount, setFollowingCount] = useState<number>(0);
@@ -65,7 +62,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
         .from("posts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at")
+            .select("*")
             .eq('user_id', userId);
         if (error || !data) {
             console.error('Error fetching post data:', error);
@@ -92,7 +89,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .select('*')
                 .in('post_id', likedPostIds);
     
             if (postsError || !postsData) {
@@ -120,7 +117,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const FavoritedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at')
+                .select('*')
                 .in('post_id', FavoritedPostIds);
     
             if (postsError || !postsData) {
@@ -145,37 +142,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             await handleFetchFavoritePosts(userId);
         }
     };
-
-    const handleRelationshipClick = async (option: string, userId: string) => {
-        if (option === 'Following') {
-            router.push(`/account/profile/${userId}/following`);
-        } else if (option === 'Followers') {
-            router.push(`/account/profile/${userId}/follower`);
-        }
-    };
-    
-    // Link decorator for clickable URLs in bio
-    const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
-        if (!isValidUrl(href)) {
-            return <span key={key}>{text}</span>;
-        }
-
-        return (
-            <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
-                {text}
-            </a>
-        );
-    };
-
-    // Simple URL validation
-    function isValidUrl(string: string): boolean {
-        try {
-            new URL(string);
-        } catch (_) {
-            return false;
-        }
-        return true;
-    }
 
     const handleFollowButton = async () => {
         const {data, error}  = await supabase

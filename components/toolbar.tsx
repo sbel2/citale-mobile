@@ -77,8 +77,13 @@ const Toolbar: React.FC = () => {
 
   const handleLogout = async () => {
     await logout();
-    localStorage.removeItem('userAvatar'); // Clear cached avatar
-    push('/');
+    localStorage.removeItem("userAvatar"); // Clear cached avatar
+  
+    if (pathname === "/") {
+      window.location.reload(); // Force full-page refresh if already on the main page
+    } else {
+      push("/"); // Navigate to home page if on a different page
+    }
   };
 
 
