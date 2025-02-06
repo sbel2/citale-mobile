@@ -17,15 +17,19 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const postIdFromURL = searchParams.get("postId");
-
+  
+  // Ensure postIdFromURL is always a valid number or fallback to 0
+  const postIdFromURL = Number(searchParams.get("postId")) || 0;
+  
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const { user } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   useEffect(() => {
-    setIsOpen(postIdFromURL === post.post_id.toString());
+    if (!isNaN(postIdFromURL)) {
+      setIsOpen(postIdFromURL === post.post_id);
+    }
   }, [postIdFromURL, post.post_id]);
 
   const handleClick = () => {
@@ -45,7 +49,7 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   };
 
   const { liked, likesCount, toggleLike } = useLike({
-    postId: post?.post_id || "",
+    postId: post?.post_id || 0, // Ensure the postId is a number
     userId: user?.id || "",
     initialLikeCount: post?.like_count || 0,
   });
