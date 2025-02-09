@@ -19,13 +19,17 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
     console.log(posts)
     const deletePost = async () => {
         console.log(postStatus, postId)
-        let postTable: string
+        let postTable: string;
+        let postBucket: string;
+
         switch(postStatus) {
             case "draft":
                 postTable = "testDraft";
+                postBucket = "test-draft"
                 break
             case "post":
                 postTable = "testPost";
+                postBucket = "test";
                 break
             default: 
                 throw new Error("Invalid postStatus value")
