@@ -18,11 +18,17 @@ const MasonryGrid = ({ posts }) => {
       className="my-masonry-grid"
       columnClassName="my-masonry-grid_column"
     >
-      {posts.map((post) => (
-        <div key={post.post_id}> {/* Adjust bottom margin */}
-          <Card post={post} />
-        </div>
-      ))}
+      {posts?.length > 0 ? (
+        posts.map((post) => (
+          <div key={post.post_id}>
+            <Card post={post} />
+          </div>
+        ))
+      ) : (
+        <p>No posts available</p>
+      )}
+
+      
     </Masonry>
   );
 };
