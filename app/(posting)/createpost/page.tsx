@@ -21,8 +21,11 @@ interface ButtonSubmitEvent extends SubmitEvent {
 
 export default function CreatePostPage() {
     const { user, logout } = useAuth();
-    //const [isValid, setValidate] = useState(false)
-    const [formData, setFormData] = useState({
+    const [isLoading, setLoad] = useState(false)
+    const [isSubmitted, setSubmit] = useState(false)
+    const [postType, setPostType] = useState<string>("")
+    const [showPop, setPopShow] = useState(false)
+    const defaultFormData = {
         title: "",
         description: "",
         location: "",
@@ -34,7 +37,8 @@ export default function CreatePostPage() {
         season: "",
         startDate: null as string | null,
         endDate: null as string | null,
-    });
+    }
+    const [formData, setFormData] = useState(defaultFormData);
 
     function handleInput(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const fieldName = e.target.name;
@@ -202,13 +206,37 @@ export default function CreatePostPage() {
         return { fileTypes, uploadedFiles }
     }
 
-    function submitForm(e: FormEvent) {
+    useEffect(() => {
+        const submitPopup = setTimeout(() => {
+            setSubmit(false);
+            //window.location.href = '/account/profile'
+
+        }, 3500); // show submit popup for ~3.5seconds
+    }, [isSubmitted])
+
+    useEffect(() => {
+        console.log("effecting")
+        if (isSubmitted) {
+            setLoad(false)
+            if (!isLoading) {
+                setTimeout(() => {
+                    setSubmit(false);
+                    //window.location.href = '/account/profile'
+        
+                }, 3500); // show submit popup for ~3.5seconds
+            }
+        }
+        
+    }, [isSubmitted, isLoading])
+    async function submitForm(e: FormEvent) {
         e.preventDefault();
         //console.log(formData)
 
         console.log(formData);
         const submitEvent = e.nativeEvent as ButtonSubmitEvent;
         const perform = submitEvent.submitter.value
+        setPostType(perform);
+        setLoad(true);
         
         async function postData(postAction: string, formDataUpdate: typeof formData) {
             //upload images to supabase and get their new filenames and boolean[] of isVideo
@@ -279,32 +307,40 @@ export default function CreatePostPage() {
                 
                 console.log(finalFormData);
                 //post data to posts database
+                
                 const { data, error } = await supabase
                 .from((postAction === "post")? "testPost" : "testDraft")
                 .insert([finalFormData]);
+                
 
                 if (error) {
                     console.error('Error Posting data:', error);
                     return
                 }
 
-                console.log('Data posted!!')
-                //window.location.href = '/account/profile'
-            }
+                console.log('Data posted!!');
+            
 
+                //window.location.href = `/account/profile/${user?.id}`
+                window.location.href = `/account/profile/${user?.id}`
+                console.log('Data posted!!');
+                //window.history.pushState(null, '', `/${postType}/${post.post_id}`)
+            }
             
         };
         
-        if (perform == 'preview') {
+        //if (perform == 'preview') {
 
             //window.location.href = '/account/profile';
-        } else {
+        //} else {
             console.log("Procesing Form Submission...")
             console.log(formData)
-            postData(perform, formData);
-            console.log("Procesing Form Submission...")
-            //window.location.href = '/account/profile';
-        }
+            await postData(perform, formData);
+            console.log(isSubmitted)
+            window.location.href = `/account/profile/${user?.id}`
+           // window.history.pushState(null, '', `/account/profile/${user?.id}`)
+           
+        //}
         
     }
 
@@ -417,11 +453,19 @@ export default function CreatePostPage() {
                         <FilesInput style={styles} onFilesChange= {handleFilesInput}/>
                     </form>
                     <div className="flex justify-end">
+                    {isLoading && (
+                            <p className="align-self-start">Saving your Content...</p>
+                        )}
                         <button type="submit" form="addpost" value="post" style={styles.submit}>Post</button>
                         <div className="flex">
                             <button type="submit" form="addpost" value="draft" formNoValidate style={styles.submit}>Save as Draft</button>
                             {/*<button type="submit" form="addpost" value="preview" formNoValidate style={styles.submit}>Preview Post</button>*/}
                         </div>
+                    </div>
+                    <div>
+                        {isLoading && (
+                            <p>Saving your Content...</p>
+                        )}
                     </div>
                 </div>
         )
