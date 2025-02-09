@@ -1,4 +1,3 @@
-//testing merge
 'use client';
 
 import React, { Suspense, useState, useEffect } from 'react';
@@ -13,7 +12,9 @@ const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: fal
 
 const Filter = () => {
   const searchParams = useSearchParams(); 
-  const selectedOption = searchParams.get('option');
+  const selectedOption = searchParams.get('option') || 'All';
+  const selectedLocation = searchParams.get('location') || 'All';
+  const selectedPrice = searchParams.get('price') || 'All';
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,13 +25,13 @@ const Filter = () => {
   
     return () => {
     };
-  }, [selectedOption]);
+  }, [selectedOption, selectedLocation, selectedPrice]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (selectedOption) {
+      if (selectedOption || selectedLocation || selectedPrice) {
         setLoading(true);
-        const data = await handleFilter(selectedOption);
+        const data = await handleFilter(selectedOption, selectedLocation, selectedPrice);
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);
@@ -39,7 +40,7 @@ const Filter = () => {
     };
 
     fetchData();
-  }, [selectedOption]);
+  }, [selectedOption, selectedLocation, selectedPrice]);
 
   if (loading && firstLoad) {
     return (

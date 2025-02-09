@@ -7,7 +7,8 @@ export async function handleSearch(query: string): Promise<Post[] | null> {
   try {
     const { data, error } = await supabase
       .from('posts')
-      .select('post_id, title, description, is_video, mediaUrl, thumbnailUrl, mapUrl,user_id, like_count, favorite_count, created_at')
+      .select('*')
+      .or('expired_dates.is.null,expired_dates.gte.' + new Date().toISOString().split('T')[0])
       .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
       .order('created_at', { ascending: false })
       .order('like_count', { ascending: false });

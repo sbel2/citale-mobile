@@ -14,6 +14,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const query = params.get('query');
+    console.log('query taken ', query)
     if (query) {
       setSearchQuery(query); // Set the search query from URL if available
     }

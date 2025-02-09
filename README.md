@@ -1,5 +1,27 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## First time installing
+
+If you are installing/running this for the first time make sure to do the following first 
+
+### Install NPM
+
+If on a mac you can install npm very easily by going to the terminal and running
+
+```bash
+brew install node
+```
+
+### Installing all the relevant packages
+
+Next, in order to run nextjs you need to make sure to run the following command in your IDE terminal
+
+```bash
+npm install
+```
+
+This will install all the packages you need to make things work. 
+
 ## Getting Started
 
 First, run the development server:

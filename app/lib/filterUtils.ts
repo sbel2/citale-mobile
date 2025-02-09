@@ -3,36 +3,35 @@ import { Post } from './types';
 
 const supabase = createClient();
 
-export async function handleFilter(option: string) : Promise<Post[] | null> {
+export async function handleFilter(option: string, location: string, price: string): Promise<Post[] | null> {
   try {
-    if (option === 'All') {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+    let query = supabase.from('posts').select('*').or('expired_dates.is.null,expired_dates.gte.' + new Date().toISOString().split('T')[0]);
+
+    // Apply filters dynamically
+    if (option !== 'All') {
+      query = query.ilike('categories_short', `%${option}%`);
     }
-    else {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .ilike('category', `%${option}%`)
-        .order('created_at', { ascending: false })
-        .order('like_count', { ascending: false });
-      if (error) {
-        console.error('Error fetching posts:', error);
-        return null;
-      } 
-      return data || [];
+    if (location !== 'All') {
+      query = query.ilike('location_short', `%${location}%`);
     }
-  }
-  catch (error) {
+    if (price !== 'All') {
+      query = query.eq('price',price);
+    }
+
+    // Apply ordering
+    query = query.order('created_at', { ascending: false }).order('like_count', { ascending: false });
+
+    // Fetch data
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching posts:', error);
+      return null;
+    }
+
+    return data || [];
+  } catch (error) {
     console.error('Unexpected error:', error);
     return null;
   }
-};  
+}
