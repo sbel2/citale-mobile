@@ -12,6 +12,8 @@ import { MultiSelectChipsInput, DatesInput, FilesInput, FileItem } from '@/compo
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 import { error } from 'console';
 import { boolean } from 'zod';
+import {v4 as uuidv4} from 'uuid' // generate post id
+
 
 const supabase = createClient();
 const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
@@ -229,6 +231,11 @@ export default function CreatePostPage() {
         }
         
     }, [isSubmitted, isLoading])
+
+    // generate unique post id
+
+
+
     async function submitForm(e: FormEvent) {
         e.preventDefault();
         //console.log(formData)
@@ -240,6 +247,7 @@ export default function CreatePostPage() {
         setLoad(true);
         
         async function postData(postAction: string, formDataUpdate: typeof formData) {
+
             //upload images to supabase and get their new filenames and boolean[] of isVideo
             if (!formData.mediaUrl[0]) {
                 console.log("madeit", formDataUpdate)
