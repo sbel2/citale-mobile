@@ -28,7 +28,35 @@ export default function CreatePostPage() {
     const [isSubmitted, setSubmit] = useState(false)
     const [postType, setPostType] = useState<string>("")
     const [showPop, setPopShow] = useState(false)
+    const [postId, setPostId] = useState<string>('')
+    // generate unique post id
+    async function generatePostId() : Promise<string>{
+        let postId = uuidv4();
+        let isUnique = false;
+
+        while (!isUnique){
+            const {data} = await supabase
+                .from('posts')
+                .select('post_id')
+                .eq('post_id', postId)
+                .single();
+            if(!data){
+                isUnique = true;
+            }
+            else{
+                postId = uuidv4();
+            }
+        }
+        setPostId(postId);
+        return postId;
+    }
+
+    useEffect(() => {
+        generatePostId();
+    }, []);
+
     const defaultFormData = {
+        post_id:postId,
         title: "",
         description: "",
         location: "",
@@ -134,6 +162,7 @@ export default function CreatePostPage() {
         const uploadedFiles: string[] =[];
         let currentFileType = "";
 
+
         for (const blobUrl of blobUrls) {
             try {
                 const response = await fetch(blobUrl);
@@ -163,9 +192,9 @@ export default function CreatePostPage() {
                         break
                 }
 
-
                 if (postAction == "draft" || postAction == "post") {
-                const fileName = `${Date.now()}-${Math.random().toString(35).substring(7)}.${currentFileType}`
+                // generate post id
+                const fileName = `${postId}-${Math.random().toString(35).substring(7)}.${currentFileType}`
                 //const filePath = `/${fileName}`
                 console.log(fileName)
                 let filePath = ""
@@ -232,7 +261,7 @@ export default function CreatePostPage() {
         
     }, [isSubmitted, isLoading])
 
-    // generate unique post id
+    
 
 
 
@@ -255,6 +284,7 @@ export default function CreatePostPage() {
                 let draftFormData = {}
                 draftFormData = {
                     ...formDataUpdate,
+                    post_id: postId,
                     post_action: statusPost,
                     user_id: user?.id
                 }
@@ -306,6 +336,7 @@ export default function CreatePostPage() {
 
                 finalFormData = {
                     ...formDataUpdate,
+                    post_id:postId,
                     mediaUrl: uploadedFiles,
                     is_video: hasVideo,
                     video_type: fileTypes,
