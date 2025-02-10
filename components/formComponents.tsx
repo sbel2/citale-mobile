@@ -1,28 +1,9 @@
 import React, { useRef, forwardRef, useImperativeHandle, useState, useCallback, useEffect, ChangeEvent, MouseEvent } from 'react';
-//import { GoogleMap, useLoadScript, Marker, Autocomplete } from '@react-google-maps/api';
 import Image from "next/legacy/image";
-//import type { Libraries } from '@react-google-maps/api';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDrop, useDrag } from "react-dnd";
 import '@/components/formComponents.css';
-import { string } from 'zod';
-
-type Library = "places" | "geometry" | "drawing" | "localContext" | "visualization";
-const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
-//const libraries: Libraries = ["places"];
-
-interface AutocompleteLocationProps {
-    onLocationChange: (place: {
-        name: string;
-        formatted_address: string;
-    }) => void;
-    style: {
-        label: {},
-        input: {},
-        map: {},
-    };
-}
 
 interface MultiSelectChipsInputProps {
   onMultiSelectChange: (
@@ -67,92 +48,6 @@ export type FileItem = {
   name: string;
   type: string;
 }
-
-// export const AutocompleteLocation: React.FC<AutocompleteLocationProps> = ({ onLocationChange, style  }) => {
-//   const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
-//   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null); 
-  
-//   const { isLoaded, loadError } = useLoadScript({
-//     googleMapsApiKey: googleApiKey,
-//     libraries,
-//   });
-
-//   useEffect(() => {
-//     // Check if google.maps is available and initialize Autocomplete
-//     if (isLoaded && !autocomplete) {
-//       const input = document.getElementById('autocomplete') as HTMLInputElement;
-      
-//       if (input) {
-//         const autocompleteInstance = new google.maps.places.Autocomplete(input, {
-//             componentRestrictions: {country: 'US'},
-//       });
-//         setAutocomplete(autocompleteInstance);
-      
-//         autocompleteInstance.addListener('place_changed', () => {
-//             const place = autocompleteInstance.getPlace();
-//             if (!place.geometry) {
-//             console.error("No details available for the selected place");
-//             return;
-//             }
-
-//             const locationData = {
-//                 name: place.name || '',
-//                 formatted_address: place.formatted_address || '',
-//                 geometry: place.geometry,
-//               };
-
-//             setSelectedPlace(locationData);
-//             onLocationChange(locationData);
-
-//             console.log(selectedPlace)
-//         })
-//       }
-//     }
-//   }, [isLoaded, autocomplete, selectedPlace, onLocationChange]);
-
-//   if (loadError) return <p>Error loading maps</p>
-//   if (!isLoaded) return <p>Loading...</p>
-
-//   return (
-//       <div>
-//         <label htmlFor="autocomplete" style={style.label}> Location
-//             <input
-//             id="autocomplete"
-//             type="text"
-//             placeholder="Enter a location"
-//             style={style.input}
-//             />
-//         </label>
-//         {/* Autocomplete is linked to the input field */}
-//         {/* <div style={style.map}>
-//             <GoogleMap
-//             id="map"
-//             mapContainerStyle={{
-//                 width: '100%',
-//                 height: '300px',
-//                 borderRadius: "15px"
-//             }}
-//             center={selectedPlace?.geometry?.location ? {
-//                 lat: selectedPlace.geometry.location.lat(), 
-//                 lng: selectedPlace.geometry.location.lng()
-//             } : { lat: 42.361145, lng: -71.057083 }}
-//             zoom= { selectedPlace? 13 : 10}
-//             >
-//             {/* Optionally, you can add a marker to the map based on the selected place */}
-//             {/* {selectedPlace && (
-//                 <Marker
-//                 position={{
-//                     lat: selectedPlace?.geometry?.location?.lat() ?? 0,
-//                     lng: selectedPlace?.geometry?.location?.lng() ?? 0,
-//                 }}
-//                 />
-//             )}
-//             </GoogleMap>
-//         </div> */}
-//       </div>
-//   );
-// };
-
 
 export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options, elementKey} : MultiSelectChipsInputProps, ref ) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -205,7 +100,6 @@ MultiSelectChipsInput.displayName = "MultiSelectChipsInput";
 
 export const DatesInput: React.FC<DatesInputProps> = ({ onSeasonChange, onDateChange, style }) => {
 
-  const { label, input } = style;
   const multiSelectRef = useRef<{ clearSelection: () => void } | null>(null);
   const seasons =["Spring", "Summer", "Fall", "Winter"];
   const [hasDate, viewDate] = useState(false)
@@ -394,8 +288,6 @@ export const FilesInput:  React.FC<FilesInputProps> = ({ onFilesChange, style })
       setFilesArray([])
       let newFiles:FileItem[] = []
       if (fileList) {
-        const fileNames = Array.from(fileList).map((file) => URL.createObjectURL(file))
-        const fileTypes = Array.from(filesArray).map((file) => (file.type.startsWith("video/") ? true : false))
         for (const file of fileList) {
           newFiles.push({name: URL.createObjectURL(file), type:file.type})
         }
