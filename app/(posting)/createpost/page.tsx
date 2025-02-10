@@ -2,18 +2,11 @@
 
 import{ createClient } from '@/supabase/client';
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
-import Image from "next/legacy/image";
 import { categoryList, locationList } from '@/components/constants';
 import { useAuth } from 'app/context/AuthContext';
-import Card from '@/components/card';
-import { Post } from "@/app/lib/types";
 import { MultiSelectChipsInput, DatesInput, FilesInput, FileItem } from '@/components/formComponents';
-import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
-import { error } from 'console';
-import { boolean } from 'zod';
 
 const supabase = createClient();
-const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 interface ButtonSubmitEvent extends SubmitEvent {
     submitter: HTMLButtonElement | HTMLInputElement;
@@ -24,7 +17,6 @@ export default function CreatePostPage() {
     const [isLoading, setLoad] = useState(false)
     const [isSubmitted, setSubmit] = useState(false)
     const [postType, setPostType] = useState<string>("")
-    const [showPop, setPopShow] = useState(false)
     const defaultFormData = {
         title: "",
         description: "",
@@ -68,26 +60,7 @@ export default function CreatePostPage() {
         console.log(formData)
     }
 
-    const handleLocationChange = (mapData: {
-        name: string;
-        formatted_address: string;
-    }) => {
-        console.log("ithappened", mapData)
-        setFormData((prevState) => ({
-            ...prevState,
-            mapUrl: `${mapData.name} - ${mapData.formatted_address}`,
-        }));
-        console.log(formData)
-    }
-
     const handleMultiSelect = (chosenOptions: string, inputKey: string) => {
-        {/*if (chosenOptions) {
-            const valid = true
-            setValidate(valid)
-        } else {
-            const valid = false
-            setValidate(valid) 
-        }*/}
         console.log("ithappened", chosenOptions)
         setTimeout(() => {
             setFormData((prevState) => ({
@@ -122,8 +95,6 @@ export default function CreatePostPage() {
       }
 
     const uploadFilesToBucket = async (blobUrls: string[], postAction: string) => {
-        //const imageBucket = 'images';
-        //const videoBucket = 'video';
         const testPostBucket = 'test';
         const testDraftBucket = 'test-draft'
         
@@ -163,7 +134,6 @@ export default function CreatePostPage() {
 
                 if (postAction == "draft" || postAction == "post") {
                 const fileName = `${Date.now()}-${Math.random().toString(35).substring(7)}.${currentFileType}`
-                //const filePath = `/${fileName}`
                 console.log(fileName)
                 let filePath = ""
 
@@ -181,14 +151,6 @@ export default function CreatePostPage() {
                         .upload(filePath, blob, {
                             upsert: false,
                         });
-                
-                {/* else if (currentFileType === "mp4" || currentFileType === "mov") {
-                    const { data, error } = await supabase.storage
-                        .from(videoBucket)
-                        .upload(filePath, blob, {
-                            upsert: false,
-                        });
-                } */}
 
                 if (error) {
                     console.error(`Error uploading ${blobUrl}:`, error.message);
@@ -209,7 +171,6 @@ export default function CreatePostPage() {
     useEffect(() => {
         const submitPopup = setTimeout(() => {
             setSubmit(false);
-            //window.location.href = '/account/profile'
 
         }, 3500); // show submit popup for ~3.5seconds
     }, [isSubmitted])
@@ -221,7 +182,6 @@ export default function CreatePostPage() {
             if (!isLoading) {
                 setTimeout(() => {
                     setSubmit(false);
-                    //window.location.href = '/account/profile'
         
                 }, 3500); // show submit popup for ~3.5seconds
             }
@@ -230,7 +190,6 @@ export default function CreatePostPage() {
     }, [isSubmitted, isLoading])
     async function submitForm(e: FormEvent) {
         e.preventDefault();
-        //console.log(formData)
 
         console.log(formData);
         const submitEvent = e.nativeEvent as ButtonSubmitEvent;
@@ -281,7 +240,6 @@ export default function CreatePostPage() {
 
             let finalFormData = {};
             console.log(postAction)
-            //add computed states to FormData and update mediaUrl with supabase file names
             if (postAction == "preview") {
                 finalFormData = {
                     ...formDataUpdate,
@@ -306,7 +264,6 @@ export default function CreatePostPage() {
                 }
                 
                 console.log(finalFormData);
-                //post data to posts database
                 
                 const { data, error } = await supabase
                 .from((postAction === "post")? "testPost" : "testDraft")
@@ -320,28 +277,17 @@ export default function CreatePostPage() {
 
                 console.log('Data posted!!');
             
-
-                //window.location.href = `/account/profile/${user?.id}`
                 window.location.href = `/account/profile/${user?.id}`
                 console.log('Data posted!!');
-                //window.history.pushState(null, '', `/${postType}/${post.post_id}`)
             }
             
         };
         
-        //if (perform == 'preview') {
-
-            //window.location.href = '/account/profile';
-        //} else {
             console.log("Procesing Form Submission...")
             console.log(formData)
             await postData(perform, formData);
             console.log(isSubmitted)
             window.location.href = `/account/profile/${user?.id}`
-           // window.history.pushState(null, '', `/account/profile/${user?.id}`)
-           
-        //}
-        
     }
 
     console.log('Boom')
@@ -389,7 +335,7 @@ export default function CreatePostPage() {
                                 required
                             />
                         </label>
-                        {/*<AutocompleteLocation onLocationChange={handleLocationChange} style={styles}/> FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX FIX*/}
+
                         <label htmlFor="price" style={styles.specialLabel}> Price
                             <select 
                                 name="price"
@@ -429,27 +375,8 @@ export default function CreatePostPage() {
                         </div>
                         <div>
                             <p style={styles.label}> Event Type(s)</p>
-                            {/*<input 
-                                type="text"
-                                id="require"
-                                name="require"
-                                value={isValid ? "full" : ''}
-                                style={{visibility: "hidden", height: "1px"}}
-                            />*/}
                             <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="category" options={categoryList} />
                         </div>
-                        {/* <label htmlFor="urldata" style={styles.specialLabel}> Upload Images and Videos
-                            <input
-                                type="file"
-                                id="urldata"
-                                name="mediaUrl"
-                                multiple
-                                accept=".jpg, .jpeg, .png, .gif, .mp4, .mov"
-                                onChange={handleInput}
-                                style={styles.specialInput}
-                                required
-                            />
-                        </label> */}
                         <FilesInput style={styles} onFilesChange= {handleFilesInput}/>
                     </form>
                     <div className="flex justify-end">
@@ -459,7 +386,6 @@ export default function CreatePostPage() {
                         <button type="submit" form="addpost" value="post" style={styles.submit}>Post</button>
                         <div className="flex">
                             <button type="submit" form="addpost" value="draft" formNoValidate style={styles.submit}>Save as Draft</button>
-                            {/*<button type="submit" form="addpost" value="preview" formNoValidate style={styles.submit}>Preview Post</button>*/}
                         </div>
                     </div>
                     <div>
@@ -481,7 +407,6 @@ const styles = {
       justifyContent: 'center',
       zIndex: 10,
       width: '40%',
-      //height: '60%',
     },
 
     form: {
@@ -490,7 +415,6 @@ const styles = {
       width: '100%',
       minWidth: '500px',
       margin: '20px 10px',
-      //boxShadow: '0 4px 400px 0 rgba(0, 0, 0, 0.2), 0 6px 400px 0 rgba(0, 0, 0, 0.19)',
       borderRadius: '15px',
       backgroundColor: 'white',
     },
@@ -498,7 +422,6 @@ const styles = {
     title: {
       alignSelf: 'center',
       fontSize: '25px',
-      //fontFamily: 'Inter SemiBold 600', eventually bold title
       margin: '25px 0px 10px',
     },
 
