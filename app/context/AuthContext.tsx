@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const initializeAuth = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
+        console.error('Error getting session:', error);
         setUser(null);
         setSession(null);
         return;
@@ -32,19 +33,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    const { data } = supabase.auth.onAuthStateChange((_, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       setUser(session?.user || null);
       setSession(session || null);
     });
 
-    return () => data?.subscription?.unsubscribe();
-  }, [supabase]);
+    return () => authListener?.subscription?.unsubscribe();
+  }, []);
 
   const logout = async () => {
     try {
       await supabase.auth.signOut();
       setUser(null);
       setSession(null);
+
+      // Clear tokens and session data
+      localStorage.clear();
+      sessionStorage.clear();
+      document.cookie = `sb-access-token=; path=/; Max-Age=0`;
+      document.cookie = `sb-refresh-token=; path=/; Max-Age=0`;
+
+      // Recheck session to confirm logout
+      const { data: sessionData } = await supabase.auth.getSession();
+      console.log('Session after logout:', sessionData);
+
+      if (!sessionData.session) {
+        console.log('Session cleared successfully.');
+      } else {
+        console.warn('Session still active:', sessionData);
+      }
     } catch (error) {
       console.error('Error during logout:', error);
     }

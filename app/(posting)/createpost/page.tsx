@@ -1,6 +1,6 @@
 'use client'
 
-import{ createClient } from '@/supabase/client';
+import { supabase } from "@/app/lib/definitions";
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import Image from "next/legacy/image";
 import { categoryList, locationList } from '@/components/constants';
@@ -8,14 +8,12 @@ import { useAuth } from 'app/context/AuthContext';
 import Card from '@/components/card';
 import { Post } from "@/app/lib/types";
 import { MultiSelectChipsInput, DatesInput, FilesInput, FileItem } from '@/components/formComponents';
-// import {AutocompleteLocation} from '@/components/formComponents';
 import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
 import { error } from 'console';
 import { boolean } from 'zod';
 import {v4 as uuidv4} from 'uuid' // generate post id
 
 
-const supabase = createClient();
 const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 interface ButtonSubmitEvent extends SubmitEvent {
@@ -155,8 +153,8 @@ export default function CreatePostPage() {
     const uploadFilesToBucket = async (blobUrls: string[], postAction: string) => {
         //const imageBucket = 'images';
         //const videoBucket = 'video';
-        const testPostBucket = 'test';
-        const testDraftBucket = 'test-draft'
+        const postsBucket = 'posts';
+        const draftsBucket = 'drafts'
         
         const fileTypes: boolean[] = [];
         const uploadedFiles: string[] =[];
@@ -209,7 +207,7 @@ export default function CreatePostPage() {
                 }
                 
                 const { data, error } = await supabase.storage
-                        .from((postAction=="post") ? testPostBucket : testDraftBucket)
+                        .from((postAction=="post") ? postsBucket : draftsBucket)
                         .upload(filePath, blob, {
                             upsert: false,
                         });
@@ -227,7 +225,7 @@ export default function CreatePostPage() {
                     continue;
                 }
 
-                const publicUrl = supabase.storage.from((postAction=="post") ? testPostBucket : testDraftBucket).getPublicUrl(filePath);
+                const publicUrl = supabase.storage.from((postAction=="post") ? postsBucket : draftsBucket).getPublicUrl(filePath);
                 uploadedFiles.push(fileName);
                 console.log(`Uploaded ${blobUrl} to:`, publicUrl);}
             } catch (error) {
@@ -292,7 +290,7 @@ export default function CreatePostPage() {
                 console.log(draftFormData);
                 //post data to posts database
                 const { data, error } = await supabase
-                .from('testDraft')
+                .from('drafts')
                 .insert([draftFormData]);
 
                 if (error) {
@@ -349,7 +347,7 @@ export default function CreatePostPage() {
                 //post data to posts database
                 
                 const { data, error } = await supabase
-                .from((postAction === "post")? "testPost" : "testDraft")
+                .from((postAction === "post")? "posts" : "drafts")
                 .insert([finalFormData]);
                 
 
@@ -361,7 +359,7 @@ export default function CreatePostPage() {
                 console.log('Data posted!!');
             
 
-                //window.location.href = `/account/profile/${user?.id}`
+                
                 window.location.href = `/account/profile/${user?.id}`
                 console.log('Data posted!!');
                 //window.history.pushState(null, '', `/${postType}/${post.post_id}`)
@@ -377,7 +375,7 @@ export default function CreatePostPage() {
             console.log(formData)
             await postData(perform, formData);
             console.log(isSubmitted)
-            window.location.href = `/account/profile/${user?.id}`
+            //window.location.href = `/account/profile/${user?.id}`
            // window.history.pushState(null, '', `/account/profile/${user?.id}`)
            
         //}
@@ -501,11 +499,6 @@ export default function CreatePostPage() {
                             <button type="submit" form="addpost" value="draft" formNoValidate style={styles.submit}>Save as Draft</button>
                             {/*<button type="submit" form="addpost" value="preview" formNoValidate style={styles.submit}>Preview Post</button>*/}
                         </div>
-                    </div>
-                    <div>
-                        {isLoading && (
-                            <p>Saving your Content...</p>
-                        )}
                     </div>
                 </div>
         )

@@ -30,8 +30,8 @@ export default function Header({ font }: { font?: string }) {
     router.push(`/search-results?query=${encodeURIComponent(searchQuery)}`);
   };
 
-  const filterRoute = async (option: string) => {
-    router.push(`/filter-results?option=${encodeURIComponent(option)}`);
+  const filterRoute = async (option: string, location: string, price: string ) => {
+    router.push(`/filter-results?option=${encodeURIComponent(option)}&location=${encodeURIComponent(location)}&price=${encodeURIComponent(price)}`);
   };
 
   return (

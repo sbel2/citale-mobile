@@ -10,7 +10,7 @@ export default function Page({ params }: { params: { post: string, id: string } 
   const [postData, setPostData] = useState<Post | null>(null);
   const [loading, setloading] = useState<boolean>(true);
   console.log(postType, post_id)
-  const postTable = postType == "post" ? "testPost" : postType == "draft" ? "testDraft" : "";
+  const postTable = postType == "post" ? "posts" : postType == "draft" ? "drafts" : "";
   console.log(postTable)
   useEffect(() => {
     const supabase = createClient();
@@ -18,7 +18,7 @@ export default function Page({ params }: { params: { post: string, id: string } 
     const fetchPostData = async () => {
       const { data, error } = await supabase
         .from(postTable)
-        .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at, video_type, favorite_count, post_action")
+        .select("*")
         .eq("post_id", post_id)
         .single();
 

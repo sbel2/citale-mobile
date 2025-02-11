@@ -8,7 +8,7 @@ import { Post } from "@/app/lib/types";
 interface DeletePopupProps {
     posts: Post[];
     postStatus: string;
-    postId: string;
+    postId: number;
     resetPosts: (updatedPosts: Post[]) => void;
     togglePopup: () => void;
 }
@@ -26,12 +26,12 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
 
         switch(postStatus) {
             case "draft":
-                postTable = "testDraft";
-                postBucket = "test-draft"
+                postTable = "drafts";
+                postBucket = "drafts"
                 break
             case "post":
-                postTable = "testPost";
-                postBucket = "test";
+                postTable = "posts";
+                postBucket = "posts";
                 break
             default: 
                 throw new Error("Invalid postStatus value")

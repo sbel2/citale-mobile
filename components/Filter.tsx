@@ -1,98 +1,196 @@
-import React, { useState, useEffect , Suspense } from 'react';
-import {useSearchParams, usePathname} from 'next/navigation';
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { createClient } from '@/supabase/client';
+import { IoIosArrowDown } from "react-icons/io";
+
+// Initialize Supabase client
+const supabase = createClient();
 import { categoryList } from '@/components/constants';
 
 interface FilterProps {
-    onFilter: (option: string) => Promise<void>;
+  onFilter: (option: string, location: string, price: string, category: string) => Promise<void>;
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterOption, setFilterOption] = useState('');
+  const [filterEvents, setFilterEvents] = useState('All');
+  const [filterLocations, setFilterLocations] = useState('All');
+  const [filterPrice, setFilterPrice] = useState('All');
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const filterParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
+  const [categories, setCategories] = useState<{
+    Price: string[];
+    Events: string[];
+    Locations: string[];
+  }>({
+    Price: [],
+    Events: [],
+    Locations: [],
+  });
 
-  useEffect(() => {
-    const option = filterParams.get('option');
-
-    // Check if the current pathname is the home page
-    if (pathname === '/') {
-        setFilterOption('All'); // Default to 'All' if on home page
-    } else if (option) {
-        setFilterOption(option); // Set the search query from URL if available
-    }
-}, [filterParams, pathname]);
-  
-  //check if user entered a query and calling onsearch to fetch results
-  const handleFilterClick = async (option: string) => {
-    setFilterOption(option);
-    await onFilter(option); // Trigger the filter logic after updating the option
+  const dropdownRefs = {
+    Events: useRef<HTMLDivElement | null>(null),
+    Locations: useRef<HTMLDivElement | null>(null),
+    Price: useRef<HTMLDivElement | null>(null),
+  };
+  const buttonRefs = {
+    Events: useRef<HTMLButtonElement | null>(null),
+    Locations: useRef<HTMLButtonElement | null>(null),
+    Price: useRef<HTMLButtonElement | null>(null),
   };
 
-  return (
-    <>
-    <style jsx>{`
-        .hide-scrollbar {
-          overflow-x: auto; /* Enable horizontal scrolling */
-          -ms-overflow-style: none; /* Internet Explorer and Edge */
-          scrollbar-width: none; /* Firefox */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        Object.values(dropdownRefs).every(
+          (ref) => ref.current && !ref.current.contains(event.target as Node)
+        ) &&
+        Object.values(buttonRefs).every(
+          (ref) => ref.current && !ref.current.contains(event.target as Node)
+        )
+      ) {
+        setDropdownOpen(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data: eventsData, error: eventsError } = await supabase.from('posts').select('categories_short');
+        const { data: locationsData, error: locationsError } = await supabase.from('posts').select('location_short');
+        const { data: priceData, error: priceError } = await supabase.from('posts').select('price');
+
+        if (eventsError || locationsError || priceError) {
+          console.error('Error fetching categories:', eventsError || locationsError || priceError);
+          return;
         }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
-        }
-      `}</style>
-    <div className="flex m-2 xl:justify-center hide-scrollbar">
-      {categoryList.map((category) => (
-          <button
-              key={category}
-              type="button"
-              onClick={() => handleFilterClick(category)}
-              className={`px-3 py-3 rounded-full text-sm min-w-max ${filterOption === category || (filterOption === '' && category === 'All') ? 'bg-gray-300' : 'bg-white'}`}
-          >
-              {category}
-          </button>
-      ))}
+
+        setCategories({
+          Events: eventsData ? [...new Set(eventsData.map((item) => item.categories_short).filter(Boolean))].sort() : [],
+          Locations: locationsData ? [...new Set(locationsData.map((item) => item.location_short).filter(Boolean))].sort() : [],
+          Price: priceData
+            ? [...new Set(priceData.map((item) => item.price).filter(Boolean))].sort((a, b) => (a === 'Free' ? -1 : b === 'Free' ? 1 : a.localeCompare(b)))
+            : [],
+        });
+      } catch (error) {
+        console.error('Unexpected error:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const updateFilterParams = (newOption: string, newLocation: string, newPrice: string) => {
+    const queryParams = new URLSearchParams(window.location.search);
+    newOption !== 'All' ? queryParams.set('option', newOption) : queryParams.delete('option');
+    newLocation !== 'All' ? queryParams.set('location', newLocation) : queryParams.delete('location');
+    newPrice !== 'All' ? queryParams.set('price', newPrice) : queryParams.delete('price');
+    router.push(`${pathname}?${queryParams.toString()}`);
+  };
+
+  useEffect(() => {
+    const option = filterParams.get('option') || 'All';
+    const location = filterParams.get('location') || 'All';
+    const price = filterParams.get('price') || 'All';
+
+    setFilterEvents(categories.Events.includes(option) ? option : 'All');
+    setFilterLocations(categories.Locations.includes(location) ? location : 'All');
+    setFilterPrice(categories.Price.includes(price) ? price : 'All');
+  }, [filterParams, categories]);
+
+  const handleFilterChange = useCallback(
+    async (option: string, location: string, price: string, category: string) => {
+      if (category === 'Events') setFilterEvents(option);
+      if (category === 'Locations') setFilterLocations(location);
+      if (category === 'Price') setFilterPrice(price);
+
+      updateFilterParams(option, location, price);
+
+      try {
+        await onFilter(option, location, price, category);
+      } catch (error) {
+        console.error('Filter error:', error);
+      }
+    },
+    [onFilter]
+  );
+
+  const resetFilters = () => {
+    setFilterEvents('All');
+    setFilterLocations('All');
+    setFilterPrice('All');
+    router.push(`${pathname}?`);
+  };
+
+  const toggleDropdown = (category: string) => {
+    setDropdownOpen(dropdownOpen === category ? null : category);
+  };
+
+  const FilterDropdown = ({ category, selected, options }: { category: string; selected: string; options: string[] }) => (
+    <div className="relative mx-2 md:mx-4">
+      <button
+        className={`flex items-center justify-center w-25 md:w-32 px-3 py-2.5 text-center text-xs md:text-sm rounded-full transition-colors 
+          ${selected !== 'All' ? 'bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'} 
+          gap-1 md:gap-3`}
+        onClick={() => toggleDropdown(category)}
+        ref={buttonRefs[category as keyof typeof buttonRefs]}
+      >
+        {selected === 'All' ? category : selected}
+        <IoIosArrowDown />
+      </button>
+      {dropdownOpen === category && (
+        <div
+        className="absolute top-14 left-0 right-0 bg-white rounded drop-shadow-2xl shadow-2xl z-10 overflow-y-auto max-h-48"
+          ref={dropdownRefs[category as keyof typeof dropdownRefs]}
+        >
+          {options.map((option) => (
+            <div
+              key={option}
+              className="px-3 py-2.5 cursor-pointer hover:bg-gray-100 text-xs md:text-sm"
+              onClick={() => {
+                handleFilterChange(
+                  category === 'Events' ? option : filterEvents,
+                  category === 'Locations' ? option : filterLocations,
+                  category === 'Price' ? option : filterPrice,
+                  category
+                );
+                setDropdownOpen(null); // Close dropdown when a category is selected
+              }}
+            >
+              {option}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-    </>
-  );
-};
+  );  
 
-const Filter = (props: FilterProps) => {
+
   return (
-    <Suspense fallback={null}>
-      <FilterButton {...props} />
-    </Suspense>
+    <div className="bg-white flex justify-center items-center pt-5 pb-z2">
+      <FilterDropdown category="Events" selected={filterEvents} options={categories.Events} />
+      <FilterDropdown category="Locations" selected={filterLocations} options={categories.Locations} />
+      <FilterDropdown category="Price" selected={filterPrice} options={categories.Price} />
+
+      <button
+        className="ml-2 md:ml-5 w-25 md:w-32 px-3 py-2.5 bg-[#fd0000] text-white rounded-full cursor-pointer hover:bg-[#fd0000] text-center text-xs md:text-sm flex justify-center items-center"
+        onClick={resetFilters}
+      >
+        Reset
+      </button>
+    </div>
   );
 };
 
-const styles = {
-  form: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#ffffff', // Light grey background
-    borderRadius: '25px', // Rounded corners
-    padding: '5px 10px', // Add some padding
-    width: '100%',
-    maxWidth: '200px', // Optional: max width for the search bar
-    boxShadow: '0 1px 1px rgba(0, 0, 0, 0.1)', // Optional: subtle shadow
-  },
-  button:{
-    marginLeft: '5px',
-    padding: '8px',
-    borderRadius: '25px',
-    // border: '1px solid #ccc',
-    fontSize: '16px',
-    backgroundColor: 'white',
-  },
-  clicked_button:{
-    marginLeft: '5px',
-    padding: '8px',
-    borderRadius: '25px',
-    // border: '1px solid #ccc',
-    fontSize: '16px',
-    backgroundColor: '#f0f0f0',
-  }
-}
+const FilterComponent: React.FC<FilterProps> = (props) => (
+  <Suspense fallback={<div>Loading filters...</div>}>
+    <FilterButton {...props} />
+  </Suspense>
+);
 
-
-
-export default Filter;
+export default FilterComponent;
