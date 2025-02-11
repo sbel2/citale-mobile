@@ -20,7 +20,8 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentCount, setCommentCount] = useState(0);
-  const [likes, setLikes] = useState<{ [key: number]: number }>({}); // Like counts
+  const [likes, setLikes] = useState<{ [key: number]: number }>({});
+  const [userLikes, setUserLikes] = useState<{ [key: number]: boolean }>({});
 
   // Fetch comments and likes initially
   const fetchComments = async () => {
@@ -28,10 +29,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     try {
       const { data, error } = await supabase
         .from("comments")
-        .select(`
-          *,
-          profiles (username, avatar_url)
-        `)
+        .select(`*, profiles (username, avatar_url)`)
         .eq("post_id", post_id)
         .order("comment_at", { ascending: false });
 
@@ -43,7 +41,6 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
       setComments(data || []);
       setCommentCount(data?.length || 0);
 
-      // Fetch likes count for each comment
       const likesData: { [key: number]: number } = {};
       for (const comment of data || []) {
         const { count, error: likeError } = await supabase
@@ -67,7 +64,6 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
   // Toggle like for a comment
   const toggleLike = async (commentId: number) => {
     if (!user_id) {
-      alert("Please log in to like a comment.");
       return;
     }
 
@@ -84,20 +80,16 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     }
 
     if (existingLike) {
-      // Unlike
-      await supabase
-        .from("comment_likes")
-        .delete()
-        .eq("id", existingLike.id);
-
+      await supabase.from("comment_likes").delete().eq("id", existingLike.id);
       setLikes((prev) => ({ ...prev, [commentId]: (prev[commentId] || 1) - 1 }));
+      setUserLikes((prev) => ({ ...prev, [commentId]: false }));
     } else {
-      // Like
       await supabase
         .from("comment_likes")
         .insert([{ user_id, comment_id: commentId }]);
 
       setLikes((prev) => ({ ...prev, [commentId]: (prev[commentId] || 0) + 1 }));
+      setUserLikes((prev) => ({ ...prev, [commentId]: true }));
     }
   };
 
@@ -172,5 +164,38 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     fetchComments();
   }, [post_id]);
 
-  return { saveComment, deleteComment, isSubmitting, isLoading, comments, commentCount, likes, toggleLike };
+  useEffect(() => {
+    const fetchUserLikes = async () => {
+      const { data, error } = await supabase
+        .from("comment_likes")
+        .select("comment_id")
+        .eq("user_id", user_id);
+
+      if (error) {
+        console.error("Error fetching user likes:", error);
+        return;
+      }
+
+      const likesMap = data.reduce((acc, like) => {
+        acc[like.comment_id] = true;
+        return acc;
+      }, {} as { [key: number]: boolean });
+
+      setUserLikes(likesMap);
+    };
+
+    if (user_id) fetchUserLikes();
+  }, [user_id]);
+
+  return {
+    saveComment,
+    deleteComment,
+    isSubmitting,
+    isLoading,
+    comments,
+    commentCount,
+    likes,
+    userLikes,
+    toggleLike,
+  };
 };

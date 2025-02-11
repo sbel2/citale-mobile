@@ -191,6 +191,35 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
             )}
             <span className="text-xs">{likesCount}</span>
           </button>
+
+          {showLoginPopup && (
+              <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                  <div className="flex justify-center mb-3">
+                      <Image src="/citale_header.svg" alt="Citale Logo" width={100} height={60} priority />
+                  </div>
+                  <p className="text-sm text-gray-600 mb-6">
+                      We are so glad you like Citale! <br /><br />
+                      Please sign in or sign up to interact with the community.
+                  </p>
+                  <div className="flex justify-center gap-6">
+                      <button
+                      className="bg-[#fd0000] hover:bg-[#fd0000] text-white px-4 py-2 rounded mr-2"
+                      onClick={() => router.push('/log-in')}
+                      >
+                      Log in
+                      </button>
+                      <button
+                      className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                      onClick={() => setShowLoginPopup(false)}
+                      >
+                      Cancel
+                      </button>
+                  </div>
+                  </div>
+              </div>
+              )}
+              
         </div>
       </div>
     </>
