@@ -9,7 +9,8 @@ import Image from 'next/image';
 import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
-import { Button } from '@nextui-org/react';
+import FollowingPopup from "./following/following";
+import FollowerPopup from "./follower/follower";
 import DeletePopup from '@/components/deletePopup';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
@@ -24,14 +25,24 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
-    const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [deletePost, setDeletePost] = useState<boolean>(false);
     const [managePostData, setManageData] = useState({id: "", postAction: ""})
+    const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
+    const [following, setFollowing] = useState<boolean>(false);
+    const [followingCount, setFollowingCount] = useState<number>(0);
+    const [followersCount, setFollowersCount] = useState<number>(0);
+    // open follow detail pop up
+    const [isFollowingOpen, setIsFollowingOpen] = useState(false);
+    const [isFollowerOpen, setIsFollowerOpen] = useState(false);
+    // display buttons on profile pages
+    const postButtons = ['Posts', 'Likes', 'Favs'];
+    const postButtons_others = ['Posts']
+    // const relationshipButtons = ['Following', 'Followers'];
 
-    const postButtons = ['My Posts', 'My Likes', 'My Favs'];
     // Fetch user profile data from Supabase
     useEffect(() => {
+        
         const fetchUserData = async () => {
             const { data, error } = await supabase
                 .from('profiles')
@@ -50,12 +61,13 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         };
 
         fetchUserData();
+        
     }, [userId]);
 
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
         .from("posts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
+            .select("*")
             .eq('user_id', userId);
         if (error || !data) {
             console.error('Error fetching post data:', error);
@@ -71,10 +83,10 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const handleFetchUserDrafts = async (userId: string) => {
         const { data, error } = await supabase
         .from("drafts")
-            .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
+            .select("*")
             .eq('user_id', userId);
         if (error || !data) {
-            console.error('Error fetching post data:', error);
+            console.error('Error fetching drafts data:', error);
             setPosts([]);
             setloading(false);
             } 
@@ -98,7 +110,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
+                .select('*')
                 .in('post_id', likedPostIds);
     
             if (postsError || !postsData) {
@@ -126,7 +138,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             const FavoritedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
                 .from('posts')
-                .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
+                .select('*')
                 .in('post_id', FavoritedPostIds);
     
             if (postsError || !postsData) {
@@ -165,7 +177,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
-        if (option === 'My Posts') {
+        if (option === 'Posts') {
             await handleFetchUserPosts(userId);
             if (isOpen) {
                 toggleDropdown()
@@ -177,14 +189,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             }
         } else if (option === 'My Favs') {
             await handleFetchFavoritePosts(userId);
-            if (isOpen) {
-                toggleDropdown()
-            }
-        } else if (option === 'My Drafts') {
-            await handleFetchUserDrafts(userId);
-            toggleDropdown()
         }
-
     };
     
 
@@ -193,23 +198,16 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         if (!isValidUrl(href)) {
             return <span key={key}>{text}</span>;
         }
-
-        return (
-            <a href={href} key={key} target="_blank" rel="noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>
-                {text}
-            </a>
-        );
+        setFollowing(false);
     };
 
-    // Simple URL validation
-    function isValidUrl(string: string): boolean {
-        try {
-            new URL(string);
-        } catch (_) {
-            return false;
-        }
-        return true;
-    }
+
+    const isMobile = () => {
+        return (
+          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          window.matchMedia("(max-width: 768px)").matches
+        );
+      };
 
     const isMobile = () => {
         return (
@@ -241,9 +239,18 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 <button
                                 onClick={() => router.push('/account/edit-profile')}
                                 className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                            >
+                                >   
                                 Edit Profile
-                            </button>
+                                </button>
+                            )}
+                            {user && user.id !== userId && (
+                                handleFollowButton(),
+                                <button
+                                onClick={() => following ? handleUnFollow() : handleFollow()}
+                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                                >   
+                                {following ? 'Unfollow' : 'Follow'}
+                                </button>
                             )}
                             
                         </div>
@@ -261,19 +268,47 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                         )}
                         
                         <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
+
+                        {/* Display followers and following counts*/}
+                        <div className="flex space-x-10 mb-6">
+                            <button onClick={() => setIsFollowingOpen(true)} className="btn">
+                                <p className="text-sm text-gray-500 mr-2">Following</p>
+                                <p className="text-sm font-medium">{followingCount}</p>
+                            </button>
+                            <FollowingPopup isOpen={isFollowingOpen} setIsOpen={setIsFollowingOpen} />
+                            <button onClick={() => setIsFollowerOpen(true)} className="btn">
+                                <p className="text-sm text-gray-500 mr-2">Follower</p>
+                                <p className="text-sm font-medium">{followersCount}</p>
+                            </button>
+                            <FollowerPopup isOpen={isFollowerOpen} setIsOpen={setIsFollowerOpen} />
+                        </div>
                     </div>
                     <div>
                         <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
-                            {postButtons.map((category) => (
-                            <button
-                                key={category}
-                                type="button"
-                                onClick={() => handleCategoryClick(category, userId)}
-                                className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
-                            >
-                            {category}
-                            </button>
-                            ))}
+                                {user && user.id === userId && (
+                                    postButtons.map((category) => (
+                                        <button
+                                            key={category}
+                                            type="button"
+                                            onClick={() => handleCategoryClick(category, userId)}
+                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                        >
+                                        {category}
+                                        </button>
+                                    ))
+                                )}
+                                {user && user.id !== userId && (
+                                    postButtons_others.map((category) => (
+                                        <button
+                                            key={category}
+                                            type="button"
+                                            onClick={() => handleCategoryClick(category, userId)}
+                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                        >
+                                        {category}
+                                        </button>
+                                            ))
+                                )}
                             <div className="flex">
                                 <button
                                     key="more"

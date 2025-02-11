@@ -9,6 +9,7 @@ export interface Post {
     thumbnailUrl: string;
     like_count: number;
     favorite_count: number;
+    comment_count: number;
     created_at: string;
     category?: string;
     user_id?: string;

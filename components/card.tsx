@@ -9,157 +9,83 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useLike } from "@/app/lib/useLikes";
+import { useParams } from "next/navigation";  // Import useParams for dynamic routing
 
 const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: string, postAction: string) => void }> = ({ post, managePost }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(post.like_count);
+  const { user } = useAuth();
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
-  const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [buttonClicked, setButtonClicked] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
 
-  
+  // Get the postId from the dynamic URL using useParams
+  const params = useParams();
+  const postIdFromURL = params.postId;
 
+  // Check if the current post's ID matches the postId in the URL
   useEffect(() => {
-    if (isOpen) {
-      document.title = post.title;
+    if (postIdFromURL && postIdFromURL === String(post.post_id)) {
+      setIsOpen(true);  // Open the dialog if the postId matches
     } else {
-      document.title = "Citale | Explore Boston";
+      setIsOpen(false);  // Close the dialog if postId does not match
     }
+  }, [postIdFromURL, post.post_id]);
 
-    return () => {
-      document.title = "Citale | Explore Boston"; // Cleanup on unmount
-    };
-  }, [isOpen, post.title]);
-
+  // Function to handle clicking on a post to navigate to its detail page
   const handleClick = () => {
-    window.history.pushState(null, '', `/${post.post_action}/${post.post_id}`);
-    setIsOpen(true);
+    router.push(`/${post.post_action}/${post.post_id}`);  // Navigate to the specific post's URL
   };
 
+  // Function to close the dialog and return to the previous page
   const handleClose = () => {
-    setIsOpen(false); // Close the post dialog or component
-    
-    if (pathname.startsWith('/account/profile/')) {
-      router.push(pathname);
-      return;
-    }
-    router.back();
+    router.push(`/`);  // Go back to the homepage (or any other page you prefer)
+    setIsOpen(false);
   };
 
-  const handleLike = async () => {
+  // Handle the like functionality
+  const { liked, likesCount, toggleLike } = useLike({
+    postId: post?.post_id || 0,
+    userId: user?.id || "",
+    initialLikeCount: post?.like_count || 0,
+  });
+
+  const handleLike = () => {
     if (!user) {
-      // Show login popup if the user is not authenticated
       setShowLoginPopup(true);
       return;
     }
-
-    try {
-      if (!liked) {
-        // Increment the like count in the 'likes' table
-        const { error: insertError } = await supabase
-          .from('likes')
-          .insert([{ user_id: user.id, post_id: post.post_id }]);
-
-        if (insertError) {
-          console.error('Error adding like:', insertError.message);
-          return;
-        }
-
-        // Increment the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount + 1 })
-          .eq('post_id', post.post_id);
-
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-
-        // Update state
-        setLikesCount((prev) => prev + 1);
-      } else {
-        // Remove the like from the 'likes' table
-        const { error: deleteError } = await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('post_id', post.post_id);
-
-        if (deleteError) {
-          console.error('Error removing like:', deleteError.message);
-          return;
-        }
-
-        // Decrement the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from('posts')
-          .update({ like_count: likesCount - 1 })
-          .eq('post_id', post.post_id);
-
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-
-        // Update state
-        setLikesCount((prev) => prev - 1);
-      }
-
-      // Toggle the like state
-      setLiked(!liked);
-    } catch (error) {
-      console.error('Error handling like:', error);
-    }
+    toggleLike();
   };
 
-  // Added effect to fetch profile data and like status concurrently
+  // Fetch profile data (username and avatar URL)
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfileData = async () => {
+      if (!post.user_id) return;
+
       try {
-        const [profileData, likeData] = await Promise.all([
-          supabase
-            .from('profiles')
-            .select('username, avatar_url')
-            .eq('id', post.user_id)
-            .single(),
-          user
-            ? supabase
-                .from('likes')
-                .select('*')
-                .eq('user_id', user.id)
-                .eq('post_id', post.post_id)
-                .single()
-            : Promise.resolve(null), // Return null for unauthenticated users
-        ]);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('id', post.user_id)
+          .single();
 
-        if (profileData.error) {
-          console.error('Error fetching profile:', profileData.error.message);
-          return;
-        }
-        setUsername(profileData.data.username || '');
-        setAvatarUrl(profileData.data.avatar_url || '');
+        if (error) throw error;
 
-        if (likeData?.error) {
-          console.error('Error fetching like status:', likeData.error.message);
-          return;
-        }
-        setLiked(!!likeData?.data);
+        setUsername(data?.username || '');
+        setAvatarUrl(data?.avatar_url || '');
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching profile:', error);
       }
     };
 
-    fetchData();
-  }, [user, post.user_id, post.post_id]);
+    fetchProfileData();
+  }, [user, post.user_id, post.user_id]);
 
   const toggleButtonClick = () => {
     setButtonClicked((prevState) => !prevState);
@@ -186,61 +112,46 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
   const bucketName = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : null;
 
   return (
-    <div>
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (open !== isOpen) {
-        setIsOpen(open);
-        if (!open) {
-          handleClose();
-        }
-      }
-    }}>
-      <DialogTrigger asChild>
-        <div>
-          <div onClick={handleClick} className="cursor-pointer">
-            <div className={styles['image-container']}>
-              {post.is_video ? (
-                <>
-                  <video
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/videos/${post.thumbnailUrl}`}
-                    width={300}
-                    height={200}
-                    autoPlay
-                    loop
-                    muted
-                    className="transition-transform duration-500 ease-in-out transform filter brightness-95"
-                    playsInline
-                  />
-                  <div className="absolute top-4 right-4 flex flex-col items-center justify-center w-6">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        height="24"
-                        className="text-white  bg-black bg-opacity-35 rounded-full"
-                      >
+    <>
+      {/* Card Wrapper to ensure other posts are not affected */}
+      <div className={styles["card-container"]}>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+          <DialogTrigger asChild>
+          <div>
+            <div className="cursor-pointer">
+              <div onClick={handleClick} className={styles["image-container"]}>
+                {post.is_video ? (
+                  <>
+                    <video
+                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/videos/${post.thumbnailUrl}`}
+                      width={300}
+                      height={200}
+                      autoPlay
+                      loop
+                      muted
+                      className="transition-transform duration-500 ease-in-out transform filter brightness-95"
+                      playsInline
+                    />
+                    <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" width="24" height="24" className="text-white  bg-black bg-opacity-35 rounded-full">
                         <path d="M8 5v14l11-7z" />
                       </svg>
-                  </div>
-                </>
-              ) : (
-                // Otherwise, display the image
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/images/${post.mediaUrl[0]}`}
-                  alt={post.title}
-                  width={300}
-                  height={200}
-                  className="transition-transform duration-500 ease-in-out transform"
-                />
-              )}
-              <div className={styles['overlay']}></div>
-            </div>
-            <div className="px-2 flex justify-between items-center pt-3">
-              <div className="text-xs sm:text-sm line-clamp-3 text-black">
-                {post.title}
+                    </div>
+                  </>
+                ) : (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/images/${post.mediaUrl?.[0]}`}
+                    alt={post.title}
+                    width={300}
+                    height={200}
+                    className="transition-transform duration-500 ease-in-out transform"
+                  />
+                )}
+                <div className={styles["overlay"]}></div>
               </div>
-              {(post.user_id == user?.id) && (pathname == `/account/profile/${user?.id}`) && ( //ADDS more button if it's your post on your profile which can be used to edit/delete/archive posts
+              <div className="px-2 pt-3">
+                <div className="text-xs sm:text-sm text-black">{post.title}</div>
+                {(post.user_id == user?.id) && (pathname == `/account/profile/${user?.id}`) && ( //ADDS more button if it's your post on your profile which can be used to edit/delete/archive posts
                       <button
                       className="pl-1 pr-1 focus:outline-none w-8 min-w-[32px] h-5"
                       aria-label="More options"
@@ -262,8 +173,8 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
                       </svg>
                     </button>
                     )}
-            </div>
-            {buttonClicked && ( //more button functions
+              </div>
+              {buttonClicked && ( //more button functions
                     <div ref={dropdownRef} className="text-xs sm:text-sm right-0 mt-2 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
                         <ul className="py-1">
                             <li
@@ -280,37 +191,33 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
                             </li>*/}
                         </ul>
                     </div>)}
+            </div>
           </div>
-        </div>
-      </DialogTrigger>
+          </DialogTrigger>
 
-      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
-        <VisuallyHidden>
-          <DialogTitle>{post.title}</DialogTitle>
-          <DialogDescription>
-            {post.description}
-          </DialogDescription>
-        </VisuallyHidden>
-        <PostComponent post={post} context="popup" />
-        <DialogClose 
-          onClick={handleClose}
-          aria-label="Close"
-        />
-      </DialogContent>
-      <div className="flex items-center justify-between px-2 py-3">
-        {/* Profile section */}
-        <button onClick={()=>router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
-          <div className="flex items-center">
-            <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
-              alt="Profile"
-              width={20}
-              height={20}
-              className="rounded-full"
-            />
-            <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
-          </div>
-        </button>
+          <DialogContent>
+            <VisuallyHidden>
+              <h2>{post.title}</h2>
+            </VisuallyHidden>
+            <PostComponent post={post} context="popup" />
+            <DialogClose onClick={handleClose} aria-label="Close" />
+          </DialogContent>
+        </Dialog>
+
+        <div className="flex items-center justify-between px-2 py-3">
+          {/* Profile Section */}
+          <button onClick={() => router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
+            <div className="flex items-center">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+                alt="Profile"
+                width={20}
+                height={20}
+                className="rounded-full"
+              />
+              <p className="text-xs ml-2 truncate max-w-[100px] text-gray-600">{username}</p>
+            </div>
+          </button>
 
         {/* Like button */}
         <button className="flex items-center p-1" onClick={handleLike}>
