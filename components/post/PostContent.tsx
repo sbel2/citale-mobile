@@ -5,6 +5,8 @@ import { Post } from "@/app/lib/types";
 import styles from "@/components/postComponent.module.css";
 import Image from 'next/image';
 import { IoIosMore } from 'react-icons/io';
+import { useRouter } from "next/navigation";
+import { comment } from "postcss";
 
 interface PostContentProps {
   post: Post;
@@ -12,14 +14,18 @@ interface PostContentProps {
   deleteComment: (commentId: number) => void;
   userId?: string;
   likes: { [key: number]: number };
+  userLikes: { [key: number]: boolean };
   toggleLike: (commentId: number) => void;
+  showLoginPopup: boolean;
+  setShowLoginPopup: (value: boolean) => void;
 }
 
-const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment, userId, likes, toggleLike }) => {
+const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment, userId, likes, toggleLike, userLikes, showLoginPopup, setShowLoginPopup }) => {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const address = post.mapUrl;
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [showConfirm, setShowConfirm] = useState<number | null>(null);
+  const router = useRouter();
 
   function isValidUrl(href: string): boolean {
     try {
@@ -40,6 +46,14 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
       </a>
     );
   };
+
+  const handleCommentLike = (comment: any) => {
+    if (!userId) {
+        setShowLoginPopup(true);
+        return;
+    }
+    toggleLike(comment.id);
+    };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -71,7 +85,6 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
       return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
     }
   };
-  
 
   return (
     <div className={`${styles.content} mt-8 mb-2`}>
@@ -97,7 +110,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
         {comments.map((comment) => {
           const profile = comment.profiles || {};
           return (
-            <div key={comment.id} className="mb-4 p-3 bg-white flex items-start">
+            <div key={comment.id} className="mb-1 p-2 bg-white flex items-start">
               <Image
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile.avatar_url || "avatar.png"}`}
                 alt="Profile"
@@ -109,8 +122,8 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
                 <p className="font-semibold">{profile.username || "Unknown User"}</p>
                 <p>{comment.content}</p>
                 <p className="text-xs text-gray-500 mt-1">{formatDate(comment.comment_at)}</p>
-                <button className="flex items-center p-1 pt-2 pr-2 gap-1" onClick={() => toggleLike(comment.id)}>
-                  {likes[comment.id] ? (
+                <button className="flex items-center p-1 pt-2 pr-2 gap-1" onClick={() => handleCommentLike(comment)}>
+                  {userLikes[comment.id] ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" color="red" fill="red">
                       <path d="M19.4626 3.99415C16.7809 2.34923 14.4404 3.01211 13.0344 4.06801C12.4578 4.50096 12.1696 4.71743 12 4.71743C11.8304 4.71743 11.5422 4.50096 10.9656 4.06801C9.55962 3.01211 7.21909 2.34923 4.53744 3.99415C1.01807 6.15294 0.221721 13.2749 8.33953 19.2834C9.88572 20.4278 10.6588 21 12 21C13.3412 21 14.1143 20.4278 15.6605 19.2834C23.7783 13.2749 22.9819 6.15294 19.4626 3.99415Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
@@ -147,7 +160,6 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
                   </div>
                 )}
               </div>
-
               {showConfirm === comment.id && (
                 <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
                   <div className="bg-white p-6 rounded-lg shadow-lg text-center">
@@ -176,6 +188,33 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
           );
         })}
       </div>
+      {showLoginPopup && (
+                  <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                      <div className="flex justify-center mb-3">
+                          <Image src="/citale_header.svg" alt="Citale Logo" width={100} height={60} priority />
+                      </div>
+                      <p className="text-sm text-gray-600 mb-6">
+                          We are so glad you like Citale! <br /><br />
+                          Please sign in or sign up to interact with the community.
+                      </p>
+                      <div className="flex justify-center gap-6">
+                          <button
+                          className="bg-[#fd0000] hover:bg-[#fd0000] text-white px-4 py-2 rounded mr-2"
+                          onClick={() => router.push('/log-in')}
+                          >
+                          Log in
+                          </button>
+                          <button
+                          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded"
+                          onClick={() => setShowLoginPopup(false)}
+                          >
+                          Cancel
+                          </button>
+                      </div>
+                      </div>
+                  </div>
+                  )}
     </div>
   );
 };
