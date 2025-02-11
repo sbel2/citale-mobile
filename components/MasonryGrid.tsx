@@ -7,7 +7,7 @@ import Card from "@/components/card";
 
 interface MasonryGridProps {
   posts: Post[] | null;
-  managePost?: (manageType: string, postId: string, postAction: string) => void; // Optional prop, function that handles the post
+  managePost?: (manageType: string, postId: number, postAction: string) => void; // Optional prop, function that handles the post
 }
 
 const MasonryGrid: React.FC<MasonryGridProps> = ({ posts , managePost }) => {

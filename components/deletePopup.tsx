@@ -8,7 +8,7 @@ import { Post } from "@/app/lib/types";
 interface DeletePopupProps {
     posts: Post[];
     postStatus: string;
-    postId: string;
+    postId: number;
     resetPosts: (updatedPosts: Post[]) => void;
     togglePopup: () => void;
 }

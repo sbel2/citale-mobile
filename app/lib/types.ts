@@ -1,6 +1,6 @@
 // all fields are optional and not requried to be read in for code
 export interface Post {
-    post_id: string;
+    post_id: number;
     title: string;
     description: string;
     is_video: boolean;

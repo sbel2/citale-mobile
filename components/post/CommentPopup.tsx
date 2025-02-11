@@ -3,7 +3,7 @@ import {useComments} from 'app/lib/useComments';
 
 interface CommentPopupProps {
   onClose: () => void;
-  post_id: number;
+   post_id: number;
   user_id?: string;
   onNewComment: (comment: any) => void;
 }

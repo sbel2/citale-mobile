@@ -9,13 +9,14 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useLike } from "@/app/lib/useLikes";
 import { useParams } from "next/navigation";  // Import useParams for dynamic routing
 
-const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: string, postAction: string) => void }> = ({ post, managePost }) => {
+const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: number, postAction: string) => void }> = ({ post, managePost }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
@@ -149,7 +150,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
                 )}
                 <div className={styles["overlay"]}></div>
               </div>
-              <div className="px-2 pt-3">
+              <div className=" flex justify-between items-center px-2 pt-3">
                 <div className="text-xs sm:text-sm text-black">{post.title}</div>
                 {(post.user_id == user?.id) && (pathname == `/account/profile/${user?.id}`) && ( //ADDS more button if it's your post on your profile which can be used to edit/delete/archive posts
                       <button
@@ -272,8 +273,9 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
           </div>
         </div>
       )}
-    </Dialog>
+
     </div>
+  </>
   );
 };
 

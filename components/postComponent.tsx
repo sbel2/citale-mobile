@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/app/lib/definitions";
 import styles from "./postComponent.module.css";
 import { useRouter } from 'next/navigation';
 import { Post } from "@/app/lib/types";
@@ -11,6 +12,7 @@ import PostHeader from "./post/PostHeader";
 import PostMedia from "./post/PostMedia";
 import PostContent from "./post/PostContent";
 import PostFooter from "./post/PostFooter";
+
 
 interface PostComponentProps {
   post: Post; 
@@ -41,176 +43,22 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     initialFavoriteCount: post.favorite_count
   });
 
-  const handleLike = () => {
+  async function handleLike() {
     if (!user) {
       setShowLoginPopup(true);
       return;
     }
-  
-    try {
-      if (!liked) {
-        // Increment the like count in the 'likes' table
-        const { error: insertError } = await supabase
-          .from('likes')
-          .insert([{ user_id: user.id, post_id: post.post_id }]);
-  
-        if (insertError) {
-          console.error('Error adding like:', insertError.message);
-          return;
-        }
-  
-        // Increment the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from(postTable)
-          .update({ like_count: likesCount + 1 })
-          .eq('post_id', post.post_id);
-  
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-  
         // Update state
-        setLikesCount((prev) => prev + 1);
-      } else {
-        // Remove the like from the 'likes' table
-        const { error: deleteError } = await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('post_id', post.post_id);
+        togglePostLike();
+      }
   
-        if (deleteError) {
-          console.error('Error removing like:', deleteError.message);
+      const handleFavorite = () => {
+        if (!user) {
+          setShowLoginPopup(true);
           return;
         }
-  
-        // Decrement the like count in the 'posts' table
-        const { error: updateError } = await supabase
-          .from(postTable)
-          .update({ like_count: likesCount - 1 })
-          .eq('post_id', post.post_id);
-  
-        if (updateError) {
-          console.error('Error updating post like count:', updateError.message);
-          return;
-        }
-  
-        // Update state
-        setLikesCount((prev) => prev - 1);
-      }
-  
-      // Toggle the like state
-      setLiked(!liked);
-    } catch (error) {
-      console.error('Error handling like:', error);
-    }
-  };
-  
-
-  const handleBack = () => {
-    setTimeout(() => {
-        router.push('/');
-    }, 0);
-};
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.changedTouches[0].screenX;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndX.current = e.changedTouches[0].screenX;
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStartX.current - touchEndX.current > 50) {
-      handleNext(); // Swipe left to move to the next image
-    }
-
-    if (touchEndX.current - touchStartX.current > 50) {
-      handlePrevious(); // Swipe right to move to the previous image
-    }
-  }
-
-  useEffect(() => {
-    const handleFetchUserProfile = async () => {
-      // Fetch user profile data from the server
-      const {data, error} = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', post.user_id)
-        .single();
-      if (error) {
-        console.error('Error fetching user profile:', error.message);
-        return;
-      }
-      if(data){
-        setUsername(data?.username || '');
-        setAvatarUrl(data?.avatar_url || '');
-        console.log(data);
-      }
-    };
-    handleFetchUserProfile();
-  }, [post.user_id]);
-
-  useEffect(() => {
-    const fetchLikeStatus = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('likes')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('post_id', post.post_id)
-          .single();
-  
-        if (error) {
-          console.error('Error fetching like status:', error.message);
-          return;
-        }
-  
-        setLiked(!!data);
-      }
-    };
-  
-    fetchLikeStatus();
-  }, [user, post.post_id]);
-
-  useEffect(() => {
-    const fetchUpdatedLikeCount = async () => {
-      try {
-        const { data, error } = await supabase
-          .from(postTable)
-          .select('like_count')
-          .eq('post_id', post.post_id)
-          .single();
-          
-        if (error) {
-          console.error('Error fetching updated like count:', error.message);
-          return;
-        }
-  
-        if (data) {
-          setLikesCount(data.like_count); // Update the likesCount state with the latest value
-        }
-      } catch (err) {
-        console.error('Error fetching updated like count:', err);
-      }
-    };
-  
-    fetchUpdatedLikeCount();
-  }, [post.post_id, postTable]);  
-
-  const handleFavorite = async () => {
-    togglePostLike();
-  };
-
-  const handleFavorite = () => {
-    if (!user) {
-      setShowLoginPopup(true);
-      return;
-    }
-    toggleFavorite();
-  };
+        toggleFavorite();
+      };
 
   useEffect(() => {
     setComments(initialComments);

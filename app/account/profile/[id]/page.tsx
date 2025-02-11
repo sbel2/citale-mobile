@@ -27,7 +27,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [deletePost, setDeletePost] = useState<boolean>(false);
-    const [managePostData, setManageData] = useState({id: "", postAction: ""})
+    const [managePostData, setManageData] = useState({id: 0, postAction: ""})
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
     const [following, setFollowing] = useState<boolean>(false);
     const [followingCount, setFollowingCount] = useState<number>(0);
@@ -161,7 +161,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         setDeletePost((prevState) => !prevState);
     }
 
-    const managePost = (manageType: string, postId: string, postAction: string) => {
+    const managePost = (manageType: string, postId: number, postAction: string) => {
         if (manageType == "delete") {
             setManageData({
                 id: postId,
@@ -182,16 +182,75 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             if (isOpen) {
                 toggleDropdown()
             }
-        } else if (option === 'My Likes') {
+        } else if (option === 'Likes') {
             await handleFetchLikedPosts(userId);
             if (isOpen) {
                 toggleDropdown()
             }
-        } else if (option === 'My Favs') {
+        } else if (option === 'Favs') {
             await handleFetchFavoritePosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
+        } else if (option === 'Drafts') {
+            await handleFetchUserDrafts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
         }
     };
     
+    const handleFollowButton = async () => {
+        const {data, error}  = await supabase
+        .from('relationships')
+        .select('user_id, follower_id')
+        .eq('user_id', user?.id) // the user that is logged in
+        .eq('follower_id',userId); // the user that is displaying on this profile page
+
+        if(data && data.length > 0){
+            // unfollow
+            setFollowing(true);
+        } else {
+            // follow
+            setFollowing(false);
+        }
+    };
+
+    useEffect(() => {
+
+        const handleCalcFollowers = async () => {
+            const { data, error } = await supabase
+            .from('relationships')
+            .select('user_id, follower_id')
+            .eq('follower_id', userId);
+    
+            if (error) {
+                console.error('Error fetching followers:', error.message);
+            }
+            if (data){
+                setFollowersCount(data.length);
+            }
+            
+        };
+        const handleCalcFollowings = async () => {
+            const { data, error } = await supabase
+            .from('relationships')
+            .select('user_id, follower_id')
+            .eq('user_id', userId);
+    
+            if (error) {
+                console.error('Error fetching followers:', error.message);
+            }
+            if (data){
+                setFollowingCount(data.length);
+            }
+    
+        };
+        handleCalcFollowers();
+        handleCalcFollowings();
+
+    }, [following]);
+
 
     // Link decorator for clickable URLs in bio
     const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
@@ -201,13 +260,44 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         setFollowing(false);
     };
 
+    function isValidUrl(string: string): boolean {
+        try {
+            new URL(string);
+        } catch (_) {
+            return false;
+        }
+        return true;
+    }
 
-    const isMobile = () => {
-        return (
-          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-          window.matchMedia("(max-width: 768px)").matches
-        );
-      };
+    const handleFollow = async () => {
+        const { error } = await supabase
+        .from('relationships')
+        .insert([
+            {
+                user_id: user?.id,
+                follower_id: userId,
+            },
+        ]);
+        if (error) {
+            console.error('Error following user:', error.message);
+            return;
+        }
+        setFollowing(true);
+    };
+
+    const handleUnFollow = async () => {
+        const { error } = await supabase
+        .from('relationships')
+        .delete()
+        .eq('user_id', user?.id)
+        .eq('follower_id', userId);
+
+        if (error) {
+            console.error('Error unfollowing user:', error.message);
+            return;
+        }
+        setFollowing(false);
+    };
 
     const isMobile = () => {
         return (
@@ -323,9 +413,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                         <ul className="py-1">
                                             <li
                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                            onClick={() => handleCategoryClick('My Drafts', userId)}
+                                            onClick={() => handleCategoryClick('Drafts', userId)}
                                             >
-                                            My Drafts
+                                            Drafts
                                             </li>
                                         </ul>
                                     </div>)}
@@ -337,9 +427,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 <ul className="py-1">
                                     <li
                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => handleCategoryClick('My Drafts', userId)}
+                                    onClick={() => handleCategoryClick('Drafts', userId)}
                                     >
-                                    My Drafts
+                                    Drafts
                                     </li>
                                 </ul>
                             </div>)}

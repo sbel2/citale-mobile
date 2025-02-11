@@ -1,6 +1,6 @@
 'use client'
 
-import{ createClient } from '@/supabase/client';
+import { supabase } from "@/app/lib/definitions";
 import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import Image from "next/legacy/image";
 import { categoryList, locationList } from '@/components/constants';
@@ -12,7 +12,7 @@ import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/Supaba
 import { error } from 'console';
 import { boolean } from 'zod';
 
-const supabase = createClient();
+
 const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 interface ButtonSubmitEvent extends SubmitEvent {
