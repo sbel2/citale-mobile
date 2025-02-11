@@ -21,9 +21,16 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  // Get the postId from the dynamic URL using useParams
   const params = useParams();
   const postIdFromURL = params.postId;
+  const currentUrl = window.location.href;
+
+  // Function to extract filters from the URL (if any)
+  const getFiltersFromURL = () => {
+    const url = new URL(currentUrl);
+    const filters = new URLSearchParams(url.search);
+    return filters.toString(); // This will return filter query params as a string
+  };
 
   // Check if the current post's ID matches the postId in the URL
   useEffect(() => {
@@ -34,14 +41,37 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
     }
   }, [postIdFromURL, post.post_id]);
 
-  // Function to handle clicking on a post to navigate to its detail page
-  const handleClick = () => {
-    router.push(`/post/${post.post_id}`);  // Navigate to the specific post's URL
+  // Function to handle clicking on a post to show the popup
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();  // Prevent default navigation
+
+    // Get the current filters from URL
+    const filters = getFiltersFromURL();
+
+    // Manually update the URL to include the post ID and filters (if any)
+    window.history.pushState(
+      {}, 
+      '', 
+      `/post/${post.post_id}${filters ? '?' + filters : ''}`
+    );
+
+    // Open the dialog (popup)
+    setIsOpen(true);
   };
 
-  // Function to close the dialog and return to the previous page
+  // Function to close the dialog and reset the URL
   const handleClose = () => {
-    router.push(`/`);  // Go back to the homepage (or any other page you prefer)
+    // Get the current filters from URL
+    const filters = getFiltersFromURL();
+
+    // Reset URL to the homepage with filters intact (if any)
+    window.history.pushState(
+      {}, 
+      '', 
+      `/` + (filters ? '?' + filters : '')
+    );
+
+    // Close the dialog
     setIsOpen(false);
   };
 
@@ -86,7 +116,6 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
 
   return (
     <>
-      {/* Card Wrapper to ensure other posts are not affected */}
       <div className={styles["card-container"]}>
         <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
           <DialogTrigger asChild>
@@ -137,7 +166,6 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
         </Dialog>
 
         <div className="flex items-center justify-between px-2 py-3">
-          {/* Profile Section */}
           <button onClick={() => router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
             <div className="flex items-center">
               <Image
@@ -151,7 +179,6 @@ const Card: React.FC<{ post: Post }> = ({ post }) => {
             </div>
           </button>
 
-          {/* Like Button */}
           <button className="flex items-center p-1" onClick={handleLike}>
             {liked ? (
               <svg fill="red" stroke="red" viewBox="0 0 24 24" className="w-4 h-4 mr-1">
