@@ -6,9 +6,12 @@ import { createClient } from "@/supabase/client";
 import { Post } from '../../../lib/types';
 
 export default function Page({ params }: { params: { id: string } }) {
+  console.log("page called")
   const { id: post_id } = params;
   const [postData, setPostData] = useState<Post | null>(null);
   const [loading, setloading] = useState<boolean>(true);
+
+  console.log("found post_id ", post_id)
 
   useEffect(() => {
     const supabase = createClient();
