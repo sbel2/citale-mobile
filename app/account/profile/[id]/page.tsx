@@ -9,7 +9,6 @@ import Image from 'next/image';
 import Linkify from 'react-linkify';
 import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
-import { Button } from '@nextui-org/react';
 import DeletePopup from '@/components/deletePopup';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
@@ -23,7 +22,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('My Posts');
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [deletePost, setDeletePost] = useState<boolean>(false);
