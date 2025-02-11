@@ -16,6 +16,8 @@ interface DeletePopupProps {
 export default function DeletePopup({ posts, postStatus, postId, resetPosts, togglePopup }: DeletePopupProps) {
     const { user, logout } = useAuth();
 
+
+
     console.log(posts)
     const deletePost = async () => {
         console.log(postStatus, postId)
@@ -51,6 +53,10 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
         console.log("Post deleted successfully!");
         }
     }
+
+    const fetchPostMedia = async (postTable: string, postId: string) => {
+      
+    };
 
 
     return (
