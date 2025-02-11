@@ -24,12 +24,12 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
 
         switch(postStatus) {
             case "draft":
-                postTable = "testDraft";
-                postBucket = "test-draft"
+                postTable = "drafts";
+                postBucket = "drafts"
                 break
             case "post":
-                postTable = "testPost";
-                postBucket = "test";
+                postTable = "posts";
+                postBucket = "posts";
                 break
             default: 
                 throw new Error("Invalid postStatus value")

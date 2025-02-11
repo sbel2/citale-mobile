@@ -10,7 +10,7 @@ export default function Page({ params }: { params: { post: string, id: string } 
   const [postData, setPostData] = useState<Post | null>(null);
   const [loading, setloading] = useState<boolean>(true);
   console.log(postType, post_id)
-  const postTable = postType == "post" ? "testPost" : postType == "draft" ? "testDraft" : "";
+  const postTable = postType == "post" ? "posts" : postType == "draft" ? "drafts" : "";
   console.log(postTable)
   useEffect(() => {
     const supabase = createClient();

@@ -7,7 +7,7 @@ export async function handleFilter(option: string) : Promise<Post[] | null> {
   try {
     if (option === 'All') {
       const { data, error } = await supabase
-        .from('testPost')
+        .from('posts')
         .select('*')
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
@@ -19,7 +19,7 @@ export async function handleFilter(option: string) : Promise<Post[] | null> {
     }
     else {
       const { data, error } = await supabase
-        .from('testPost')
+        .from('posts')
         .select('*')
         .ilike('category', `%${option}%`)
         .order('created_at', { ascending: false })

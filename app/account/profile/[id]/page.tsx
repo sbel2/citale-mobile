@@ -54,7 +54,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchUserPosts = async (userId: string) => {
         const { data, error } = await supabase
-        .from("testPost")
+        .from("posts")
             .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
             .eq('user_id', userId);
         if (error || !data) {
@@ -70,7 +70,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchUserDrafts = async (userId: string) => {
         const { data, error } = await supabase
-        .from("testDraft")
+        .from("drafts")
             .select("post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action")
             .eq('user_id', userId);
         if (error || !data) {
@@ -86,7 +86,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchLikedPosts = async (userId: string) => {
         const { data, error } = await supabase
-            .from('testLikes') // Assuming there's a 'testLikes' table
+            .from('likes') // Assuming there's a 'likes' table
             .select('post_id')
             .eq('user_id', userId);
     
@@ -97,7 +97,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         } else {
             const likedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
-                .from('testPost')
+                .from('posts')
                 .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
                 .in('post_id', likedPostIds);
     
@@ -114,7 +114,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const handleFetchFavoritePosts = async (userId: string) => {
         const { data, error } = await supabase
-            .from('testFavorites') // Assuming there's a 'testLikes' table
+            .from('favorites') // Assuming there's a 'likes' table
             .select('post_id')
             .eq('user_id', userId);
     
@@ -125,7 +125,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         } else {
             const FavoritedPostIds = data.map((like) => like.post_id);
             const { data: postsData, error: postsError } = await supabase
-                .from('testPost')
+                .from('posts')
                 .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, created_at, video_type, post_action')
                 .in('post_id', FavoritedPostIds);
     

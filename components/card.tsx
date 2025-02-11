@@ -16,7 +16,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
   const router = useRouter();
   const pathname = usePathname();
   const [liked, setLiked] = useState(false);
-  const [testLikesCount, setLikesCount] = useState(post.like_count);
+  const [likesCount, setLikesCount] = useState(post.like_count);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('avatar.png');
   const { user, logout } = useAuth();
@@ -63,9 +63,9 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
 
     try {
       if (!liked) {
-        // Increment the like count in the 'testLikes' table
+        // Increment the like count in the 'likes' table
         const { error: insertError } = await supabase
-          .from('testLikes')
+          .from('likes')
           .insert([{ user_id: user.id, post_id: post.post_id }]);
 
         if (insertError) {
@@ -75,8 +75,8 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
 
         // Increment the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('testPost')
-          .update({ like_count: testLikesCount + 1 })
+          .from('posts')
+          .update({ like_count: likesCount + 1 })
           .eq('post_id', post.post_id);
 
         if (updateError) {
@@ -87,9 +87,9 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
         // Update state
         setLikesCount((prev) => prev + 1);
       } else {
-        // Remove the like from the 'testLikes' table
+        // Remove the like from the 'likes' table
         const { error: deleteError } = await supabase
-          .from('testLikes')
+          .from('likes')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', post.post_id);
@@ -101,8 +101,8 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
 
         // Decrement the like count in the 'posts' table
         const { error: updateError } = await supabase
-          .from('testPost')
-          .update({ like_count: testLikesCount - 1 })
+          .from('posts')
+          .update({ like_count: likesCount - 1 })
           .eq('post_id', post.post_id);
 
         if (updateError) {
@@ -133,7 +133,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
             .single(),
           user
             ? supabase
-                .from('testLikes')
+                .from('likes')
                 .select('*')
                 .eq('user_id', user.id)
                 .eq('post_id', post.post_id)
@@ -183,7 +183,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
       managePost ? managePost("delete", post.post_id, post.post_action) : null;
   }
 
-  const bucketName = post.post_action == "post" ? "test" : post.post_action == "draft" ? "test-draft" : null;
+  const bucketName = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : null;
 
   return (
     <div>
@@ -333,7 +333,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: str
               <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           )}
-          <span className="text-xs">{testLikesCount}</span>
+          <span className="text-xs">{likesCount}</span>
         </button>
       </div>
 
