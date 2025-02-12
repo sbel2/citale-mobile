@@ -400,7 +400,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                             ))
                                 )}
                             <div className="flex">
-                                <button
+                                {user && user.id === userId && (
+                                    <button
                                     key="more"
                                     type="button"
                                     onClick={toggleDropdown}
@@ -408,7 +409,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 >
                                 ...
                                 </button>
-                                {isOpen && !isMobile() && (
+                                )}
+                                
+                                {isOpen && user && user.id === userId && !isMobile() && (
                                     <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
                                         <ul className="py-1">
                                             <li
@@ -422,7 +425,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             </div>
                             
                         </div>
-                        {isOpen && isMobile() && (
+                        {isOpen && user && user.id === userId && isMobile() && (
                             <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
                                 <ul className="py-1">
                                     <li
