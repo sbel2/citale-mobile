@@ -1,15 +1,10 @@
 'use client'
 
 import{ createClient } from '@/supabase/client';
-import React, { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { categoryList, locationList } from '@/components/constants';
 import { useAuth } from 'app/context/AuthContext';
-import Card from '@/components/card';
-import { Post } from "@/app/lib/types";
 import { MultiSelectChipsInput, DatesInput, FilesInput, FileItem } from '@/components/formComponents';
-import { SupabaseAuthClient } from '@supabase/supabase-js/dist/module/lib/SupabaseAuthClient';
-import { error } from 'console';
-import { boolean } from 'zod';
 
 const supabase = createClient();
 
@@ -42,27 +37,30 @@ export default function CreatePostPage() {
             video.preload = "metadata";
     
             try {
-                // Convert blob URL back to a Blob
                 console.log("pre")
-                const response = await fetch(file.name); // Fetch the blob URL
+                const response = await fetch(file.name);
                 console.log("response ", response)
-                const blob = await response.blob(); // Convert response to a Blob
+                const blob = await response.blob();
                 console.log("blob ", blob)
                 // Read blob as Data URL
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     if (typeof e.target?.result === "string") {
-                        video.src = e.target.result; // Set the video source to the data URL
+                        video.src = e.target.result;
                     } else {
+                        
+                        console.log("Failed to read video file.")
                         reject("Failed to read video file.");
+                        
                     }
                 };
     
                 reader.onerror = () => {
+                    console.log("Error reading video file.")
                     reject("Error reading video file.");
+                    
                 };
-    
-                reader.readAsDataURL(blob); // Read blob as Data URL
+                reader.readAsDataURL(blob);
     
                 video.onloadedmetadata = () => {
                     if (isNaN(video.duration) || video.duration === Infinity) {
@@ -85,60 +83,16 @@ export default function CreatePostPage() {
     function handleInput(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const fieldName = e.target.name;
 
-        if (e.target instanceof HTMLInputElement && e.target.type === "file") {
-            const fileList = e.target.files;
-            console.log(fileList);
-
-            if (fileList) {
-                const processFiles = async () => {
-                    setVideoError(null);
-                    const filesArray: string[] = []; 
-                    
-                    for (const file of Array.from(fileList)) {
-                        if (file.type.startsWith('video/')) {
-                            try {
-                                const duration = await checkVideoDuration(file);
-                                if (duration > 16) {
-                                    setVideoError("Videos must be 15 seconds or shorter. Please upload a shorter video.");
-                                    return;
-                                }
-                            } catch (err) {
-                                console.error("Error checking video duration:", err);
-                                setVideoError("Error processing video. Please try again.");
-                                return;
-                            }
-                        }
-                        filesArray.push(URL.createObjectURL(file));
-                    }
-                    
-                    setFormData((prevState) => ({
-                        ...prevState,
-                        [fieldName]: filesArray,
-                    }));
-                };
-                
-                processFiles();
-            }
-        } else if (!(e.target instanceof HTMLSelectElement && e.target.hasAttribute('multiple')))  {
+        
+        if (!(e.target instanceof HTMLSelectElement && e.target.hasAttribute('multiple')))  {
             const fieldValue = e.target.value;
+
             setFormData((prevState) => ({
                 ...prevState,
                 [fieldName]: fieldValue,
-            }));
+            }))
         }
 
-        console.log(formData)
-    }
-
-    const handleLocationChange = (mapData: {
-        name: string;
-        formatted_address: string;
-    }) => {
-        console.log("ithappened", mapData)
-        setFormData((prevState) => ({
-            ...prevState,
-            mapUrl: `${mapData.name} - ${mapData.formatted_address}`,
-        }));
         console.log(formData)
     }
 
@@ -173,8 +127,8 @@ export default function CreatePostPage() {
                     console.log('checking duration')
                     const duration = await checkVideoDuration(file as unknown as File);
                     console.log('duration: ', duration)
-                    if (duration > 10) {
-                        setVideoError("Videos must be 10 seconds or shorter. Please upload a shorter video.");
+                    if (duration > 16) {
+                        setVideoError("Videos must be 15 seconds or shorter. Please upload a shorter video.");
                         return;
                     }
                 } catch (err) {
@@ -312,59 +266,45 @@ export default function CreatePostPage() {
             for (const [index, type] of fileTypes.entries()) {
                 if (type == true) {
                     hasVideo = true;
-                    thumbnailUrl = postAction==="preview"? formDataUpdate.mediaUrl[index] : `${uploadedFiles[index]}`;
+                    thumbnailUrl = `${uploadedFiles[index]}`;
                     break
                 };
             }            
 
             let finalFormData = {};
-            console.log(postAction)
-            if (postAction == "preview") {
-                finalFormData = {
-                    ...formDataUpdate,
-                    is_video: hasVideo,
-                    video_type: fileTypes,
-                    thumbnailUrl: thumbnailUrl,
-                }
-                console.log(finalFormData)
 
-            } else {
-                console.log("madeit")
-                let statusPost = (postAction === "post"? "post" : "draft");
+            console.log("madeit")
+            let statusPost = (postAction === "post"? "post" : "draft");
 
-                finalFormData = {
-                    ...formDataUpdate,
-                    mediaUrl: uploadedFiles,
-                    is_video: hasVideo,
-                    video_type: fileTypes,
-                    thumbnailUrl: thumbnailUrl,
-                    post_action: statusPost,
-                    user_id: user?.id
-                }
-                
-                console.log(finalFormData);
-                const { data, error } = await supabase
-                .from((postAction === "post")? "testPost" : "testDraft")
-                .insert([finalFormData]);
-
-                if (error) {
-                    console.error('Error Posting data:', error);
-                    return
-                }
-
-                console.log('Data posted!!')
+            finalFormData = {
+                ...formDataUpdate,
+                mediaUrl: uploadedFiles,
+                is_video: hasVideo,
+                video_type: fileTypes,
+                thumbnailUrl: thumbnailUrl,
+                post_action: statusPost,
+                user_id: user?.id
             }
+            
+            console.log(finalFormData);
+            const { data, error } = await supabase
+            .from((postAction === "post")? "testPost" : "testDraft")
+            .insert([finalFormData]);
+
+            if (error) {
+                console.error('Error Posting data:', error);
+                return
+            }
+
+            console.log('Data posted!!')
+            window.location.href = '/account/profile/{user?.id}';
         };
         
-        if (perform == 'preview') {
-            //window.location.href = '/account/profile';
-        } else {
-            console.log("Processing Form Submission...")
-            console.log(formData)
-            postData(perform, formData);
-            console.log("Processing Form Submission...")
-            //window.location.href = '/account/profile';
-        }
+ 
+        console.log("Processing Form Submission...")
+        console.log(formData)
+        postData(perform, formData);
+        console.log("Processing Form Submission...")      
     }
 
     // Return JSX
@@ -425,7 +365,7 @@ export default function CreatePostPage() {
                         style={styles.specialInput}
                     >
                         <option value="" disabled> Select Price Range... </option>
-                        <option key='free' value='free'>
+                        <option key='Free' value='Free'>
                             Free
                         </option>
                         <option key='$' value='$'>
