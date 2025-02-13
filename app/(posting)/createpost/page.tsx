@@ -347,7 +347,6 @@ export default function CreatePostPage() {
                         value={formData.mapUrl}
                         onChange={handleInput}
                         className="w-full mt-3 p-2 border rounded-md focus:ring focus:ring-blue-300"
-                        required
                     />
                 </label>
                 <label htmlFor="price" className="block text-gray-700 font-medium mt-3"> Price

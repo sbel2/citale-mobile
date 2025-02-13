@@ -270,8 +270,6 @@ export const FilesInput:  React.FC<FilesInputProps> = ({ onFilesChange}) => {
       setFilesArray([])
       let newFiles:FileItem[] = []
       if (fileList) {
-        const fileNames = Array.from(fileList).map((file) => URL.createObjectURL(file))
-        const fileTypes = Array.from(filesArray).map((file) => (file.type.startsWith("video/") ? true : false))
         for (const file of fileList) {
           newFiles.push({name: URL.createObjectURL(file), type:file.type})
         }

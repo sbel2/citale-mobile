@@ -2,6 +2,7 @@ import 'app/globals.css';
 import { Inter } from "next/font/google";
 import Toolbar from "@/components/toolbar";
 import Header from "@/components/header";
+import { MediaProvider } from "app/context/MediaContext"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +19,16 @@ export default function ProfileLayout({
     return (
         <html lang="en">
             <body className={`${inter.className} bg-white`}>
-                <div className="flex h-screen">
-                    <div className="md:w-64">
-                        <Toolbar />
-                    </div>
+                <MediaProvider>
+                    <div className="flex h-screen">
+                        <div className="md:w-64">
+                            <Toolbar />
+                        </div>
                         <main className="flex-1 p-4 bg-gray-951">
                             {children}
                         </main>
-                </div>
+                    </div>
+                </MediaProvider>
             </body>
         </html>
     );
