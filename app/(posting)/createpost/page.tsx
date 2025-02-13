@@ -1,5 +1,7 @@
 'use client'
 
+//trigger commit
+
 import{ createClient } from '@/supabase/client';
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { categoryList, locationList } from '@/components/constants';
