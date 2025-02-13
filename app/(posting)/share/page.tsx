@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useMedia } from "app/context/MediaContext";
 
 export default function SharePage() {
-    const { uploadedFiles } = useMedia(); // ✅ Retrieve stored files from context
+    const { uploadedFiles } = useMedia(); // ✅ Now retrieves an array of `{ name, type }`
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isVideo, setIsVideo] = useState(false);
+    const [videoType, setVideoType] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     console.log("📂 Uploaded Files:", uploadedFiles);
@@ -21,15 +22,20 @@ export default function SharePage() {
         }
 
         try {
-            // ✅ Use the blob URLs directly instead of recreating blobs
-            setPreviewUrls(uploadedFiles);
+            // ✅ Extract blob URLs
+            setPreviewUrls(uploadedFiles.map((file) => file.name));
 
-            // ✅ Detect if the first file is a video based on its MIME type (if available)
+            // ✅ Detect video based on MIME type
             const firstFile = uploadedFiles[0];
-            console.log("🔎 Checking if first file is a video:", firstFile);
+            console.log("🔎 Checking file type:", firstFile);
 
-            // Since it's a blob URL, we can't use regex on the name. Instead, rely on file context.
-            setIsVideo(firstFile.includes("blob:") && /\.(mp4|mov)$/i.test(firstFile));
+            if (firstFile?.type?.startsWith("video/")) {
+                console.log("🎥 Detected as video.");
+                setIsVideo(true);
+                setVideoType(firstFile.type); // Store MIME type
+            } else {
+                setIsVideo(false);
+            }
 
         } catch (err) {
             console.error("❌ Error processing uploaded files:", err);
@@ -51,12 +57,16 @@ export default function SharePage() {
                     <>
                         <p className="text-green-500">🎥 Detected video format</p>
                         <video
-                            src={previewUrls[0]}
+                            key={previewUrls[0]} // 🔑 Ensures video re-renders properly
                             controls
                             className="w-full max-w-lg rounded-lg shadow-lg"
-                        />
+                        >
+                            <source src={previewUrls[0]} type={videoType ?? "video/mp4"} />
+                            Your browser does not support the video tag.
+                        </video>
                     </>
                 ) : (
+
                     <>
                         <p className="text-blue-500">🖼️ Rendering {previewUrls.length} image(s)</p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">

@@ -37,19 +37,27 @@ export default function UploadMedia() {
 
     const handleNextStep = () => {
         console.log("➡️ Next step button clicked");
-
+    
         if (files.length === 0) {
             console.error("🚨 No files selected");
             setVideoError("Please select at least one file.");
             return;
         }
-
-        console.log("📝 Storing files in `setUploadedFiles`:", files.map((file) => file.name));
-        setUploadedFiles(files.map((file) => file.name));
-
+    
+        // ✅ Store both `name` (blob URL) and `type` in `setUploadedFiles`
+        const formattedFiles = files.map((file) => ({
+            name: file.name,
+            type: file.type,
+        }));
+    
+        console.log("📝 Storing files in `setUploadedFiles`:", formattedFiles);
+        setUploadedFiles(formattedFiles); // ✅ Now correctly passing objects instead of strings
+    
         console.log("🚀 Redirecting to `/share`...");
         router.push(`/share`);
     };
+    
+    
 
     return (
         <div className="flex flex-col items-center p-6">

@@ -1,16 +1,21 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
+
+export type FileItem = {
+    name: string;
+    type: string;
+};
 
 type MediaContextType = {
-    uploadedFiles: string[];
-    setUploadedFiles: (files: string[]) => void;
+    uploadedFiles: FileItem[]; // ✅ Change from `string[]` to `FileItem[]`
+    setUploadedFiles: (files: FileItem[]) => void; // ✅ Accept objects instead of strings
 };
 
 const MediaContext = createContext<MediaContextType | undefined>(undefined);
 
-export const MediaProvider = ({ children }: { children: ReactNode }) => {
-    const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+export const MediaProvider = ({ children }: { children: React.ReactNode }) => {
+    const [uploadedFiles, setUploadedFiles] = useState<FileItem[]>([]); // ✅ Store full file objects
 
     return (
         <MediaContext.Provider value={{ uploadedFiles, setUploadedFiles }}>
