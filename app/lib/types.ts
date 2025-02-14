@@ -13,6 +13,8 @@ export interface Post {
     created_at: string;
     category?: string;
     user_id?: string;
+    video_type: boolean[];
+    post_action: string;
   }
   
   export interface UserProfile {

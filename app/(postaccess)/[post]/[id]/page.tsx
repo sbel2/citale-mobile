@@ -5,20 +5,19 @@ import PostComponent from "@/components/postComponent";
 import { createClient } from "@/supabase/client";
 import { Post } from '../../../lib/types';
 
-export default function Page({ params }: { params: { id: string } }) {
-  console.log("page called")
-  const { id: post_id } = params;
+export default function Page({ params }: { params: { post: string, id: string } }) {
+  const { post: postType, id: post_id } = params;
   const [postData, setPostData] = useState<Post | null>(null);
   const [loading, setloading] = useState<boolean>(true);
-
-  console.log("found post_id ", post_id)
-
+  console.log(postType, post_id)
+  const postTable = postType == "post" ? "posts" : postType == "draft" ? "drafts" : "";
+  console.log(postTable)
   useEffect(() => {
     const supabase = createClient();
 
     const fetchPostData = async () => {
       const { data, error } = await supabase
-        .from("posts")
+        .from(postTable)
         .select("*")
         .eq("post_id", post_id)
         .single();
@@ -30,13 +29,14 @@ export default function Page({ params }: { params: { id: string } }) {
         return;
       } else {
         setPostData(data);
+        console.log(data)
         document.title = data.title;
         setloading(false);
       }
     };
 
     fetchPostData();
-  }, [post_id]);
+  }, [postType, post_id, postTable]);
 
   if (loading) {
     return (
@@ -52,7 +52,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <p className="text-xl text-gray-600">No post found :(</p>
       </div>
     );
-  };
+  }
 
   return (
     <div className="post-container md:w-[750px] md:h-[600px] lg:w-[850px] lg:h-[678px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2">

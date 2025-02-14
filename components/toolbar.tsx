@@ -1,10 +1,11 @@
-'use client'; 
-import React, { useEffect, useState } from "react"; 
-import { createClient } from '@/supabase/client'; 
-import Image from "next/image"; 
-import Link from "next/link"; 
-import { useRouter, usePathname } from 'next/navigation'; 
-import { useAuth } from 'app/context/AuthContext';  
+'use client';
+
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/definitions";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from 'app/context/AuthContext';
 
 const Toolbar: React.FC = () => { 
   const { user, logout } = useAuth(); 
@@ -16,15 +17,14 @@ const Toolbar: React.FC = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);   
 
-  // Fetch and set user avatar   
-  const fetchUserAvatar = async (userId: string) => {     
-    try {       
-      const supabase = createClient();       
-      const { data, error } = await supabase         
-        .from('profiles')         
-        .select('avatar_url')         
-        .eq('id', userId)         
-        .single();        
+  // Fetch and set user avatar
+  const fetchUserAvatar = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', userId)
+        .single();
 
       if (error || !data?.avatar_url) {         
         console.warn('Error fetching avatar:', error?.message || 'Avatar not found');         
@@ -100,14 +100,25 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Home</span>       
       </button>        
 
-      {/* Talebot Button */}       
-      <button         
-        onClick={() => push('/talebot')}         
-        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'font-semibold' : ''}`}       
-      >         
-        <Image src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"} alt="Robot Icon" width={25} height={25} priority />         
-        <span className="ml-5 hidden md:inline">Talebot</span>       
-      </button>        
+      {/* Talebot Button */}
+      <button
+        onClick={() => push('/talebot')}
+        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'font-semibold' : ''}`}
+      >
+        <Image src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"} alt="Robot Icon" width={25} height={25} priority />
+        <span className="ml-5 hidden md:inline">Talebot</span>
+      </button>
+
+      <button onClick={() => {user ? push('/upload') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
+          <Image
+            src={["/upload", "/posting"].includes(pathname) ? "/plus_s.svg" : "/plus.svg"}
+            alt="Plus Icon"
+            width={25}
+            height={25}
+            priority
+          />
+        <span className="ml-5 hidden md:inline">Post</span>
+      </button>
 
       {/* Profile Button */}       
       {user ? (         

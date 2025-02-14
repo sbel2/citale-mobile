@@ -11,6 +11,7 @@ import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
 import FollowingPopup from "./following/following";
 import FollowerPopup from "./follower/follower";
+import DeletePopup from '@/components/deletePopup';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -23,6 +24,9 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [deletePost, setDeletePost] = useState<boolean>(false);
+    const [managePostData, setManageData] = useState({id: 0, postAction: ""})
     const [displayCAtagory, setDisplayCAtagory] = useState<string>('Posts')
     const [following, setFollowing] = useState<boolean>(false);
     const [followingCount, setFollowingCount] = useState<number>(0);
@@ -63,9 +67,26 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         const { data, error } = await supabase
         .from("posts")
             .select("*")
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
         if (error || !data) {
             console.error('Error fetching post data:', error);
+            setPosts([]);
+            setloading(false);
+            } 
+        else {
+            setPosts(data);
+            setloading(false);
+        }
+    };
+
+    const handleFetchUserDrafts = async (userId: string) => {
+        const { data, error } = await supabase
+        .from("drafts")
+            .select("*")
+            .eq('user_id', userId);
+        if (error || !data) {
+            console.error('Error fetching drafts data:', error);
             setPosts([]);
             setloading(false);
             } 
@@ -131,18 +152,54 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
     };
 
+    const toggleDropdown = () => {
+        setIsOpen((prevState) => !prevState)
+    }
+
+    const toggleDeletePopUp = () => {
+        console.log(managePostData)
+        setDeletePost((prevState) => !prevState);
+    }
+
+    const managePost = (manageType: string, postId: number, postAction: string) => {
+        if (manageType == "delete") {
+            setManageData({
+                id: postId,
+                postAction: postAction,
+            })
+            toggleDeletePopUp();
+        }
+    }
+
+    const resetPosts = (updatedPosts: Post[]) => {
+        setPosts(updatedPosts);
+    }
     //check if user entered a query and calling onsearch to fetch results
     const handleCategoryClick = async (option: string, userId: string) => {
         setDisplayCAtagory(option);
         if (option === 'Posts') {
             await handleFetchUserPosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
         } else if (option === 'Likes') {
             await handleFetchLikedPosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
         } else if (option === 'Favs') {
             await handleFetchFavoritePosts(userId);
+            if (isOpen) {
+                toggleDropdown()
+            }
+        // } else if (option === 'Drafts') {
+        //     await handleFetchUserDrafts(userId);
+        //     if (isOpen) {
+        //         toggleDropdown()
+        //     }
         }
     };
-
+    
     const handleFollowButton = async () => {
         const {data, error}  = await supabase
         .from('relationships')
@@ -194,7 +251,23 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     }, [following]);
 
-    
+
+    // Link decorator for clickable URLs in bio
+    const linkDecorator = (href: string, text: string, key: number): React.ReactNode => {
+        if (!isValidUrl(href)) {
+            return <span key={key}>{text}</span>;
+        }
+        setFollowing(false);
+    };
+
+    function isValidUrl(string: string): boolean {
+        try {
+            new URL(string);
+        } catch (_) {
+            return false;
+        }
+        return true;
+    }
 
     const handleFollow = async () => {
         const { error } = await supabase
@@ -226,6 +299,12 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         setFollowing(false);
     };
 
+    const isMobile = () => {
+        return (
+          /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+          window.matchMedia("(max-width: 768px)").matches
+        );
+      };
 
     return (
         <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
@@ -294,8 +373,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             <FollowerPopup isOpen={isFollowerOpen} setIsOpen={setIsFollowerOpen} />
                         </div>
                     </div>
-                        <div>
-                            <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
+                    <div>
+                        <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
                                 {user && user.id === userId && (
                                     postButtons.map((category) => (
                                         <button
@@ -318,18 +397,58 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                         >
                                         {category}
                                         </button>
-                                    ))
+                                            ))
                                 )}
+                            {/* <div className="flex">
+                                {user && user.id === userId && (
+                                    <button
+                                    key="more"
+                                    type="button"
+                                    onClick={toggleDropdown}
+                                    className={`px-3 py-3 rounded-full text-sm min-w-max ${isOpen ? 'bg-gray-300' : 'bg-white'}`}
+                                >
+                                ...
+                                </button>
+                                )}
+                                
+                                {isOpen && user && user.id === userId && !isMobile() && (
+                                    <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
+                                        <ul className="py-1">
+                                            <li
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                            onClick={() => handleCategoryClick('Drafts', userId)}
+                                            >
+                                            Drafts
+                                            </li>
+                                        </ul>
+                                    </div>)}
+                            </div> */}
+                            
                         </div>
+                        {isOpen && user && user.id === userId && isMobile() && (
+                            <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
+                                <ul className="py-1">
+                                    <li
+                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => handleCategoryClick('Drafts', userId)}
+                                    >
+                                    Drafts
+                                    </li>
+                                </ul>
+                            </div>)}
                     </div>
-
                     <div className="border-b border-gray-300 mb-5"></div>
                     
                     <div className={styles.container}>
                         {posts.length === 0 ? (
                             <p className="text-center">No posts found :) </p>
                         ) : (
-                            <MasonryGrid posts={posts} />
+                            <div>
+                                {deletePost && (
+                                    <DeletePopup posts={posts} postStatus={managePostData.postAction} postId={managePostData.id} resetPosts={resetPosts} togglePopup={toggleDeletePopUp}/>
+                                )}
+                                <MasonryGrid posts={posts} managePost={managePost}/>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -340,4 +459,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             )}
         </div>
     );
+}
+
+function order(arg0: string, arg1: { ascending: boolean; }) {
+    throw new Error('Function not implemented.');
 }

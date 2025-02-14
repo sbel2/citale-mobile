@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { supabase } from "@/app/lib/definitions";
 import styles from "./postComponent.module.css";
 import { useRouter } from 'next/navigation';
 import { Post } from "@/app/lib/types";
@@ -12,16 +13,20 @@ import PostMedia from "./post/PostMedia";
 import PostContent from "./post/PostContent";
 import PostFooter from "./post/PostFooter";
 
+
 interface PostComponentProps {
   post: Post; 
   context: 'popup' | 'static'; 
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
+  
   const headerClass = context === 'popup' ? styles.popup : styles.static;
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const postBucket = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : "";
+  const postTable = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : "";
 
   const { comments: initialComments, saveComment, commentCount, deleteComment, likes, toggleLike, userLikes } = useComments({ post_id: post.post_id, user_id: user?.id });
   const [comments, setComments] = useState(initialComments);
@@ -38,21 +43,22 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
     initialFavoriteCount: post.favorite_count
   });
 
-  const handleLike = () => {
+  async function handleLike() {
     if (!user) {
       setShowLoginPopup(true);
       return;
     }
-    togglePostLike();
-  };
-
-  const handleFavorite = () => {
-    if (!user) {
-      setShowLoginPopup(true);
-      return;
-    }
-    toggleFavorite();
-  };
+        // Update state
+        togglePostLike();
+      }
+  
+      const handleFavorite = () => {
+        if (!user) {
+          setShowLoginPopup(true);
+          return;
+        }
+        toggleFavorite();
+      };
 
   useEffect(() => {
     setComments(initialComments);

@@ -43,6 +43,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
         }
     }
 
+    const postBucket = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : "";
   return (
     <div 
           className={post.is_video ? styles.videocontainer : styles.imagecontainer}
@@ -53,7 +54,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
           {post.is_video ? (
             // Video display if the post is a video
             <video
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video/${post.mediaUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
               controls
               autoPlay
               loop
@@ -63,7 +64,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
           ) : (
             // Image display if the post is an image
             <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${post.mediaUrl[currentImageIndex]}`}
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
               alt={post.title}
               fill
               style={{ objectFit: "contain" }}
