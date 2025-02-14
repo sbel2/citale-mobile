@@ -9,6 +9,7 @@ export const signUpUser = async ({ email, password, username }: { email: string;
     options:{
       data:{
         username: username,
+        avatar_url: 'avatar.png'
       },
     },
   });
