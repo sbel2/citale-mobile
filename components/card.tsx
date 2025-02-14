@@ -65,18 +65,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
 
   // Function to close the dialog and reset the URL
   const handleClose = () => {
-    // Get the current filters from URL
-
-    // const filters = getFiltersFromURL();
-
-    // // Reset URL to the homepage with filters intact (if any)
-    // window.history.pushState(
-    //   {}, 
-    //   '', 
-    //   `/` + (filters ? '?' + filters : '')
-    // );
     router.back();
-
     // Close the dialog
     setIsOpen(false);
   };

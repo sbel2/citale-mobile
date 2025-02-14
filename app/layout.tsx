@@ -3,11 +3,12 @@ import Script from 'next/script';
 import posthog from 'posthog-js'
 import { PostHogProvider } from './providers.jsx'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export const metadata = {
+  title: "Things to do in Boston",
+  description: "share and talk",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
