@@ -17,22 +17,22 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const router = useRouter();
   const [categories, setCategories] = useState<{
     Price: string[];
-    Events: string[];
-    Locations: string[];
+    Category: string[];
+    Location: string[];
   }>({
     Price: [],
-    Events: [],
-    Locations: [],
+    Category: [],
+    Location: [],
   });
 
   const dropdownRefs = {
-    Events: useRef<HTMLDivElement | null>(null),
-    Locations: useRef<HTMLDivElement | null>(null),
+    Category: useRef<HTMLDivElement | null>(null),
+    Location: useRef<HTMLDivElement | null>(null),
     Price: useRef<HTMLDivElement | null>(null),
   };
   const buttonRefs = {
-    Events: useRef<HTMLButtonElement | null>(null),
-    Locations: useRef<HTMLButtonElement | null>(null),
+    Category: useRef<HTMLButtonElement | null>(null),
+    Location: useRef<HTMLButtonElement | null>(null),
     Price: useRef<HTMLButtonElement | null>(null),
   };
 
@@ -67,8 +67,8 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
         }
 
         setCategories({
-          Events: eventsData ? [...new Set(eventsData.map((item) => item.categories_short).filter(Boolean))].sort() : [],
-          Locations: locationsData ? [...new Set(locationsData.map((item) => item.location_short).filter(Boolean))].sort() : [],
+          Category: eventsData ? [...new Set(eventsData.map((item) => item.categories_short).filter(Boolean))].sort() : [],
+          Location: locationsData ? [...new Set(locationsData.map((item) => item.location_short).filter(Boolean))].sort() : [],
           Price: priceData
             ? [...new Set(priceData.map((item) => item.price).filter(Boolean))].sort((a, b) => (a === 'Free' ? -1 : b === 'Free' ? 1 : a.localeCompare(b)))
             : [],
@@ -94,15 +94,15 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     const location = filterParams.get('location') || 'All';
     const price = filterParams.get('price') || 'All';
 
-    setFilterEvents(categories.Events.includes(option) ? option : 'All');
-    setFilterLocations(categories.Locations.includes(location) ? location : 'All');
+    setFilterEvents(categories.Category.includes(option) ? option : 'All');
+    setFilterLocations(categories.Location.includes(location) ? location : 'All');
     setFilterPrice(categories.Price.includes(price) ? price : 'All');
   }, [filterParams, categories]);
 
   const handleFilterChange = useCallback(
     async (option: string, location: string, price: string, category: string) => {
-      if (category === 'Events') setFilterEvents(option);
-      if (category === 'Locations') setFilterLocations(location);
+      if (category === 'Category') setFilterEvents(option);
+      if (category === 'Location') setFilterLocations(location);
       if (category === 'Price') setFilterPrice(price);
 
       updateFilterParams(option, location, price);
@@ -150,8 +150,8 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
               className="px-3 py-2.5 cursor-pointer hover:bg-gray-100 text-xs md:text-sm"
               onClick={() => {
                 handleFilterChange(
-                  category === 'Events' ? option : filterEvents,
-                  category === 'Locations' ? option : filterLocations,
+                  category === 'Category' ? option : filterEvents,
+                  category === 'Location' ? option : filterLocations,
                   category === 'Price' ? option : filterPrice,
                   category
                 );
@@ -169,8 +169,8 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
   return (
     <div className="bg-white flex justify-center items-center pt-5 pb-z2">
-      <FilterDropdown category="Events" selected={filterEvents} options={categories.Events} />
-      <FilterDropdown category="Locations" selected={filterLocations} options={categories.Locations} />
+      <FilterDropdown category="Category" selected={filterEvents} options={categories.Category} />
+      <FilterDropdown category="Location" selected={filterLocations} options={categories.Location} />
       <FilterDropdown category="Price" selected={filterPrice} options={categories.Price} />
 
       <button
