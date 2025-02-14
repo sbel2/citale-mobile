@@ -1,11 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from "react";
-
-export type FileItem = {
-    name: string;
-    type: string;
-};
+import { FileItem } from "app/lib/fileUtils";
 
 type MediaContextType = {
     uploadedFiles: FileItem[]; // ✅ Change from `string[]` to `FileItem[]`

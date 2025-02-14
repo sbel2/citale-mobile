@@ -106,7 +106,7 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Talebot</span>
       </button>
 
-      <button onClick={() => {user ? push('/createpost') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
+      <button onClick={() => {user ? push('/upload') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
         <Image
           src={pathname === '/createpost' ? "/plus_s.svg" : "/plus.svg"}
           alt="Plus Icon"
@@ -114,7 +114,7 @@ const Toolbar: React.FC = () => {
           height={25}
           priority
         />
-        <span className="ml-5 hidden md:inline">Create Post</span>
+        <span className="ml-5 hidden md:inline">Post</span>
       </button>
 
       {/* Profile Button */}

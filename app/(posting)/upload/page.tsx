@@ -54,7 +54,7 @@ export default function UploadMedia() {
         setUploadedFiles(formattedFiles); // ✅ Now correctly passing objects instead of strings
     
         console.log("🚀 Redirecting to `/share`...");
-        router.push(`/share`);
+        router.push(`/posting`);
     };
     
     
