@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { createClient } from '@/supabase/client';
+import { supabase } from 'app/lib/definitions';
 import { IoIosArrowDown } from "react-icons/io";
-
-// Initialize Supabase client
-const supabase = createClient();
-import { categoryList } from '@/components/constants';
 
 interface FilterProps {
   onFilter: (option: string, location: string, price: string, category: string) => Promise<void>;
