@@ -34,6 +34,10 @@ export default function Header({ font }: { font?: string }) {
     router.push(`/filter-results?option=${encodeURIComponent(option)}&location=${encodeURIComponent(location)}&price=${encodeURIComponent(price)}`);
   };
 
+  const handleFollowingPostDisplay = async() =>{
+    router.push(`/`);
+  }
+
   return (
     <header className={`py-1 md:py-3 pt-4 md:pt-6 bg-gray-0 ${font}`}>
       <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
@@ -52,6 +56,13 @@ export default function Header({ font }: { font?: string }) {
           </div>
         </div>
       </div>
+
+      <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
+        <button className="items-center"
+          onClick={handleFollowingPostDisplay}
+        >Following</button>
+      </div>
+
       
       {!pathname.startsWith("/search-results") &&
         !pathname.startsWith("/account/profile/") &&
