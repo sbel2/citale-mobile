@@ -3,30 +3,31 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMedia } from "app/context/MediaContext";
-import { useAuth } from "app/context/AuthContext"; // ✅ Use Auth Context
+import { useAuth } from "app/context/AuthContext";
 import ImagePreview from "@/components/share/imagePreview";
 import ShareForm from "@/components/share/shareForm";
-import { uploadFilesToBucket } from 'app/lib/fileUtils'; // ✅ Import uploadFilesToBucket
-import { createClient } from "@/supabase/client";
-
-const supabase = createClient();
+import { uploadFilesToBucket } from 'app/lib/fileUtils';
+import { supabase } from "@/app/lib/definitions";
+import { v4 as uuidv4 } from "uuid";
 
 export default function SharePage() {
     const { uploadedFiles, setUploadedFiles } = useMedia();
-    const { user } = useAuth(); // ✅ Get user from AuthContext
+    const { user } = useAuth();
     const router = useRouter();
     
+    const [postId, setPostId] = useState<string>("");
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [isVideo, setIsVideo] = useState(false);
     const [videoType, setVideoType] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
+        post_id: postId,
         title: "",
         description: "",
         location: "",
         category: "",
         price: "",
-        user_id: user?.id || null, // ✅ Assign user_id from AuthContext
+        user_id: user?.id || null,
         mapUrl: "",
         season: "",
         startDate: null,
@@ -34,9 +35,44 @@ export default function SharePage() {
         mediaUrl: [] as string[],
     });
 
+    // ✅ Generate unique post_id
+    async function generatePostId(): Promise<string> {
+        let newPostId = uuidv4();
+        let isUnique = false;
+
+        while (!isUnique) {
+            const { data } = await supabase
+                .from("posts")
+                .select("post_id")
+                .eq("post_id", newPostId)
+                .single();
+
+            if (!data) {
+                isUnique = true;
+            } else {
+                newPostId = uuidv4();
+            }
+        }
+        setPostId(newPostId);
+        return newPostId;
+    }
+
+    useEffect(() => {
+        generatePostId();
+    }, []);
+
+    // ✅ Ensure user_id updates when user changes
+    useEffect(() => {
+        if (user) {
+            setFormData((prevState) => ({
+                ...prevState,
+                user_id: user.id,
+            }));
+        }
+    }, [user]);
+
     useEffect(() => {
         if (!uploadedFiles || uploadedFiles.length === 0) {
-            console.warn("🔄 No media found! Redirecting to /upload...");
             router.replace("/upload");
             return;
         }
@@ -56,14 +92,6 @@ export default function SharePage() {
         }
     }, [uploadedFiles, router]);
 
-    useEffect(() => {
-        if (user) {
-            setFormData((prevState) => ({
-                ...prevState,
-                user_id: user.id, // ✅ Ensure user_id updates when user changes
-            }));
-        }
-    }, [user]);
 
     const handleSubmit = async () => {
         try {
@@ -79,30 +107,29 @@ export default function SharePage() {
             // Upload media to Supabase
             const { uploadedFiles: storedFiles } = await uploadFilesToBucket(
                 uploadedFiles.map((file) => file.name),
-                "post"
+                "post",
+                postId
             );
 
             const thumbnailUrl = hasVideo ? storedFiles[0] : null;
 
             const postPayload = {
                 ...formData,
+                post_id: postId,
                 mediaUrl: storedFiles,
-                user_id: user?.id, // ✅ Ensure correct user_id is submitted
+                user_id: user?.id, 
                 created_at: new Date().toISOString(),
-                is_video: hasVideo, // ✅ Set `is_video` explicitly (true/false)
-                video_type: video_types, // ✅ Store video types for future reference
-                post_action: "post", // ✅ Add post_action to differentiate between drafts and posts
+                is_video: hasVideo,
+                video_type: video_types,
+                post_action: "post", 
                 thumbnailUrl: thumbnailUrl
             };
 
-            const { error } = await supabase.from("testPost").insert([postPayload]);
+            const { error } = await supabase.from("posts").insert([postPayload]);
 
             if (error) throw error;
-
-            alert("✅ Post created successfully!");
             router.push(`/account/profile/${user?.id}`); // ✅ Redirect to dynamic profile page
         } catch (err) {
-            console.error("❌ Error submitting post:", err);
             alert("There was an error submitting your post.");
         }
     };

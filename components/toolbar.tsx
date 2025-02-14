@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { createClient } from '@/supabase/client';
+import { supabase } from "@/app/lib/definitions";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
@@ -20,7 +20,6 @@ const Toolbar: React.FC = () => {
   // Fetch and set user avatar
   const fetchUserAvatar = async (userId: string) => {
     try {
-      const supabase = createClient();
       const { data, error } = await supabase
         .from('profiles')
         .select('avatar_url')

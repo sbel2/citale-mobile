@@ -80,7 +80,7 @@ export const handleFilesInput = async (
                 hasVideo = true;
                 validFiles = [file]; // Only allow one video
             } catch (err) {
-                setVideoError("Error processing video. Please try again.");
+                setVideoError("We only take mp4 files for videos at the moment.");
                 return;
             }
         } else if (IMAGE_TYPES.includes(file.type)) {
@@ -100,8 +100,8 @@ export const handleFilesInput = async (
 };
 
 
-export const uploadFilesToBucket = async (blobUrls: string[], postAction: string) => {
-    const storageBucket = postAction === "post" ? "test" : "test-draft";
+export const uploadFilesToBucket = async (blobUrls: string[], postAction: string, postId: string) => {
+    const storageBucket = postAction === "post" ? "posts" : "drafts";
     const uploadedFiles: string[] = [];
 
     for (const blobUrl of blobUrls) {
@@ -116,7 +116,7 @@ export const uploadFilesToBucket = async (blobUrls: string[], postAction: string
             }
 
             const fileExtension = fileType.split("/")[1];
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
+            const fileName = `${postId}_${Date.now()}_${Math.random().toString(36).substring(6)}.${fileExtension}`;
             const filePath = `${fileType.startsWith("image/") ? "images" : "videos"}/${fileName}`;
 
             // Upload to Supabase Storage
