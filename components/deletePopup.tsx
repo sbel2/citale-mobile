@@ -47,8 +47,10 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
 
         // delete media path
         let deleteMediaPaths: string[] = [];
+
+        console.log(data?.is_video)
     
-        if (data?.is_video === 'TRUE') {
+        if (data?.is_video === true) {
             deleteMediaPaths = mediaUrls.map(url => `videos/${url}`);
         } else {
             deleteMediaPaths = mediaUrls.map(url => `images/${url}`);
