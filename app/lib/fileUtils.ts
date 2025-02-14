@@ -53,7 +53,7 @@ export const handleFilesInput = async (
     filesArray: FileItem[],
     setVideoError: (error: string | null) => void,
     setFiles: (updateFn: (prevState: FileItem[]) => FileItem[]) => void
-) => {
+): Promise<boolean> => {
     setVideoError(null);
 
     let hasVideo = false;
@@ -64,40 +64,39 @@ export const handleFilesInput = async (
         if (VIDEO_TYPES.includes(file.type)) {
             if (hasImages) {
                 setVideoError("You can only upload either one video or multiple images, not both.");
-                return;
+                return false;
             }
             if (hasVideo) {
                 setVideoError("Only one video is allowed.");
-                return;
+                return false;
             }
 
             try {
                 const duration = await checkVideoDuration(file as unknown as File);
                 if (duration > MAX_VIDEO_DURATION) {
                     setVideoError(`Videos must be ${MAX_VIDEO_DURATION} seconds or shorter.`);
-                    return;
+                    return false;
                 }
                 hasVideo = true;
                 validFiles = [file]; // Only allow one video
             } catch (err) {
                 setVideoError("We only take mp4 files for videos at the moment.");
-                return;
+                return false;
             }
         } else if (IMAGE_TYPES.includes(file.type)) {
             if (hasVideo) {
                 setVideoError("You can only upload either one video or multiple images, not both.");
-                return;
+                return false;
             }
             hasImages = true;
             validFiles.push(file);
         }
     }
 
-    console.log("Setting Files State:", validFiles); // Debugging
-
-    // ✅ Correct way to update state
-    setFiles(() => validFiles); // Now passing a function that returns an array
+    setFiles(() => validFiles); // Update state correctly
+    return validFiles.length > 0; // ✅ Indicate success/failure
 };
+
 
 
 export const uploadFilesToBucket = async (blobUrls: string[], postAction: string, postId: string) => {

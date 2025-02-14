@@ -96,8 +96,9 @@ const ImagePreview = ({
   };
 
   return (
+    
     <DndProvider backend={MultiBackend} options={backendOptions}>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-1 md:p-4 bg-gray-100 rounded-md">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-4 p-1 md:p-4 bg-gray-100 rounded-md">
         {/* 📌 Image Preview Grid */}
         {files?.map((file, index) => (
           <DraggableImage key={index} file={file} index={index} moveFile={moveFile} />

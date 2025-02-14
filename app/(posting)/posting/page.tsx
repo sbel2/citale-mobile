@@ -9,6 +9,8 @@ import ShareForm from "@/components/share/shareForm";
 import { uploadFilesToBucket } from 'app/lib/fileUtils';
 import { supabase } from "@/app/lib/definitions";
 import { v4 as uuidv4 } from "uuid";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function SharePage() {
     const { uploadedFiles, setUploadedFiles } = useMedia();
@@ -140,33 +142,66 @@ export default function SharePage() {
     }
 
     return (
-        <div className="flex flex-col items-center p-6">
-            <h2 className="text-xl font-bold mb-4">Review Your Upload</h2>
+        <div className="flex flex-col h-[100dvh] bg-white">
+        
+            <header className="shrink-0 border-b border-gray-200 bg-white lg:hidden">
+                <div className="mx-auto px-4 py-2 flex justify-between items-center">
+                <a href="/upload" aria-label="Back to upload" className="text-gray-800 dark:text-white ml-1">
+                    &#x2190; Back to upload
+                </a>
+                <Link href="/" aria-label="Home" className="inline-block mt-1">
+                    <Image
+                    src="/citale_header.svg"
+                    alt="Citale Logo"
+                    width={90}
+                    height={30}
+                    priority
+                    />
+                </Link>
+                </div>
+            </header>
 
-            {/* Image & Video Previews */}
-            <div className="flex flex-col md:flex-row gap-6 w-full max-w-4xl">
-                {isVideo ? (
-                    <div className="w-[30%] sticky top-10 shadow-lg">
-                        <video key={previewUrls[0]} controls className="w-full rounded-lg">
+            <div className="w-full hidden lg:flex justify-between items-center">
+                    <a href="/upload" aria-label="Back to upload" className="text-gray-800 dark:text-white ml-1 left-0">
+                        &#x2190; Back to upload
+                    </a>
+            </div>
+
+            {isVideo ? (
+                <div className="flex flex-col md:flex-row-reverse items-start md:gap-10">
+                    <div className="max-w-[250px] mt-10 md:mt-32 mr-10">
+                        <video key={previewUrls[0]} controls className="w-[50%] md:w-full rounded-lg">
                             <source src={previewUrls[0]} type={videoType ?? "video/mp4"} />
                             Your browser does not support the video tag.
                         </video>
                     </div>
-                ) : (
+                    <div className="w-full md:w-[70%] mt-6">
+                        <ShareForm formData={formData} setFormData={setFormData} />
+                        <button
+                            onClick={handleSubmit}
+                            className=" w-[20%] md:w-[10%] bg-red-600 text-white py-2 mt-4 rounded-md hover:bg-red-700 transition mt-8 mb-[128px]"
+                        >
+                            Post
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col items-start">
+                <div className="justify-left flex flex-col items-start mt-10">
+                    <p className="text-lg font-lg text-left mb-2">Image editing</p>
                     <ImagePreview filesUpload={uploadedFiles} onFilesChange={setUploadedFiles} />
-                )}
-            </div>
-
-            {/* Post Form */}
-            <div className="w-full max-w-3xl mt-6">
-                <ShareForm formData={formData} setFormData={setFormData} />
-                <button
-                    onClick={handleSubmit}
-                    className="w-full bg-red-600 text-white py-2 mt-4 rounded-md hover:bg-red-700 transition"
-                >
-                    Submit Post
-                </button>
-            </div>
+                </div>
+                <div className="w-full mt-6">
+                    <ShareForm formData={formData} setFormData={setFormData} />
+                    <button
+                        onClick={handleSubmit}
+                        className=" w-[20%] md:w-[10%] bg-red-600 text-white py-2 mt-4 rounded-md hover:bg-red-700 transition mt-8 mb-[128px]"
+                    >
+                        Post
+                    </button>
+                </div>
+                </div>
+            )}
         </div>
     );
 }
