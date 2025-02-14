@@ -76,10 +76,26 @@ const Toolbar: React.FC = () => {
   }, [user]);
 
   const handleLogout = async () => {
-    await logout();
-    localStorage.removeItem('userAvatar'); // Clear cached avatar
-    push('/');
+    try {
+      console.log("Attempting to log out...");
+  
+      await logout(); // Clear Supabase session
+      localStorage.removeItem("userAvatar"); // Clear cached avatar
+  
+      // Clear additional cached data if any
+      sessionStorage.clear();
+  
+      // Force refresh or redirect
+      if (pathname === "/") {
+        window.location.reload(); // Refresh homepage
+      } else {
+        window.location.href = "/"; // Force redirect to clear stale sessions
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
+  
 
 
   return (

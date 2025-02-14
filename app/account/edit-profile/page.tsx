@@ -77,7 +77,7 @@ export default function ProfilePage() {
       }
       localStorage.setItem('userAvatar', userAvatar ?? '');
       setMessage(message);
-      router.push('/account/profile');
+      router.back();
     } catch (e) {
       console.error('Unexpected error during profile update:', e);
       setError('An unexpected error occurred.');

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import Image from 'next/image';
@@ -11,10 +11,27 @@ export default function Chat() {
   const [messages, setMessages] = useState<{ id: number; content: string; role: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Function to remove citations (like [1], [2], etc.)
   const removeCitations = (text: string) => {
     return text.replace(/\[\d+\]/g, '').trim();
   };
 
+  // Load messages from localStorage on component mount
+  useEffect(() => {
+    const storedMessages = localStorage.getItem('chatMessages');
+    if (storedMessages) {
+      setMessages(JSON.parse(storedMessages));
+    }
+  }, []);
+
+  // Save messages to localStorage whenever the messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('chatMessages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // Handle submitting user input
   const handleSubmit = async (input: string) => {
     if (!input.trim()) return;
 
@@ -23,7 +40,7 @@ export default function Chat() {
       content: input,
       role: 'user'
     };
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setIsLoading(true);
 
     try {
@@ -47,6 +64,12 @@ export default function Chat() {
     }
 
     setIsLoading(false);
+  };
+
+  // Function to clear chat history
+  const clearChat = () => {
+    setMessages([]); // Clear state messages
+    localStorage.removeItem('chatMessages'); // Remove from localStorage
   };
 
   return (
@@ -106,6 +129,16 @@ export default function Chat() {
             <div className="animate-pulse">AI is thinking...</div>
           </div>
         )}
+      </div>
+
+      {/* Clear Chat Button */}
+      <div className="text-center p-4">
+        <button
+          onClick={clearChat}
+          className="px-4 py-2 text-white bg-red-600 rounded-full hover:bg-red-700"
+        >
+          Clear Chat
+        </button>
       </div>
   
       {/* ChatInput component */}

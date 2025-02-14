@@ -8,13 +8,15 @@ import { Post } from "@/app/lib/types";
 interface DeletePopupProps {
     posts: Post[];
     postStatus: string;
-    postId: string;
+    postId: number;
     resetPosts: (updatedPosts: Post[]) => void;
     togglePopup: () => void;
 }
 
 export default function DeletePopup({ posts, postStatus, postId, resetPosts, togglePopup }: DeletePopupProps) {
     const { user, logout } = useAuth();
+    const [deleteMedia, setDeleteMedia] = useState<string[]>([]);
+
 
     console.log(posts)
     const deletePost = async () => {
@@ -24,22 +26,53 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
 
         switch(postStatus) {
             case "draft":
-                postTable = "testDraft";
-                postBucket = "test-draft"
+                postTable = "drafts";
+                postBucket = "drafts"
                 break
             case "post":
-                postTable = "testPost";
-                postBucket = "test";
+                postTable = "posts";
+                postBucket = "posts";
                 break
             default: 
                 throw new Error("Invalid postStatus value")
         }
 
+        const {data} = await supabase
+        .from(postTable)
+        .select('mediaUrl, is_video')
+        .eq('post_id', postId)
+        .single()
+
+        const mediaUrls = Array.isArray(data?.mediaUrl) ? data.mediaUrl : [data?.mediaUrl].filter(Boolean);
+
+        // delete media path
+        let deleteMediaPaths: string[] = [];
+    
+        if (data?.is_video === 'TRUE') {
+            deleteMediaPaths = mediaUrls.map(url => `videos/${url}`);
+        } else {
+            deleteMediaPaths = mediaUrls.map(url => `images/${url}`);
+        }
+    
+        console.log("Deleting files:", deleteMediaPaths);
+
+        if (deleteMediaPaths.length > 0) {
+          const { error: storageError } = await supabase.storage
+              .from(postBucket)
+              .remove(deleteMediaPaths);
+  
+          if (storageError) {
+              console.error("Error deleting media:", storageError.message);
+              return;
+          }
+        }
+  
 
         const { error } = await supabase
         .from(postTable)
         .delete()
         .match({post_id: postId, user_id: user?.id})
+        
 
         const updatedPosts = posts.filter(post => post.post_id !== postId);
         resetPosts(updatedPosts);
@@ -51,6 +84,10 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
         console.log("Post deleted successfully!");
         }
     }
+
+    const fetchPostMedia = async (postTable: string, postId: string) => {
+      
+    };
 
 
     return (
