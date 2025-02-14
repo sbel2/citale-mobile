@@ -23,10 +23,10 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const { comments: initialComments, saveComment, commentCount, deleteComment } = useComments({ post_id: post.post_id, user_id: user?.id });
+  const { comments: initialComments, saveComment, commentCount, deleteComment, likes, toggleLike, userLikes } = useComments({ post_id: post.post_id, user_id: user?.id });
   const [comments, setComments] = useState(initialComments);
 
-  const { liked, likesCount, toggleLike } = useLike({
+  const { liked, likesCount, toggleLike: togglePostLike } = useLike({
     postId: post.post_id,
     userId: user?.id,
     initialLikeCount: post.like_count
@@ -43,7 +43,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
       setShowLoginPopup(true);
       return;
     }
-    toggleLike();
+    togglePostLike();
   };
 
   const handleFavorite = () => {
@@ -64,7 +64,17 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
         <PostMedia post={post} />
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
           <PostHeader post={post} />
-          <PostContent post={post} comments={comments} deleteComment={deleteComment} userId={user?.id}/>
+          <PostContent 
+            post={post} 
+            comments={comments} 
+            deleteComment={deleteComment} 
+            userId={user?.id} 
+            likes={likes} 
+            userLikes={userLikes} // Ensure this is passed
+            toggleLike={toggleLike}
+            showLoginPopup={showLoginPopup}
+            setShowLoginPopup={setShowLoginPopup}
+          />
           <PostFooter 
               liked={liked}
               likesCount={likesCount}

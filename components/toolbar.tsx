@@ -152,9 +152,10 @@ const Toolbar: React.FC = () => {
 
             {/* Help Button - Aligned to the left without any extra margin */}
             <Link
-              href="https://docs.google.com/forms/d/e/1FAIpQLSf4MW-GDtmjf2GYVGOH1I4zacB7RghQ5Oc0guopx5fZ01Q5YQ/viewform?usp=header" // Replace with your Google Form link
+              href="https://forms.gle/6Vmipb4uNuJekn7e8" // Replace with your Google Form link
               className="block p-4 hover:bg-gray-200 text-black-600"
-            >
+              target="_blank" 
+              >
               Help
             </Link>           
           </div>         
