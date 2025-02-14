@@ -18,20 +18,16 @@ export default function ExploreLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} flex flex-col md:flex-row`}>
-        {/* Toolbar on the left */}
-        <Toolbar />
+    <div className={`${inter.className} flex flex-col md:flex-row`}>
+      {/* Toolbar on the left */}
+      <Toolbar />
 
-        {/* Group Header and Main Content */}
-        <div className="flex-1 flex flex-col md:ml-64">
-          <Header />
-          <main className="flex-1 p-4 bg-gray-951">
-            {children}
-          </main>
-        </div>
-      </body>
-
-    </html>
-  );
-}
+      {/* Group Header and Main Content */}
+      <div className="flex-1 flex flex-col md:ml-64">
+        <Header />
+        <main className="flex-1 p-4 bg-gray-951">
+          {children}
+        </main>
+      </div>
+    </div>
+)}
