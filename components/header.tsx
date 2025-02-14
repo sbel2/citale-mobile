@@ -64,7 +64,9 @@ export default function Header({ font }: { font?: string }) {
         </div>
       </div>
 
-      {user &&(
+      {!pathname.startsWith("/search-results") &&
+        !pathname.startsWith("/account/profile/") &&
+        !fromSearch && user &&(
         <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
         <button className={`p-4 text-x1 w-full flex justify-center items-center focus:outline-none transition-all round-lg ${activeButton === 'explore' ? 'underline' : ''}`}
           onClick={() => handleButtonClick('explore', '/')}
