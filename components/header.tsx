@@ -7,7 +7,7 @@ import FilterButton from '@/components/Filter';
 import { useAuth } from 'app/context/AuthContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { FaHome, FaUserFriends } from 'react-icons/fa';
+// import { FaHome, FaUserFriends } from 'react-icons/fa';
 
 export default function Header({ font }: { font?: string }) {
   const pathname = usePathname();
@@ -47,22 +47,6 @@ export default function Header({ font }: { font?: string }) {
   return (
     <header className={`py-1 md:py-3 pt-4 md:pt-6 bg-gray-0 ${font}`}>
 
-        {user &&(
-        <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
-        <button className={`p-4 w-full flex justify-center items-center md:hover:bg-white focus:outline-none transition-all round-lg ${activeButton === 'explore' ? '' : 'bg-gray-100'}`}
-          onClick={() => handleButtonClick('explore', '/')}
-        >
-          <FaHome className="mr-2" /> 
-          Explore</button>
-        <button className={`p-4 w-full flex justify-center items-center md:hover:bg-white focus:outline-none transition-all round-lg ${activeButton === 'following' ? '' : 'bg-gray-100'}`}
-          onClick={() => handleButtonClick('following', '/following-post')}
-        >
-          <FaUserFriends className="mr-2" />
-          Following</button>
-      </div>
-      )}
-
-
       <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
         <Link href="/" aria-label="Home" className = "pt-1.5 md:hidden">
           <Image
@@ -79,6 +63,19 @@ export default function Header({ font }: { font?: string }) {
           </div>
         </div>
       </div>
+
+      {user &&(
+        <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
+        <button className={`p-4 text-x1 w-full flex justify-center items-center focus:outline-none transition-all round-lg ${activeButton === 'explore' ? 'underline' : ''}`}
+          onClick={() => handleButtonClick('explore', '/')}
+        >
+          Explore</button>
+        <button className={`p-4 text-x1 w-full flex justify-center items-center focus:outline-none transition-all round-lg ${activeButton === 'following' ? 'underline' : ''}`}
+          onClick={() => handleButtonClick('following', '/following-post')}
+        >
+          Following</button>
+      </div>
+      )}
 
       
       {!pathname.startsWith("/search-results") &&
