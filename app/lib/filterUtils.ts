@@ -9,10 +9,10 @@ export async function handleFilter(option: string, location: string, price: stri
 
     // Apply filters dynamically
     if (option !== 'All') {
-      query = query.ilike('categories_short', `%${option}%`);
+      query = query.ilike('category', `%${option}%`);
     }
     if (location !== 'All') {
-      query = query.ilike('location_short', `%${location}%`);
+      query = query.ilike('location', `%${location}%`);
     }
     if (price !== 'All') {
       query = query.eq('price',price);

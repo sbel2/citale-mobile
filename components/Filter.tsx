@@ -8,7 +8,7 @@ interface FilterProps {
 }
 
 const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
-  const [filterEvents, setFilterEvents] = useState('All');
+  const [filterActivities, setFilterActivities] = useState('All');
   const [filterLocations, setFilterLocations] = useState('All');
   const [filterPrice, setFilterPrice] = useState('All');
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
@@ -17,21 +17,21 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   const router = useRouter();
   const [categories, setCategories] = useState<{
     Price: string[];
-    Category: string[];
+    Activity: string[];
     Location: string[];
   }>({
     Price: [],
-    Category: [],
+    Activity: [],
     Location: [],
   });
 
   const dropdownRefs = {
-    Category: useRef<HTMLDivElement | null>(null),
+    Activity: useRef<HTMLDivElement | null>(null),
     Location: useRef<HTMLDivElement | null>(null),
     Price: useRef<HTMLDivElement | null>(null),
   };
   const buttonRefs = {
-    Category: useRef<HTMLButtonElement | null>(null),
+    Activity: useRef<HTMLButtonElement | null>(null),
     Location: useRef<HTMLButtonElement | null>(null),
     Price: useRef<HTMLButtonElement | null>(null),
   };
@@ -57,21 +57,32 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data: eventsData, error: eventsError } = await supabase.from('posts').select('categories_short');
-        const { data: locationsData, error: locationsError } = await supabase.from('posts').select('location_short');
+        const { data: activitiesData, error: activitiesError } = await supabase.from('posts').select('category');
+        const { data: locationsData, error: locationsError } = await supabase.from('posts').select('location');
         const { data: priceData, error: priceError } = await supabase.from('posts').select('price');
 
-        if (eventsError || locationsError || priceError) {
-          console.error('Error fetching categories:', eventsError || locationsError || priceError);
+        if (activitiesError || locationsError || priceError) {
+          console.error('Error fetching categories:', activitiesError || locationsError || priceError);
           return;
         }
 
         setCategories({
-          Category: eventsData ? [...new Set(eventsData.map((item) => item.categories_short).filter(Boolean))].sort() : [],
-          Location: locationsData ? [...new Set(locationsData.map((item) => item.location_short).filter(Boolean))].sort() : [],
+          Activity: activitiesData 
+          ? ["All",...new Set(
+              activitiesData
+                  .map(item => item.category)
+                  .filter(Boolean)
+                  .flatMap(category => category.split(',').map((cat: string) => cat.trim()))
+          )].sort()
+          : ["All"],
+          Location: locationsData ? ["All",...new Set(locationsData.map((item) => item.location).filter(Boolean))].sort() : ["All"],
           Price: priceData
-            ? [...new Set(priceData.map((item) => item.price).filter(Boolean))].sort((a, b) => (a === 'Free' ? -1 : b === 'Free' ? 1 : a.localeCompare(b)))
-            : [],
+            ? ["All",...new Set(priceData.map((item) => item.price).filter(Boolean))].sort((a, b) => (a === "All" ? -1 : 
+              b === "All" ? 1 : 
+              a === "Free" ? -1 : 
+              b === "Free" ? 1 : 
+              a.localeCompare(b)))
+            : ["All"],
         });
       } catch (error) {
         console.error('Unexpected error:', error);
@@ -94,14 +105,14 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
     const location = filterParams.get('location') || 'All';
     const price = filterParams.get('price') || 'All';
 
-    setFilterEvents(categories.Category.includes(option) ? option : 'All');
+    setFilterActivities(categories.Activity.includes(option) ? option : 'All');
     setFilterLocations(categories.Location.includes(location) ? location : 'All');
     setFilterPrice(categories.Price.includes(price) ? price : 'All');
   }, [filterParams, categories]);
 
   const handleFilterChange = useCallback(
     async (option: string, location: string, price: string, category: string) => {
-      if (category === 'Category') setFilterEvents(option);
+      if (category === 'Activity') setFilterActivities(option);
       if (category === 'Location') setFilterLocations(location);
       if (category === 'Price') setFilterPrice(price);
 
@@ -117,10 +128,10 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   );
 
   const resetFilters = () => {
-    setFilterEvents('All');
+    setFilterActivities('All');
     setFilterLocations('All');
     setFilterPrice('All');
-    router.push(`${pathname}?`);
+    router.push(`/`);
   };
 
   const toggleDropdown = (category: string) => {
@@ -150,7 +161,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
               className="px-3 py-2.5 cursor-pointer hover:bg-gray-100 text-xs md:text-sm"
               onClick={() => {
                 handleFilterChange(
-                  category === 'Category' ? option : filterEvents,
+                  category === 'Activity' ? option : filterActivities,
                   category === 'Location' ? option : filterLocations,
                   category === 'Price' ? option : filterPrice,
                   category
@@ -169,7 +180,7 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
 
   return (
     <div className="bg-white flex justify-center items-center pt-5 pb-z2">
-      <FilterDropdown category="Category" selected={filterEvents} options={categories.Category} />
+      <FilterDropdown category="Activity" selected={filterActivities} options={categories.Activity} />
       <FilterDropdown category="Location" selected={filterLocations} options={categories.Location} />
       <FilterDropdown category="Price" selected={filterPrice} options={categories.Price} />
 
