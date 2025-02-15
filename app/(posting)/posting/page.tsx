@@ -104,7 +104,6 @@ export default function SharePage() {
 
             // ✅ Determine if a video is included
             const hasVideo = uploadedFiles.some((file) => file.type.startsWith("video/"));
-            const video_types = uploadedFiles.map((file) => file.type.startsWith("video/"));
 
             // Upload media to Supabase
             const { uploadedFiles: storedFiles } = await uploadFilesToBucket(
@@ -122,7 +121,6 @@ export default function SharePage() {
                 user_id: user?.id, 
                 created_at: new Date().toISOString(),
                 is_video: hasVideo,
-                video_type: video_types,
                 post_action: "post", 
                 thumbnailUrl: thumbnailUrl
             };
