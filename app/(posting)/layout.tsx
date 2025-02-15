@@ -17,19 +17,18 @@ export default function ProfileLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
-            <body className={`${inter.className} bg-white`}>
-                <MediaProvider>
-                    <div className="flex h-screen">
-                        <div className="md:w-64">
-                            <Toolbar />
-                        </div>
-                        <main className="flex-1 p-4 bg-gray-951">
-                            {children}
-                        </main>
-                    </div>
-                </MediaProvider>
-            </body>
-        </html>
+        <MediaProvider>
+            <div className={`${inter.className} bg-white flex h-screen`}>
+                {/* Sidebar */}
+                <div className="md:w-64">
+                    <Toolbar />
+                </div>
+
+                {/* Main Content */}
+                <main className="flex-1 p-4 bg-gray-951">
+                    {children}
+                </main>
+            </div>
+        </MediaProvider>
     );
 }

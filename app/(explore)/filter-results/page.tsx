@@ -21,7 +21,7 @@ const Filter = () => {
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   useEffect(() => {
-    document.title = selectedOption ? `${selectedOption} - Citale Search` : 'Citale Search';
+    document.title = selectedOption ? `${selectedOption} - Citale` : 'Citale';
   
     return () => {
     };

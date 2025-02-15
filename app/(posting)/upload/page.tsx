@@ -16,13 +16,6 @@ export default function UploadMedia() {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    // 📱 Auto-trigger mobile file picker on mount
-    useEffect(() => {
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-            fileInputRef.current?.click();
-        }
-    }, []);
-
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
         setVideoError(null);
@@ -76,9 +69,9 @@ export default function UploadMedia() {
     
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen w-full">
+        <div className="flex flex-col items-center justify-center overflow-hidden mt-48 md:mt-36">
             {/* 📌 Logo at the Top */}
-            <Link href="/" aria-label="Home" className="inline-block mb-28">
+            <Link href="/" aria-label="Home" className="inline-block mb-20">
                 <Image
                     src="/citale_header.svg"
                     alt="Citale Logo"
@@ -104,7 +97,6 @@ export default function UploadMedia() {
                 </p>
             </div>
 
-            {/* 📌 Hidden File Input (Auto-opens on mobile) */}
             <input
                 type="file"
                 multiple

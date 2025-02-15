@@ -1,11 +1,11 @@
 export const categoryList: string[] = [
-  'Outdoor', 'Sport', 'Photography', 'Shopping', 'Market',
-  'Music', 'Dating', 'Performance', 'Event', 'Museum', 'Food', 'Art'
+  'Outdoor', 'Sport', 'Shopping', 'Market',
+  'Music', 'Dating', 'Event', 'Food', 'Art'
 ];
 
 export const locationList: string[] = [
   'Allston', 'Back Bay', 'Beacon Hill', 'Brookline', 'Cambridge', 
-  'Downtown', 'Greater Boston', 'Somerville', 'Fenway', 'Other'
+  'Downtown', 'Greater Boston', 'Somerville', 'Fenway'
 ];
 
 export const seasonList: string[] = [
