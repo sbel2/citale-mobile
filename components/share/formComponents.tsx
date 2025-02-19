@@ -17,7 +17,6 @@ interface DatesInputProps {
 
 export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options, elementKey} : MultiSelectChipsInputProps, ref ) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  console.log(selectedOptions)
 
   const toggleOption = (option: string) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -37,7 +36,6 @@ export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options
       setTimeout(() => {
         onMultiSelectChange("", elementKey);
       }, 0);
-      console.log('cleaned')
     }
   }));
 

@@ -18,7 +18,6 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ posts , managePost }) => {
     750: 2,
   };
 
-  console.log(posts);
   return (
       <Masonry
         breakpointCols={breakpointColumnsObj}

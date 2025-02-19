@@ -30,7 +30,6 @@ const PostHeader: React.FC<PostHeaderProps> = ({ post }) => {
         if(data){
           setUsername(data?.username || '');
           setAvatarUrl(data?.avatar_url || '');
-          console.log(data);
         }
       };
       handleFetchUserProfile();
