@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initializeAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
       setUser(session?.user || null);
       setSession(session || null);
     });
@@ -56,7 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       // Recheck session to confirm logout
       const { data: sessionData } = await supabase.auth.getSession();
-      console.log('Session after logout:', sessionData);
 
       if (!sessionData.session) {
         console.log('Session cleared successfully.');

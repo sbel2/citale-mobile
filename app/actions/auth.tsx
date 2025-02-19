@@ -63,8 +63,6 @@ export async function updatePassword(newPassword: string) {
     console.error('Failed to update password:', error);
     return { success: false, message: error.message };
   }
-
-  console.log('Password updated successfully for user:', data);
   return { success: true, message: 'Password updated successfully' };
 }
 

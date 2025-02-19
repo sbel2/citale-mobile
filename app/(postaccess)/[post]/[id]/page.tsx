@@ -9,9 +9,7 @@ export default function Page({ params }: { params: { post: string, id: string } 
   const { post: postType, id: post_id } = params;
   const [postData, setPostData] = useState<Post | null>(null);
   const [loading, setloading] = useState<boolean>(true);
-  console.log(postType, post_id)
   const postTable = postType == "post" ? "posts" : postType == "draft" ? "drafts" : "";
-  console.log(postTable)
   useEffect(() => {
     const supabase = createClient();
 
@@ -29,7 +27,6 @@ export default function Page({ params }: { params: { post: string, id: string } 
         return;
       } else {
         setPostData(data);
-        console.log(data)
         document.title = data.title;
         setloading(false);
       }

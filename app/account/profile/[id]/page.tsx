@@ -157,7 +157,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     }
 
     const toggleDeletePopUp = () => {
-        console.log(managePostData)
         setDeletePost((prevState) => !prevState);
     }
 

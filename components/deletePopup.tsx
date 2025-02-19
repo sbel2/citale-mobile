@@ -16,9 +16,7 @@ interface DeletePopupProps {
 export default function DeletePopup({ posts, postStatus, postId, resetPosts, togglePopup }: DeletePopupProps) {
     const { user, logout } = useAuth();
 
-    console.log(posts)
     const deletePost = async () => {
-        console.log(postStatus, postId)
         let postTable: string;
         let postBucket: string;
 
@@ -45,16 +43,12 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
 
         // delete media path
         let deleteMediaPaths: string[] = [];
-
-        console.log(data?.is_video)
     
         if (data?.is_video === true) {
             deleteMediaPaths = mediaUrls.map(url => `videos/${url}`);
         } else {
             deleteMediaPaths = mediaUrls.map(url => `images/${url}`);
         }
-    
-        console.log("Deleting files:", deleteMediaPaths);
 
         if (deleteMediaPaths.length > 0) {
           const { error: storageError } = await supabase.storage
