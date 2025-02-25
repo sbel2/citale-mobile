@@ -76,6 +76,10 @@ export async function getUserId(){
 }
 
 export async function addingProfile(userId: string, username: string, email: string){
+  if (!email.endsWith('@bu.edu')) {
+    console.error('Error: Only @bu.edu email addresses are allowed.');
+    return { success: false, message: 'Only @bu.edu email addresses are allowed.' };
+  }
   const {data, error} = await supabase
     .from('profiles')
     .upsert([
