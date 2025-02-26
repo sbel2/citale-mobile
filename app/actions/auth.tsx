@@ -2,6 +2,9 @@ import { supabase } from '@/app/lib/definitions';
 import { createClient } from '@/supabase/server';
 
 export const signUpUser = async ({ email, password, username }: { email: string; password: string; username: string }) => {
+  if (!email.endsWith('@bu.edu')) {
+    throw new Error('Only emails from bu.edu are allowed');
+  }
   // Call the sign-up function
   const { data, error } = await supabase.auth.signUp({ 
     email, 
@@ -76,10 +79,6 @@ export async function getUserId(){
 }
 
 export async function addingProfile(userId: string, username: string, email: string){
-  if (!email.endsWith('@bu.edu')) {
-    console.error('Error: Only @bu.edu email addresses are allowed.');
-    return { success: false, message: 'Only @bu.edu email addresses are allowed.' };
-  }
   const {data, error} = await supabase
     .from('profiles')
     .upsert([
