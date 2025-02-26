@@ -106,7 +106,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
 
       <div className='border-t border-gray-200 mt-8'></div>
 
-      <div className="mt-4 mb-20">
+      <div className="mt-4 mb-48 md:mb-20">
         {comments.map((comment) => {
           const profile = comment.profiles || {};
           return (
