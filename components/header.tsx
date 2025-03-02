@@ -76,14 +76,33 @@ export default function Header({ font }: { font?: string }) {
         !pathname.startsWith("/account/profile/") &&
         !fromSearch && user &&(
         <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
-        <button className={`p-4 text-x1 w-full flex justify-center items-center focus:outline-none transition-all round-lg ${activeButton === 'explore' ? 'underline' : ''}`}
+        <button
+          className={`p-4 text-xl w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
+            activeButton === 'explore'
+              ? '' // Expand the underline
+              : 'text-gray-300' // Hide the underline
+          }`}
           onClick={() => handleButtonClick('explore', '/')}
         >
-          Explore</button>
-        <button className={`p-4 text-x1 w-full flex justify-center items-center focus:outline-none transition-all round-lg ${activeButton === 'following' ? 'underline' : ''}`}
+          Explore
+          {activeButton === 'explore' && (
+            <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 border-t-4 border-black'></div>
+          )}
+          </button>
+          
+          <button
+            className={`p-4 text-xl w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
+              activeButton === 'following'
+                ? '' // Expand the underline
+                : 'text-gray-300' // Hide the underline
+            }`}
           onClick={() => handleButtonClick('following', '/following-post')}
         >
-          Following</button>
+          Following
+          {activeButton === 'following' && (
+            <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 border-t-4 border-black'></div>
+          )}
+          </button>
       </div>
       )}
 
