@@ -109,9 +109,12 @@ export default function ProfilePage() {
   const getCropData = async () => {
     if (cropperRef.current && cropperRef.current.cropper) {
       const croppedCanvas = cropperRef.current.cropper.getCroppedCanvas({
-        width: 256,
-        height: 256,
+        width: 128,
+        height: 128,
       });
+
+      if(!croppedCanvas) return;
+
       croppedCanvas.toBlob(async (blob: Blob | null) => {
         if (blob) {
           const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
@@ -120,6 +123,7 @@ export default function ProfilePage() {
           setCropWindow(false);
         }
       }, 'image/png');
+
     }
   };
 
