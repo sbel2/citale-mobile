@@ -63,7 +63,7 @@ const DialogContentForFollow = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "dialog-content fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden bg-white duration-200 sm:rounded-lg",
+        "dialog-content fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-white duration-200 sm:rounded-lg",
         "max-w-[500px] max-h-[80vh] p-5",
         className
       )}

@@ -5,14 +5,14 @@ const supabase = createClient();
 
 export async function handleFilter(option: string, location: string, price: string): Promise<Post[] | null> {
   try {
-    let query = supabase.from('posts').select('*').or('expired_dates.is.null,expired_dates.gte.' + new Date().toISOString().split('T')[0]);
+    let query = supabase.from('posts').select('*').or('endDate.is.null,endDate.gte.' + new Date().toISOString().split('T')[0]);
 
     // Apply filters dynamically
     if (option !== 'All') {
-      query = query.ilike('categories_short', `%${option}%`);
+      query = query.ilike('category', `%${option}%`);
     }
     if (location !== 'All') {
-      query = query.ilike('location_short', `%${location}%`);
+      query = query.ilike('location', `%${location}%`);
     }
     if (price !== 'All') {
       query = query.eq('price',price);

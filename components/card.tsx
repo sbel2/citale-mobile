@@ -177,7 +177,6 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                       className="pl-1 pr-1 focus:outline-none w-8 min-w-[32px] h-5"
                       aria-label="More options"
                       onClick={(e) => {
-                        console.log("clicked")
                         e.stopPropagation(); // Prevents the click event from propagating to the parent div
                         toggleButtonClick();  // Call your custom button function
                       }}

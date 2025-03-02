@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
 import { Post } from "@/app/lib/types";
@@ -15,12 +15,8 @@ interface DeletePopupProps {
 
 export default function DeletePopup({ posts, postStatus, postId, resetPosts, togglePopup }: DeletePopupProps) {
     const { user, logout } = useAuth();
-    const [deleteMedia, setDeleteMedia] = useState<string[]>([]);
 
-
-    console.log(posts)
     const deletePost = async () => {
-        console.log(postStatus, postId)
         let postTable: string;
         let postBucket: string;
 
@@ -48,13 +44,11 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
         // delete media path
         let deleteMediaPaths: string[] = [];
     
-        if (data?.is_video === 'TRUE') {
+        if (data?.is_video === true) {
             deleteMediaPaths = mediaUrls.map(url => `videos/${url}`);
         } else {
             deleteMediaPaths = mediaUrls.map(url => `images/${url}`);
         }
-    
-        console.log("Deleting files:", deleteMediaPaths);
 
         if (deleteMediaPaths.length > 0) {
           const { error: storageError } = await supabase.storage
@@ -84,11 +78,6 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
         console.log("Post deleted successfully!");
         }
     }
-
-    const fetchPostMedia = async (postTable: string, postId: string) => {
-      
-    };
-
 
     return (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -120,24 +109,3 @@ export default function DeletePopup({ posts, postStatus, postId, resetPosts, tog
         
     )
 }
-
-{/* <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'fixed',
-            //left: '30%',
-            top: '45%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 10,
-            width: '90%',
-            backgroundColor: 'white',
-            //height: '60%',
-        }}>
-            <h1 className="text-md">Are you sure you want to delete this post?</h1>
-            <h2 className="text-sm">When a post is deleted, it&apos;s gone forever!</h2>
-            <div className="flex justify-around w-full">
-            <button onClick={deletePost} className="px-3 py-1 rounded-xl border border-black-500">Delete Post</button>
-            <button onClick={togglePopup}>Cancel</button>
-            </div>
-        </div> */}

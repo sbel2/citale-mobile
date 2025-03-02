@@ -1,18 +1,14 @@
 import '../globals.css';
 
 export const metadata = {
-  title: 'Citale | Explore Boston',
+  title: 'Citale | Account',
   description: 'Things to do in Boston',
-}
+};
 
 export default function RootAccLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  )
+  return <div>{children}</div>;
 }

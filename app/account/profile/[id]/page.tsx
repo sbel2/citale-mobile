@@ -24,7 +24,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [fetchSuccess, setFetchSuccess] = useState<boolean>(false);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setloading] = useState<boolean>(true);
-    const [firstLoad, setFirstLoad] = useState<boolean>(true);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [deletePost, setDeletePost] = useState<boolean>(false);
     const [managePostData, setManageData] = useState({id: 0, postAction: ""})
@@ -68,7 +67,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         const { data, error } = await supabase
         .from("posts")
             .select("*")
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false });
         if (error || !data) {
             console.error('Error fetching post data:', error);
             setPosts([]);
@@ -157,7 +157,6 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     }
 
     const toggleDeletePopUp = () => {
-        console.log(managePostData)
         setDeletePost((prevState) => !prevState);
     }
 
@@ -192,11 +191,11 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             if (isOpen) {
                 toggleDropdown()
             }
-        } else if (option === 'Drafts') {
-            await handleFetchUserDrafts(userId);
-            if (isOpen) {
-                toggleDropdown()
-            }
+        // } else if (option === 'Drafts') {
+        //     await handleFetchUserDrafts(userId);
+        //     if (isOpen) {
+        //         toggleDropdown()
+        //     }
         }
     };
     
@@ -399,7 +398,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                         </button>
                                             ))
                                 )}
-                            <div className="flex">
+                            {/* <div className="flex">
                                 {user && user.id === userId && (
                                     <button
                                     key="more"
@@ -422,7 +421,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                             </li>
                                         </ul>
                                     </div>)}
-                            </div>
+                            </div> */}
                             
                         </div>
                         {isOpen && user && user.id === userId && isMobile() && (
@@ -459,4 +458,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             )}
         </div>
     );
+}
+
+function order(arg0: string, arg1: { ascending: boolean; }) {
+    throw new Error('Function not implemented.');
 }

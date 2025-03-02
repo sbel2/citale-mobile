@@ -10,82 +10,116 @@ interface PostMediaProps {
 
 const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // We’ll keep track if the user touched a button, so we skip swipe
+  const isTouchOnButton = useRef(false);
+
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
   const handlePrevious = () => {
     const newIndex =
-    currentImageIndex > 0 ? currentImageIndex - 1 : post.mediaUrl.length - 1;
+      currentImageIndex > 0 ? currentImageIndex - 1 : post.mediaUrl.length - 1;
     setCurrentImageIndex(newIndex);
-    };
+  };
 
   const handleNext = () => {
     const newIndex =
-    currentImageIndex < post.mediaUrl.length - 1 ? currentImageIndex + 1 : 0;
+      currentImageIndex < post.mediaUrl.length - 1 ? currentImageIndex + 1 : 0;
     setCurrentImageIndex(newIndex);
-   };
+  };
 
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.changedTouches[0].screenX;
-    };
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.changedTouches[0].screenX;
-    };
-
-    const handleTouchEnd = () => {
-        if (touchStartX.current - touchEndX.current > 50) {
-        handleNext(); // Swipe left to move to the next image
-        }
-
-        if (touchEndX.current - touchStartX.current > 50) {
-        handlePrevious(); // Swipe right to move to the previous image
-        }
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    // If the user’s finger started on a button, bail out
+    if ((e.target as HTMLElement).closest(`button`)) {
+      isTouchOnButton.current = true;
+      return;
+    } else {
+      isTouchOnButton.current = false;
     }
 
-    const postBucket = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : "";
+    touchStartX.current = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    // If touch started on a button, skip
+    if (isTouchOnButton.current) return;
+
+    touchEndX.current = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    // If touch started on a button, skip
+    if (isTouchOnButton.current) return;
+
+    const distance = touchStartX.current - touchEndX.current;
+
+    if (distance > 50) {
+      // Swipe left => next
+      handleNext();
+    } else if (distance < -50) {
+      // Swipe right => previous
+      handlePrevious();
+    }
+  };
+
+  const postBucket =
+    post.post_action === "post"
+      ? "posts"
+      : post.post_action === "draft"
+      ? "drafts"
+      : "";
+
   return (
-    <div 
-          className={post.is_video ? styles.videocontainer : styles.imagecontainer}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {post.is_video ? (
-            // Video display if the post is a video
-            <video
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
-              controls
-              autoPlay
-              loop
-              className="w-full h-full object-contain filter brightness-95"
-              playsInline
-            />
-          ) : (
-            // Image display if the post is an image
-            <Image
-              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
-              alt={post.title}
-              fill
-              style={{ objectFit: "contain" }}
-            />
-          )}
-          {post.mediaUrl.length > 1 && !post.is_video && (
-            <div className={styles.navigation}>
-              <button className={styles.navbutton} onClick={handlePrevious} aria-label="Previous Image">
-                &lt;
-              </button>
-              <button className={styles.navbutton} onClick={handleNext} aria-label="Next Image">
-                &gt;
-              </button>
-            </div>
-          )}
-          {!post.is_video && (
-            <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-              {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
-            </span>
-          )}
+    <div
+      className={post.is_video ? styles.videocontainer : styles.imagecontainer}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      {post.is_video ? (
+        <video
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
+          controls
+          autoPlay
+          loop
+          className="w-full h-full object-contain filter brightness-95"
+          playsInline
+        />
+      ) : (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
+          alt={post.title}
+          fill
+          style={{ objectFit: "contain" }}
+        />
+      )}
+
+      {post.mediaUrl.length > 1 && !post.is_video && (
+        <div className={styles.navigation}>
+          <button
+            className={styles.navbutton}
+            aria-label="Previous Image"
+            onClick={handlePrevious}
+          >
+            &lt;
+          </button>
+          <button
+            className={styles.navbutton}
+            aria-label="Next Image"
+            onClick={handleNext}
+          >
+            &gt;
+          </button>
         </div>
+      )}
+
+      {!post.is_video && (
+        <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+          {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
+        </span>
+      )}
+    </div>
   );
 };
 

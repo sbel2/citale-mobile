@@ -16,6 +16,7 @@ export default function Header({ font }: { font?: string }) {
   const [fromSearch, setFromSearch] = useState(false);
   const { user, logout } = useAuth();
   const [activeButton, setActiveButton] = useState<string>('explore');
+  const [fromProfile, setFromProfile] = useState(false);
 
   useEffect(() => {
     // Check if the previous pathname was "/search-results"
@@ -23,6 +24,13 @@ export default function Header({ font }: { font?: string }) {
       setFromSearch(true);
     } else {
       setFromSearch(false);
+    }
+
+    // Check if the previous pathname was "/account/profile/"
+    if (prevPathnameRef.current?.startsWith('/account/profile/')) {
+      setFromProfile(true);
+    } else {
+      setFromProfile(false);
     }
 
     // Update the ref with the current pathname
@@ -82,7 +90,8 @@ export default function Header({ font }: { font?: string }) {
       
       {!pathname.startsWith("/search-results") &&
         !pathname.startsWith("/account/profile/") &&
-        !fromSearch && (
+        !fromSearch &&
+        !fromProfile && (
           <div className="w-full p-1">
             <FilterButton onFilter={filterRoute} />
           </div>

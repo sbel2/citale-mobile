@@ -7,26 +7,26 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
     title: 'Citale | Profile',
     description: 'Profile Page',
-  }
-  
-  export default function EProfileLayout({
+};
+
+export default function EProfileLayout({
     children,
-  }: {
-    children: React.ReactNode
-  }) {
+}: {
+    children: React.ReactNode;
+}) {
     return (
-      <html lang="en">
-        <body className={`${inter.className} bg-white`}>
-        <div className="md:w-64">
-          <Toolbar />
+        <div className={`${inter.className} bg-white flex`}>
+            {/* Sidebar */}
+            <div className="md:w-64">
+                <Toolbar />
+            </div>
+
+            {/* Main Content */}
+            <main className="flex-1 mb-64 md:ml-64">
+                <div>
+                    {children}
+                </div>
+            </main>
         </div>
-        <main className="flex-1 mb-64 md:ml-64">
-          <div>
-            {children}
-          </div>
-        </main>
-      </body>
-      </html>
-    )
-  }
-  
+    );
+}

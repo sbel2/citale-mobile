@@ -17,7 +17,6 @@ export const useLike = ({ postId, userId, initialLikeCount }: UseLikeProps) => {
       if (!userId) return;
 
       try {
-          // Fetch like status for the user
           const { data: likeData, error: likeError } = await supabase
               .from('likes')
               .select()
@@ -26,7 +25,6 @@ export const useLike = ({ postId, userId, initialLikeCount }: UseLikeProps) => {
 
           if (likeError) throw likeError;
 
-          // Fetch latest like count
           const { data: postData, error: postError } = await supabase
               .from('posts')
               .select('like_count')

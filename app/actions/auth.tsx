@@ -2,6 +2,9 @@ import { supabase } from '@/app/lib/definitions';
 import { createClient } from '@/supabase/server';
 
 export const signUpUser = async ({ email, password, username }: { email: string; password: string; username: string }) => {
+  if (!email.endsWith('@bu.edu')) {
+    throw new Error('Only emails from bu.edu are allowed');
+  }
   // Call the sign-up function
   const { data, error } = await supabase.auth.signUp({ 
     email, 
@@ -9,6 +12,7 @@ export const signUpUser = async ({ email, password, username }: { email: string;
     options:{
       data:{
         username: username,
+        avatar_url: 'avatar.png'
       },
     },
   });
@@ -62,8 +66,6 @@ export async function updatePassword(newPassword: string) {
     console.error('Failed to update password:', error);
     return { success: false, message: error.message };
   }
-
-  console.log('Password updated successfully for user:', data);
   return { success: true, message: 'Password updated successfully' };
 }
 
