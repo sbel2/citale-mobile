@@ -11,7 +11,7 @@ import { useAuth } from 'app/context/AuthContext';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
-export default function Home() {
+export default function FollowingPosts() {
   const [posts, setPosts] = useState<Post[] | null>(null); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function Home() {
 
       const { data, error } = await supabase
         .from('posts')
-        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, favorite_count, comment_count, created_at, video_type, post_action')
+        .select('post_id, title, description, is_video, mediaUrl, mapUrl, thumbnailUrl, user_id, like_count, created_at, post_action, favorite_count')
         .in('user_id', userIds)
         .order('created_at', { ascending: false })
         .order('like_count', { ascending: false });
