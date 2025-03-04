@@ -95,7 +95,7 @@ export async function addingProfile(userId: string, username: string, email: str
   return data;
 }
 
-export async function updateProfile(userId: string, username: string, email: string, fullName: string, avatarUrl: string, website: string, bio: string){
+export async function updateProfile(userId: string, username: string, email: string, fullName: string, avatarUrl: string, avatarUrlSmall:string, website: string, bio: string){
   // update user profile
   const {data, error} = await supabase
     .from('profiles')
@@ -104,6 +104,7 @@ export async function updateProfile(userId: string, username: string, email: str
       email: email,
       full_name: fullName,
       avatar_url: avatarUrl,
+      avatar_url_small: avatarUrlSmall,
       website: website,
       bio: bio
     })

@@ -20,6 +20,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.44.2",
     "ai": "^4.0.13",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cropperjs": "^1.6.2",

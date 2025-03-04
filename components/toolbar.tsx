@@ -22,16 +22,16 @@ const Toolbar: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('avatar_url')
+        .select('avatar_url_small')
         .eq('id', userId)
         .single();
 
-      if (error || !data?.avatar_url) {         
+      if (error || !data?.avatar_url_small) {         
         console.warn('Error fetching avatar:', error?.message || 'Avatar not found');         
         return '/account.svg'; // Fallback to placeholder       
       }        
 
-      const avatarUrl = data.avatar_url;       
+      const avatarUrl = data.avatar_url_small;       
       localStorage.setItem('userAvatar', avatarUrl); // Cache avatar in localStorage       
       return avatarUrl;     
     } catch (err) {       
