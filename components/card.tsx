@@ -203,12 +203,12 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                             >
                             Delete {post.post_action}
                             </li>
-                            {/*<li
+                            <li
                             className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
-                            //onClick={() => handleCategoryClick('My Drafts', userId)}
+                            onClick={() => router.push(`/editpost/${post.post_action}/${post.post_id}`)}
                             >
                             Edit {post.post_action}
-                            </li>*/}
+                            </li>
                         </ul>
                     </div>)}
             </div>

@@ -76,7 +76,7 @@ export default function ShareForm({ formData, setFormData }: {
 
                 <div className="mt-3 overflow-x-auto">
                     <p className="text-gray-700 font-sm">Activity</p>
-                        <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="category" options={categoryList} />
+                        <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="category" options={categoryList}  defaultValue={formData.category} />
                 </div>
 
 
@@ -114,10 +114,10 @@ export default function ShareForm({ formData, setFormData }: {
                     <div className="mt-3 p-4 bg-gray-50 rounded-md">
                         {/* Seasonal Activity */}
                         <p className="text-gray-700 text-sm">Is this a seasonal activity?</p>
-                        <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="season" options={seasonList} />
+                        <MultiSelectChipsInput onMultiSelectChange={handleMultiSelect} elementKey="season" options={seasonList}  defaultValue={formData.season}/>
 
                         {/* Date Input */}
-                        <DatesInput onDateChange={handleDateInput} />
+                        <DatesInput onDateChange={handleDateInput} startDateInit={formData.startDate} endDateInit={formData.endDate} />
 
                          {/* Map Input */}
                         <label className="block text-gray-700 text-sm mt-4">
