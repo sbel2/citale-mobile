@@ -20,7 +20,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({ post }) => {
         // Fetch user profile data from the server
         const {data, error} = await supabase
           .from('profiles')
-          .select('username, avatar_url_small')
+          .select('username, avatar_url')
           .eq('id', post.user_id)
           .single();
         if (error) {
@@ -29,7 +29,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({ post }) => {
         }
         if(data){
           setUsername(data?.username || '');
-          setAvatarUrl(data?.avatar_url_small || '');
+          setAvatarUrl(data?.avatar_url || '');
         }
       };
       handleFetchUserProfile();
