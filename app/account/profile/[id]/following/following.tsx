@@ -18,7 +18,7 @@ const FollowingPopup: React.FC<FollowingPopupProps> = ({ isOpen, setIsOpen }) =>
     const pathname = usePathname();
     const userId = pathname.split('/')[3];
     const { user, logout } = useAuth();
-    const [followingDetails, setFollowingDetails] = useState<{ id: string; username: string; avatar_url: string }[]>([]);
+    const [followingDetails, setFollowingDetails] = useState<{ id: string; username: string; avatar_url_small: string }[]>([]);
     const [followingCount, setFollowingCount] = useState<number>(0)
 
 
@@ -58,7 +58,7 @@ const FollowingPopup: React.FC<FollowingPopupProps> = ({ isOpen, setIsOpen }) =>
     const handleFetchUser = async (userId: string) => {
         const { data, error } = await supabase
         .from('profiles')
-        .select('id, username, avatar_url')
+        .select('id, username, avatar_url_small')
         .eq('id', userId)
         .single();
 
@@ -89,7 +89,7 @@ const FollowingPopup: React.FC<FollowingPopupProps> = ({ isOpen, setIsOpen }) =>
                             <li key={`${index}-${user.id}`} className="flex items-center space-x-2">
                                 <button className="flex items-center space-x-2" onClick={() => router.push(`/account/profile/${user.id}`)}>
                                     <img
-                                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url}`}
+                                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url_small}`}
                                         alt="profile"
                                         width={25}
                                         height={25}
