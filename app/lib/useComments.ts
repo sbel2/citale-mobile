@@ -29,7 +29,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
     try {
       const { data, error } = await supabase
         .from("comments")
-        .select(`*, profiles (username, avatar_url_small)`)
+        .select(`*, profiles (username, avatar_url)`)
         .eq("post_id", post_id)
         .order("comment_at", { ascending: false });
 
@@ -110,7 +110,7 @@ export const useComments = ({ post_id, user_id }: UseCommentsProps) => {
       if (newComment) {
         const { data: profile, error: profileError } = await supabase
           .from("profiles")
-          .select("username, avatar_url_small")
+          .select("username, avatar_url")
           .eq("id", user_id)
           .single();
 

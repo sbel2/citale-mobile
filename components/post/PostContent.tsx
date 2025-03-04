@@ -112,7 +112,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
           return (
             <div key={comment.id} className="mb-1 p-2 bg-white flex items-start">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile.avatar_url_small || "avatar.png"}`}
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile.avatar_url || "avatar.png"}`}
                 alt="Profile"
                 width={40}
                 height={40}
