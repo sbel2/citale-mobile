@@ -20,6 +20,11 @@ const SignUpForm = () => {
     setError(null);
     setSuccess(false);
 
+    if (!email.endsWith('@bu.edu')) {
+      setError('Only @bu.edu email addresses are allowed.');
+      return;
+    }
+
     try {
       await signUpUser({ email, password, username });
       setSuccess(true);
@@ -68,7 +73,7 @@ const SignUpForm = () => {
         <form className="w-full flex flex-col">
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email (Boston University Emails Only)"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="p-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
