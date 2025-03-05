@@ -150,7 +150,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                       autoPlay
                       loop
                       muted
-                      className="transition-transform duration-500 ease-in-out transform filter brightness-95"
+                      className="transition-transform duration-500 ease-in-out transform"
                       playsInline
                     />
                     <div className="absolute top-4 right-4 flex items-center justify-center w-6 h-6 bg-black bg-opacity-35 rounded-full">
