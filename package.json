@@ -11,6 +11,8 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.0.7",
     "@amplitude/analytics-browser": "^2.9.3",
+    "@capacitor/cli": "^7.0.1",
+    "@capacitor/core": "^7.0.1",
     "@headlessui/react": "^2.2.0",
     "@hotjar/browser": "^1.0.9",
     "@nextui-org/react": "^2.6.8",
