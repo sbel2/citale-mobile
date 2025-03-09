@@ -83,7 +83,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
           controls
           autoPlay
           loop
-          className="w-full h-full object-contain filter brightness-95"
+          className="w-full h-full object-contain"
           playsInline
         />
       ) : (
