@@ -79,7 +79,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
     >
       {post.is_video ? (
         <video
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postBucket}/videos/${post.mediaUrl[currentImageIndex]}`}
           controls
           autoPlay
           loop
@@ -88,7 +88,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
         />
       ) : (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
+          src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`}
           alt={post.title}
           fill
           style={{ objectFit: "contain" }}

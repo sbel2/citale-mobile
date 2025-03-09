@@ -10,6 +10,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "qteefmlwxyvxjvehgjvp.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "supabase-image-cache.citaleco.workers.dev",
+      },
     ],
   },
 };

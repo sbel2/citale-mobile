@@ -313,7 +313,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4">
                             <Image
-                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                                src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${userAvatar}`}
                                 alt="Profile"
                                 width={128}
                                 height={128}

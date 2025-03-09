@@ -133,8 +133,8 @@ export default function EditPostPage({ params }: {  params: { post: string, id: 
           {isVideo ? (
             <div className="flex flex-col md:flex-row-reverse items-start md:gap-10">
               <div className="max-w-[250px] mt-10 md:mt-32 mr-10">
-                <video key={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postTable}/videos/${formData.mediaUrl[0]}`} controls className="w-[50%] md:w-full rounded-lg">
-                  <source src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postTable}/videos/${formData.mediaUrl[0]}`} type={videoType ?? "video/mp4"} />
+                <video key={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postTable}/videos/${formData.mediaUrl[0]}`} controls className="w-[50%] md:w-full rounded-lg">
+                  <source src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postTable}/videos/${formData.mediaUrl[0]}`} type={videoType ?? "video/mp4"} />
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -159,7 +159,7 @@ export default function EditPostPage({ params }: {  params: { post: string, id: 
                                 className="relative w-24 h-24 md:w-36 md:h-36 rounded-lg overflow-hidden shadow-md border"
                             >
                                 <Image
-                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${postTable}/images/${file}`}
+                                src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postTable}/images/${file}`}
                                 alt={`post image ${index + 1}`}
                                 layout="fill"
                                 objectFit="cover"
