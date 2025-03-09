@@ -1,4 +1,4 @@
-import React, {forwardRef, useImperativeHandle, useState } from 'react';
+import React, {forwardRef, useImperativeHandle, useState, useEffect } from 'react';
 
 interface MultiSelectChipsInputProps {
   onMultiSelectChange: (
@@ -7,16 +7,23 @@ interface MultiSelectChipsInputProps {
   ) => void;
   options: string[];
   elementKey: string;
+  defaultValue: string;
 }
 
 interface DatesInputProps {
   onDateChange: (
     period: (string | null)[]
   ) => void;
+  startDateInit: string;
+  endDateInit: string;
 }
 
-export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options, elementKey} : MultiSelectChipsInputProps, ref ) => {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options, elementKey, defaultValue} : MultiSelectChipsInputProps, ref ) => {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>( defaultValue ? defaultValue.split(",") : []);
+
+  useEffect(() => {
+    setSelectedOptions(defaultValue.split(",") || []);
+  }, [defaultValue]);
 
   const toggleOption = (option: string) => {
     setSelectedOptions((prevSelectedOptions) => {
@@ -61,9 +68,9 @@ export const MultiSelectChipsInput = forwardRef(( { onMultiSelectChange, options
 });
 MultiSelectChipsInput.displayName = "MultiSelectChipsInput";
 
-export const DatesInput: React.FC<DatesInputProps> = ({ onDateChange }) => {
-  const [startDate, changeStartDate] = useState<string | null>(null);
-  const [endDate, changeEndDate] = useState<string | null>(null);
+export const DatesInput: React.FC<DatesInputProps> = ({ onDateChange, startDateInit, endDateInit }) => {
+  const [startDate, changeStartDate] = useState<string | null>(startDateInit);
+  const [endDate, changeEndDate] = useState<string | null>(endDateInit);
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.id === "startdate") {
