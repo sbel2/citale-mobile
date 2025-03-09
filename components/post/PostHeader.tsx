@@ -40,7 +40,7 @@ const PostHeader: React.FC<PostHeaderProps> = ({ post }) => {
             <div className="flex items-center ml-8">
               <button onClick={()=>router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${avatarUrl}`}
                   alt="Profile"
                   width={40}
                   height={40}

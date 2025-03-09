@@ -189,7 +189,7 @@ export default function ProfilePage() {
               <div className="relative group">
                 <Image
                   className="h-32 w-32 rounded-full border-4 border-blue-500 transition-opacity group-hover:opacity-75"
-                  src={previewUrl || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${userAvatar}`}
+                  src={previewUrl || `${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${userAvatar}`}
                   alt="User Avatar"
                   width={128}
                   height={128}

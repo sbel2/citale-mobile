@@ -11,6 +11,7 @@ const nextConfig = {
         hostname: "qteefmlwxyvxjvehgjvp.supabase.co",
       },
     ],
+    domains: ["supabase-image-cache.citaleco.workers.dev"],
   },
 };
 

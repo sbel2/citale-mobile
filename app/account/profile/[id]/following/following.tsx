@@ -89,7 +89,7 @@ const FollowingPopup: React.FC<FollowingPopupProps> = ({ isOpen, setIsOpen }) =>
                             <li key={`${index}-${user.id}`} className="flex items-center space-x-2">
                                 <button className="flex items-center space-x-2" onClick={() => router.push(`/account/profile/${user.id}`)}>
                                     <img
-                                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${user.avatar_url_small}`}
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${user.avatar_url_small}`}
                                         alt="profile"
                                         width={25}
                                         height={25}

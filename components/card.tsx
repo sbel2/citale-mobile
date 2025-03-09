@@ -228,7 +228,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
           <button onClick={() => router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
             <div className="flex items-center">
               <Image
-                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${avatarUrl}`}
+                src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${avatarUrl}`}
                 alt="Profile"
                 width={20}
                 height={20}
