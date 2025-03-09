@@ -208,7 +208,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
         );
       })
     ) : (
-      <p className="text-sm text-gray-500">No comments yet.</p>
+      <p className="text-sm text-gray-500">No comments yet :(</p>
     )}
   </div>
 )}
@@ -245,7 +245,7 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
               })}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">No likes yet.</p>
+            <p className="text-sm text-gray-500">No likes yet :(</p>
           )}
         </div>
       )}
