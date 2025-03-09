@@ -144,7 +144,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                 {post.is_video ? (
                   <>
                     <video
-                      src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/videos/${post.thumbnailUrl}`}
+                      src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${bucketName}/videos/${post.thumbnailUrl}`}
                       width={300}
                       height={200}
                       autoPlay
@@ -161,7 +161,7 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                   </>
                 ) : (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucketName}/images/${post.mediaUrl?.[0]}`}
+                    src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/${bucketName}/images/${post.mediaUrl?.[0]}`}
                     alt={post.title}
                     width={300}
                     height={200}
