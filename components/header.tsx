@@ -77,7 +77,7 @@ export default function Header({ font }: { font?: string }) {
         !fromSearch && user &&(
         <div className="max-w-[100rem] px-3 md:px-6 mx-auto flex items-center">
         <button
-          className={`p-4 text-lg w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
+          className={`p-4 text-base md:text-lg w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
             activeButton === 'explore'
               ? '' // Expand the underline
               : 'text-gray-300' // Hide the underline
@@ -91,7 +91,7 @@ export default function Header({ font }: { font?: string }) {
           </button>
           
           <button
-            className={`p-4 text-lg w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
+            className={`p-4 text-base md:text-lg w-full flex justify-center items-center focus:outline-none transition-all rounded-lg relative ${
               activeButton === 'following'
                 ? '' // Expand the underline
                 : 'text-gray-300' // Hide the underline
