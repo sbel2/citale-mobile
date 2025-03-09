@@ -93,14 +93,14 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('username, avatar_url')
+          .select('username, avatar_url_small')
           .eq('id', post.user_id)
           .single();
 
         if (error) throw error;
 
         setUsername(data?.username || '');
-        setAvatarUrl(data?.avatar_url || '');
+        setAvatarUrl(data?.avatar_url_small || '');
       } catch (error) {
         console.error('Error fetching profile:', error);
       }

@@ -9,6 +9,7 @@ import Cropper, { ReactCropperElement } from 'react-cropper';
 import 'cropperjs/dist/cropper.css';
 import { FaUser, FaGlobe, FaInfoCircle, FaUpload } from 'react-icons/fa';
 import Link from 'next/link';
+import imageCompression from 'browser-image-compression';
 
 
 export default function ProfilePage() {
@@ -16,6 +17,7 @@ export default function ProfilePage() {
   const [userName, setUserName] = useState<string|null>(null);
   const [userEmail, setUserEmail] = useState<string|null>(null);
   const [userAvatar, setUserAvatar] = useState<string|null>('avatar.png');
+  const [userAvatarCompressed, setUserAvatarCompressed] = useState<string|null>('avatar.png');
   const [userWebsite, setUserWebsite] = useState<string|null>(null);
   const [userBio, setUserBio] = useState<string|null>(null);
   const [fullName, setFullName] = useState<string|null>(null);
@@ -67,6 +69,7 @@ export default function ProfilePage() {
         userEmail ?? '',
         fullName ?? '',
         userAvatar ?? '',
+        userAvatarCompressed ?? '',
         userWebsite ?? '',
         userBio ?? ''
       );
@@ -89,9 +92,9 @@ export default function ProfilePage() {
     router.back();
   };
 
-  const uploadPicToStorage = async (file: File) => {
+  const uploadPicToStorage = async (type: string ,file: File) => {
     if (!file) return;
-    const filePath = `${userId}/${Math.floor(Math.random() * 10000)}-${file.name}`;
+    const filePath = `${userId}/${Math.floor(Math.random() * 10000)}-${type}-${file.name}`;
     const { data, error } = await supabase.storage
       .from('profile-pic')
       .upload(filePath, file, {
@@ -102,8 +105,27 @@ export default function ProfilePage() {
       console.error('Error uploading file:', error.message);
       return;
     }
-    setUserAvatar(filePath);
+    if (type === 'normal'){
+      setUserAvatar(filePath);
+    }
+    else if (type === 'compressed'){
+      setUserAvatarCompressed(filePath);
+    }
+    
     return filePath;
+  };
+
+  const compressImage = async (file: File) => {
+    const options = {
+      maxWidthOrHeight: 40,
+      useWebWorker: true,
+    }
+    try{
+      const compressed = await imageCompression(file, options);
+      const uploadCompressedImage = await uploadPicToStorage('compressed',compressed);
+    } catch(error){
+      console.error('Error compressing image:', error);
+    }
   };
 
   const getCropData = async () => {
@@ -118,7 +140,8 @@ export default function ProfilePage() {
       croppedCanvas.toBlob(async (blob: Blob | null) => {
         if (blob) {
           const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
-          const filePath = await uploadPicToStorage(file);
+          const filePath = await uploadPicToStorage('normal', file);
+          const compress = await compressImage(file);
           setPreviewUrl(URL.createObjectURL(file));
           setCropWindow(false);
         }
