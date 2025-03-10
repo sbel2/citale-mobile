@@ -114,18 +114,18 @@ const PostContent: React.FC<PostContentProps> = ({ post, comments, deleteComment
         const profile = comment.profiles || {};
         return (
           <div key={comment.id} className="mb-1 p-2 bg-white flex items-start">
-            <button onClick={() => router.push(`/account/profile/${comment.user_id}`)}>
+           <button onClick={() => router.push(`/account/profile/${comment.user_id}`)} className="flex-shrink-0">
               <Image
                 src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/profile-pic/${profile.avatar_url || "avatar.png"}`}
                 alt="Profile"
                 width={40}
                 height={40}
-                className="rounded-full mr-3"
+                className="rounded-full mr-3 object-cover"
               />
             </button>
-          <div>
-            <button
-              className="font-semibold"
+          <div className="flex flex-col">
+          <button
+              className="font-semibold text-left whitespace-nowrap"
               onClick={() => router.push(`/account/profile/${comment.user_id}`)}
             >
               {profile.username || "Unknown User"}
