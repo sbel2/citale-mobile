@@ -5,11 +5,24 @@ import { Capacitor } from "@capacitor/core";
 import { IonApp, IonContent, IonHeader, IonToolbar } from "@ionic/react";
 
 export default function IonicWrapper({ children }: { children: React.ReactNode }) {
-  const [isNativeApp, setIsNativeApp] = useState(false);
+  const [isNativeApp, setIsNativeApp] = useState<boolean | null>(() => {
+    // Load from localStorage if available
+    if (typeof window !== "undefined") {
+      const storedValue = localStorage.getItem("isNativeApp");
+      return storedValue ? JSON.parse(storedValue) : null;
+    }
+    return null;
+  });
 
   useEffect(() => {
-    setIsNativeApp(Capacitor.isNativePlatform()); // Check if running in a native app
-  }, []);
+    if (isNativeApp === null) {
+      const detected = Capacitor.isNativePlatform();
+      setIsNativeApp(detected);
+      localStorage.setItem("isNativeApp", JSON.stringify(detected)); // Persist value
+    }
+  }, [isNativeApp]);
+
+  if (isNativeApp === null) return null; // Prevent render until detection is done
 
   return (
     <IonApp>
@@ -22,8 +35,12 @@ export default function IonicWrapper({ children }: { children: React.ReactNode }
         </IonHeader>
       )}
 
-      {/* Adjust padding dynamically */}
-      <IonContent className={`${isNativeApp ? "pt-[var(--safe-area-inset-top,20px)]" : "pt-0"}`}>
+      {/* Ensure consistent safe area padding */}
+      <IonContent
+        className={`transition-all duration-300 ${
+          isNativeApp ? "pt-[env(safe-area-inset-top,56px)]" : "pt-0"
+        }`}
+      >
         {children}
       </IonContent>
     </IonApp>

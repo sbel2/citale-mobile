@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { supabase } from "@/app/lib/definitions";
 import styles from "./postComponent.module.css";
 import { useRouter } from 'next/navigation';
 import { Post } from "@/app/lib/types";
@@ -20,8 +19,6 @@ interface PostComponentProps {
 }
 
 const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
-  
-  const headerClass = context === 'popup' ? styles.popup : styles.static;
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -65,7 +62,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
 
   return (
     <>
-      <div className={`${styles.card} ${headerClass}`}>
+      <div className={`${styles.card}`}>
         <PostMedia post={post} />
         <div className={`${styles.textcontainer} p-4 md:p-10`}>
           <PostHeader post={post} />

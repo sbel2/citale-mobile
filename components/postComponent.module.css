@@ -113,8 +113,8 @@
     .header {
         position: fixed; /* Fixed at the top */
         width: 100%;
-        top:0;
         left:0;
+        top:0;
         background: white; /* White background */
     }
     }
