@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#ffffff" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
       </head>
-      <body>
+      <body className="h-[calc(100vh-56px)] overflow-hidden">
         <AuthProvider>
           <PostHogProvider>
             <IonicWrapper> {/* Now dynamically imported without SSR */}

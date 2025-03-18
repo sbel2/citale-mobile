@@ -37,7 +37,7 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 relative">
+    <div className="flex items-center justify-center h-[calc(100vh-56px)] p-4 relative">
       {/* Go Back Button */}
       <a href="/" aria-label="Go back home" className="absolute top-4 left-4 text-gray-800 dark:text-white ml-1">
         &#x2190; Home

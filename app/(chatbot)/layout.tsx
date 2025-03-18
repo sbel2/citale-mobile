@@ -15,7 +15,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${inter.className} bg-gray-100 flex h-screen`}>
+    <div className={`${inter.className} bg-gray-100 flex h-[calc(100dvh-56px)] `}>
       {/* Toolbar - hidden on small screens, visible on large screens */}
       <div className="hidden lg:block w-64">
         <Toolbar />
