@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PostComponent from "@/components/postComponent"; 
 import styles from "./card.module.css";
 import Image from "next/image";
@@ -14,7 +13,6 @@ import { useLike } from "@/app/lib/useLikes";
 import { useParams } from "next/navigation";  // Import useParams for dynamic routing
 
 const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: number, postAction: string) => void }> = ({ post, managePost }) => {
-  const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useAuth();
@@ -24,51 +22,6 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
   const [buttonClicked, setButtonClicked] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-
-  const params = useParams();
-  const postIdFromURL = params.postId;
-  const currentUrl = window.location.href;
-
-  // Function to extract filters from the URL (if any)
-  const getFiltersFromURL = () => {
-    const url = new URL(currentUrl);
-    const filters = new URLSearchParams(url.search);
-    return filters.toString(); // This will return filter query params as a string
-  };
-
-  // Check if the current post's ID matches the postId in the URL
-  useEffect(() => {
-    if (postIdFromURL && postIdFromURL === String(post.post_id)) {
-      setIsOpen(true);  // Open the dialog if the postId matches
-    } else {
-      setIsOpen(false);  // Close the dialog if postId does not match
-    }
-  }, [postIdFromURL, post.post_id]);
-
-  // Function to handle clicking on a post to show the popup
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();  // Prevent default navigation
-
-    // Get the current filters from URL
-    const filters = getFiltersFromURL();
-
-    // Manually update the URL to include the post ID and filters (if any)
-    window.history.pushState(
-      {}, 
-      '', 
-      `/${post.post_action}/${post.post_id}${filters ? '?' + filters : ''}`
-    );
-
-    // Open the dialog (popup)
-    setIsOpen(true);
-  };
-
-  // Function to close the dialog and reset the URL
-  const handleClose = () => {
-    router.back();
-    // Close the dialog
-    setIsOpen(false);
-  };
 
   // Handle the like functionality
   const { liked, likesCount, toggleLike } = useLike({
@@ -132,12 +85,14 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
 
   const bucketName = post.post_action == "post" ? "posts" : post.post_action == "draft" ? "drafts" : null;
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push(`/${post.post_action}/${post.post_id}`);
+  };
+
   return (
     <>
       <div className={styles["card-container"]}>
-        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-          <DialogTrigger asChild>
-          <div>
             <div className="cursor-pointer">
               <div onClick={handleClick} className={styles["image-container"]}>
                 {post.is_video ? (
@@ -212,16 +167,6 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
                     </div>)}
             </div>
           </div>
-          </DialogTrigger>
-
-          <DialogContent>
-            <VisuallyHidden>
-              <h2>{post.title}</h2>
-            </VisuallyHidden>
-            <PostComponent post={post} context="popup" />
-            <DialogClose onClick={handleClose} aria-label="Close" />
-          </DialogContent>
-        </Dialog>
 
         <div className="flex items-center justify-between px-2 py-3">
           <button onClick={() => router.push(`/account/profile/${post.user_id}`)} className="flex items-center">
@@ -279,7 +224,6 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
               )}
               
         </div>
-      </div>
     </>
   );
 };

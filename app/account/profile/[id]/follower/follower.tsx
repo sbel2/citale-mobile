@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';
 import { supabase } from '@/app/lib/definitions';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Dialog, DialogTrigger, DialogContentForFollow, DialogClose, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContentForFollow, DialogClose} from "@/components/dialog";
 
 interface FollowerPopupProps {
     isOpen: boolean;
