@@ -27,7 +27,10 @@ export default function LogInForm({ onSignIn }: LogInFormProps) {
     }
     if (response.status === 200) {
       setMessage({ text: "Sign-in successful! Redirecting...", type: "success" });
-      router.push("/");
+    
+      setTimeout(() => {
+        router.replace("/");
+      }, 100);  // Small delay ensures layout transition properly applies padding
     } else if (response.status === 400) {
       setMessage({ text: "Password or Email incorrect. Please try again.", type: "error" });
     }

@@ -14,11 +14,10 @@ import PostFooter from "./post/PostFooter";
 
 
 interface PostComponentProps {
-  post: Post; 
-  context: 'popup' | 'static'; 
+  post: Post;
 }
 
-const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
+const PostComponent: React.FC<PostComponentProps> = ({ post }) => {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [showLoginPopup, setShowLoginPopup] = useState(false);
@@ -94,16 +93,15 @@ const PostComponent: React.FC<PostComponentProps> = ({ post, context }) => {
           />
           </div>
         </div>
-        {context === 'static' && (
-              <button
-                className='fixed top-5 right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
-                style={{ width: "30px", height: "30px", lineHeight: "30px" }}
-                onClick={() => router.push('/')}
-                aria-label='Close Post'
-              >
-                &#x2715;
-              </button>
-            )}
+      
+        <button
+          className='fixed top-[80px] right-5 bg-gray-600 bg-opacity-50 text-white p-1 rounded-full flex items-center justify-center'
+          style={{ width: "30px", height: "30px", lineHeight: "30px" }}
+          onClick={() => router.back()}
+          aria-label='Close Post'
+        >
+          &#x2715;
+        </button>
     </>
   );
 };

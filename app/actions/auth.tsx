@@ -1,5 +1,4 @@
 import { supabase } from '@/app/lib/definitions';
-import { createClient } from '@/supabase/server';
 
 export const signUpUser = async ({ email, password, username }: { email: string; password: string; username: string }) => {
   if (!email.endsWith('@bu.edu')) {
