@@ -3,6 +3,8 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Capacitor } from "@capacitor/core";
 
 import { cn } from "@/app/lib/utils"
 
@@ -33,14 +35,34 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => {
+  const [isNativeApp, setIsNativeApp] = useState<boolean | null>(() => {
+    if (typeof window !== "undefined") {
+      const storedValue = localStorage.getItem("isNativeApp");
+      return storedValue ? JSON.parse(storedValue) : null;
+    }
+    return null;
+  });
+
+  useEffect(() => {
+    if (isNativeApp === null) {
+      const detected = Capacitor.isNativePlatform();
+      setIsNativeApp(detected);
+      localStorage.setItem("isNativeApp", JSON.stringify(detected));
+    }
+  }, [isNativeApp]);
+
+  if (isNativeApp === null) return null;
+  return(
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "dialog-content fixed inset-0 z-50 grid w-full h-full transform-none overflow-hidden bg-white duration-200 sm:rounded-lg",
-        "md:w-[720px] md:max-w-4xl md:h-[575px] xl:w-[810px] xl:h-[645px] xl:w-[855px] xl:h-[684px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
+        "fixed z-50 grid transform-none overflow-hidden bg-white duration-200 sm:rounded-lg",
+        isNativeApp
+          ? "max-h-[60vh]"
+          : "inset-0 w-full h-full md:w-[720px] md:max-w-4xl md:h-[575px] xl:w-[810px] xl:h-[645px] xl:w-[855px] xl:h-[684px] md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
         className
       )}
       {...props}
@@ -51,7 +73,8 @@ const DialogContent = React.forwardRef<
       </DialogClose>
     </DialogPrimitive.Content>
   </DialogPortal>
-))
+);
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogContentForFollow = React.forwardRef<
@@ -63,7 +86,7 @@ const DialogContentForFollow = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "dialog-content fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-white duration-200 sm:rounded-lg",
+        "fixed left-1/2 top-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-white duration-200 sm:rounded-lg",
         "max-w-[500px] max-h-[80vh] p-5",
         className
       )}
