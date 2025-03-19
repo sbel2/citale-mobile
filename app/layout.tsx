@@ -1,7 +1,7 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import { AuthProvider } from "app/context/AuthContext"; // Adjust the path
-import { PostHogProvider } from "./providers.jsx";
+import { PostHogProvider } from "./providers";
 
 // Dynamically import IonicWrapper with SSR disabled
 const IonicWrapper = dynamic(() => import("components/IonicWrapper"), {
