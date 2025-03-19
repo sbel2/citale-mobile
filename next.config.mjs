@@ -15,6 +15,22 @@ const nextConfig = {
         hostname: "supabase-image-cache.citaleco.workers.dev",
       },
     ],
+    domains: [
+      "prod-files-secure.s3.us-west-2.amazonaws.com",
+      "qteefmlwxyvxjvehgjvp.supabase.co",
+      "supabase-image-cache.citaleco.workers.dev",
+    ],
+    formats: ["image/avif", "image/webp"], // ✅ Enable better image optimization
+  },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        has: [{ type: "header", key: "User-Agent", value: "(?!capacitor)" }],
+        destination: "https://citaleco.com", // ✅ Redirect browser users to main site
+        permanent: true,
+      },
+    ];
   },
 };
 
