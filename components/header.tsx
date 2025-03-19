@@ -19,6 +19,12 @@ export default function Header({ font }: { font?: string }) {
   const [fromProfile, setFromProfile] = useState(false);
 
   useEffect(() => {
+    if (pathname === "/following-post") {
+      setActiveButton("following");
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     // Check if the previous pathname was "/search-results"
     if (prevPathnameRef.current === '/search-results' && pathname.startsWith('/post')) {
       setFromSearch(true);

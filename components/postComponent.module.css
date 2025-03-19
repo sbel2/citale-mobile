@@ -152,7 +152,7 @@
     @media (max-width: 768px) {
       .footer {
         position: fixed;
-        bottom: 0;
+        bottom: 16px;
         left: 0;
         right: 0;
         background-color: white;
@@ -160,8 +160,8 @@
     }
 
     .icon {
-    width: 23px;
-    height: 23px;
+    width: 24px;
+    height: 24px;
     margin-right: 8px; /* Space between icon and text */
     stroke-width: 1.25; /* Ensure stroke width is consistent */
     flex-shrink: 0; /* Prevents icon from shrinking */

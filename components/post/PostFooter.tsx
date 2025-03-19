@@ -38,13 +38,14 @@ const PostFooter: React.FC<PostFooterProps> = ({ liked, likesCount, handleLike, 
     <div className={styles.footer}>
    {!showCommentPopup ? (
     <div className="flex items-center justify-center h-full w-full">
-        <input
-          type="text"
-          placeholder="Say something..."
-          className="text-sm h-[60%] w-[80%] p-2 bg-gray-200 rounded-full flex items-center justify-center"
-          onFocus={() => handleCommentClick()}
-        />
+        <button
+        className="text-sm h-[60%] w-[80%] p-2 bg-gray-200 rounded-full flex items-center pl-4"
+        onClick={() => handleCommentClick()}
+        >
+        <span className="text-gray-400 text-sm w-full text-left">Say something...</span>    
+        </button>
     </div>
+  
       ) : (
         <CommentPopup onClose={() => setShowCommentPopup(false)} post_id={post_id} user_id={user_id} onNewComment={onNewComment} />
       )}

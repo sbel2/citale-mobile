@@ -91,6 +91,7 @@ const PostComponent: React.FC<PostComponentProps> = ({ post }) => {
               onNewComment={saveComment}
               commentCount={commentCount}
           />
+          <div className="fixed bottom-0 left-0 w-full h-1 bg-white p-2 shadow-md z-10 md:hidden"></div>
           </div>
         </div>
       
