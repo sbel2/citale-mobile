@@ -2,6 +2,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { AuthProvider } from "app/context/AuthContext"; // Adjust the path
 import { PostHogProvider } from "./providers";
+import KeyboardProvider from "./KeyboardProvider";
 
 // Dynamically import IonicWrapper with SSR disabled
 const IonicWrapper = dynamic(() => import("components/IonicWrapper"), {
@@ -24,9 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-[calc(100vh-56px)] overflow-hidden">
         <AuthProvider>
           <PostHogProvider>
+            <KeyboardProvider>
             <IonicWrapper> {/* Now dynamically imported without SSR */}
               {children}
             </IonicWrapper>
+            </KeyboardProvider>
           </PostHogProvider>
         </AuthProvider>
       </body>
