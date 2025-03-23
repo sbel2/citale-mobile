@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import { AuthProvider } from "app/context/AuthContext"; // Adjust the path
 import { PostHogProvider } from "./providers";
 import KeyboardProvider from "./KeyboardProvider";
+import "app/globals.css";
 
 // Dynamically import IonicWrapper with SSR disabled
 const IonicWrapper = dynamic(() => import("components/IonicWrapper"), {

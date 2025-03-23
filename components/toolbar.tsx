@@ -168,7 +168,15 @@ const Toolbar: React.FC = () => {
               target="_blank" 
               >
               Help
-            </Link>           
+            </Link>
+
+            <Link
+              href="/privacy-policy"
+              className="block p-4 hover:bg-gray-200 text-black"
+              target="_blank"
+            >
+              Privacy Policy
+            </Link>              
           </div>         
         )}         
         <button           
