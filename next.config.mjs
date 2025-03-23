@@ -22,16 +22,6 @@ const nextConfig = {
     ],
     formats: ["image/avif", "image/webp"], // ✅ Enable better image optimization
   },
-  async redirects() {
-    return [
-      {
-        source: "/",
-        has: [{ type: "header", key: "User-Agent", value: "(?!capacitor)" }],
-        destination: "https://citaleco.com", // ✅ Redirect browser users to main site
-        permanent: true,
-      },
-    ];
-  },
   async headers() {
     return [
       {
