@@ -5,7 +5,7 @@ export default function PrivacyPolicyPage() {
       <p><strong>Effective Date:</strong> March 25, 2025</p>
 
       <p className="mt-4">
-        Citale ("we", "our", or "us") provides a media-based social platform. This Privacy Policy outlines how we collect, use, and protect your data when you use our mobile app and website.
+        Citale (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) provides a media-based social platform. This Privacy Policy outlines how we collect, use, and protect your data when you use our mobile app and website.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect</h2>
