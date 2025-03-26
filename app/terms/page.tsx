@@ -1,8 +1,17 @@
-// app/terms/page.tsx
+'use client';
+
+import { useRouter } from 'next/navigation';
 
 export default function TermsPage() {
+  const router = useRouter();
   return (
     <div className="p-6 max-w-4xl mx-auto text-base leading-relaxed text-gray-800">
+      <button
+        onClick={() => router.back()}
+        className="mb-4 text-sm text-blue-600 underline"
+      >
+        Close
+      </button>
       <h1 className="text-3xl font-bold mb-6">Terms of Use</h1>
 
       <p className="mb-4">

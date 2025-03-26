@@ -172,7 +172,7 @@ const Toolbar: React.FC = () => {
             </Link>
 
             <Link
-              href="/support" // Replace with your Google Form link
+              href="https://www.citaleco.com/support" // Replace with your Google Form link
               className="block p-4 hover:bg-gray-200 text-black-600"
               target="_blank" 
               >
@@ -180,13 +180,13 @@ const Toolbar: React.FC = () => {
             </Link>
 
             <Link
-              href="/privacy-policy"
+              href="https://www.citaleco.com/privacy-policy"
               className="block p-4 hover:bg-gray-200 text-black"
               target="_blank" 
             >
               Privacy Policy
             </Link> 
-            <Link href="/terms" className="block p-4 hover:bg-gray-200 text-black" target="_blank"  >Terms of Use</Link>             
+            <Link href="https://www.citaleco.com/terms" className="block p-4 hover:bg-gray-200 text-black" target="_blank"  >Terms of Use</Link>             
           </div>         
         )}         
         <button           

@@ -1,6 +1,17 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
 export default function PrivacyPolicyPage() {
+  const router = useRouter();
   return (
     <div className="p-6 max-w-3xl mx-auto text-base leading-relaxed text-gray-800">
+      <button
+        onClick={() => router.back()}
+        className="mb-4 text-sm text-blue-600 underline"
+      >
+        Close
+      </button>
       <h1 className="text-2xl font-semibold mb-4">Privacy Policy for Citale</h1>
       <p><strong>Effective Date:</strong> March 25, 2025</p>
 
