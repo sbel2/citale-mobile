@@ -31,7 +31,7 @@ export default function ResetForm({ onResetPassword }: ResetProps) {
 };
 
 return (
-  <div className="flex items-center justify-center min-h-screen p-4 relative">
+  <div className="flex items-center justify-center h-[calc(100dvh-56px)] p-4 relative">
       {/* Go Back Button */}
       <a
         href="/"

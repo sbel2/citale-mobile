@@ -18,7 +18,7 @@ export default function ProfileLayout({
 }) {
     return (
         <MediaProvider>
-            <div className={`${inter.className} bg-white flex h-screen`}>
+            <div className={`${inter.className} bg-white flex h-[calc(100dvh-56px)]`}>
                 {/* Sidebar */}
                 <div className="md:w-64">
                     <Toolbar />

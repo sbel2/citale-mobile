@@ -62,7 +62,7 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 relative">
+    <div className="flex items-center justify-center h-[calc(100dvh-56px)] p-4 relative">
       <a
         href="/"
         aria-label="Go back home"
@@ -71,7 +71,7 @@ const SignUpForm = () => {
         &#x2190; Home
       </a>
 
-      <div className="w-full h-full p-8 bg-white flex flex-col items-center justify-center md:h-[60%] md:w-[40%] rounded-lg md:border border-gray-200">
+      <div className="w-full h-full p-8 bg-white flex flex-col items-center justify-center md:h-[80%] md:w-[40%] rounded-lg md:border border-gray-200">
         <Link href="/" aria-label="Home" className="inline-block mb-6">
           <Image
             src="/citale_header.svg"
