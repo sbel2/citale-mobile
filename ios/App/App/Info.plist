@@ -31,7 +31,7 @@
 		<string>armv7</string>
 	</array>
     <key>NSCameraUsageDescription</key>
-    <string>We need access to your camera to allow photo uploads.</string>
+    <string>We use your camera so you can capture and upload videos or images as part of your posts. </string>
 	<key>UIStatusBarStyle</key>
 	<string></string>
 	<key>UISupportedInterfaceOrientations</key>
