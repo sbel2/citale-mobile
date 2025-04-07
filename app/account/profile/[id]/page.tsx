@@ -455,7 +455,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                                         <h3 className="font-medium text-lg mb-4">Confirm Block</h3>
                                                         <p className="mb-6">
                                                             Are you sure you want to block this user? 
-                                                            They won't be able to follow you or see your profile.
+                                                            They won&apos;t be able to follow you or see your profile.
                                                         </p>
                                                         <div className="flex justify-end gap-3">
                                                             <button
@@ -562,7 +562,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             
                             <div className={styles.container}>
                                 {posts.length === 0 ? (
-                                    <p className="text-center">No posts found &#39;) </p>
+                                    <p className="text-center">No posts found :) </p>
                                 ) : (
                                     <div>
                                         {deletePost && (
