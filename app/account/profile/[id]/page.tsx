@@ -10,6 +10,7 @@ import { Post } from '@/app/lib/types';
 import styles from '@/components/postComponent.module.css'
 import FollowingPopup from "./following/following";
 import FollowerPopup from "./follower/follower";
+import BlockingPopup from './block/blocking';
 import DeletePopup from '@/components/deletePopup';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
@@ -38,6 +39,14 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const postButtons = ['Posts', 'Likes', 'Favs'];
     const postButtons_others = ['Posts']
     // const relationshipButtons = ['Following', 'Followers'];
+    const [blocked, setBlocked] = useState<boolean>(false);
+    const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+    const [isBlockingOpen, setIsBlockingOpen] = useState(false);
+    const [blockedCount, setBlockedCount] = useState(0);
+    const [viewerIsBlocked, setViewerIsBlocked] = useState(false);
+
+    const [showMenu, setShowMenu] = useState(false);
+    // blocks n stuff idk anymore
 
     // Fetch user profile data from Supabase
     useEffect(() => {
@@ -215,8 +224,21 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         }
     };
 
-    useEffect(() => {
+    const handleBlockButton = async () => {
+        const {data, error} = await supabase
+        .from('blocks')
+        .select('user_id, blocked_id')
+        .eq('user_id', user?.id)
+        .eq('blocked_id', userId);
 
+        if(data && data.length > 0){
+            setBlocked(true);
+        } else {
+            setBlocked(false);
+        }
+    };
+
+    useEffect(() => {
         const handleCalcFollowers = async () => {
             const { data, error } = await supabase
             .from('relationships')
@@ -229,8 +251,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             if (data){
                 setFollowersCount(data.length);
             }
-            
         };
+
         const handleCalcFollowings = async () => {
             const { data, error } = await supabase
             .from('relationships')
@@ -243,12 +265,15 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             if (data){
                 setFollowingCount(data.length);
             }
-    
         };
+
         handleCalcFollowers();
         handleCalcFollowings();
-
-    }, [following]);
+        if (user && user.id !== userId) {
+            handleFollowButton();
+            handleBlockButton();
+        }
+    }, [following, blocked, userId]);
 
 
     const handleFollow = async () => {
@@ -281,10 +306,86 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
         setFollowing(false);
     };
 
+    const handleBlock = async () => {
+        try {
+            const { error: blockError } = await supabase
+                .from('blocks')
+                .insert([{ user_id: user?.id, blocked_id: userId }]);
+            
+            if (blockError) throw blockError;
+            const { error: removeTheirFollowError } = await supabase
+                .from('relationships')
+                .delete()
+                .eq('user_id', userId)
+                .eq('follower_id', user?.id);
+            
+            if (removeTheirFollowError) throw removeTheirFollowError;
+    
+            setBlocked(true);
+            setBlockedCount(prev => prev + 1);
+            
+            const { count: followersCount } = await supabase
+                .from('relationships')
+                .select('*', { count: 'exact' })
+                .eq('follower_id', userId);
+    
+            setFollowersCount(followersCount || 0);
+        } catch (error) {
+            console.error('Error blocking user:', error);
+        }
+    };
+    
+    const handleUnblock = async () => {
+        const { error } = await supabase
+            .from('blocks')
+            .delete()
+            .eq('user_id', user?.id)
+            .eq('blocked_id', userId);
+        
+        if (error) {
+            console.error('Error unblocking user:', error.message);
+            return;
+        }
+        setBlocked(false);
+        setBlockedCount(prev => prev - 1);
+    };
+
+    useEffect(() => {
+        const fetchBlockedCount = async () => {
+            if (user && user.id === userId) {
+                const { count } = await supabase
+                    .from('blocks')
+                    .select('*', { count: 'exact' })
+                    .eq('user_id', userId);
+                
+                setBlockedCount(count || 0);
+            }
+        };
+
+        const checkIfBlocked = async () => {
+            if (user && user.id !== userId) {
+                const { data, error } = await supabase
+                    .from('blocks')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('blocked_id', user.id)
+                    .single();
+    
+                if (data) {
+                    setViewerIsBlocked(true);
+                }
+            }
+        };
+        
+        checkIfBlocked();
+        fetchBlockedCount();
+    }, [user, userId]);
+
     return (
         <div className="w-full min-h-screen bg-white pb-20 md:pb-0">
             {userProfile ? (
                 <div className="px-4 pt-5">
+                    {/* Always show basic profile info */}
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4">
                             <Image
@@ -295,144 +396,184 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                 className="rounded-full object-cover"
                             />
                         </div>
-                        
-                        <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-xl font-medium">
-                                {userProfile.full_name ? userProfile.full_name : userProfile.username}
-                            </h1>
-                            {user && user.id === userId && (
-                                <button
-                                onClick={() => router.push('/account/edit-profile')}
-                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                                >   
-                                Edit Profile
-                                </button>
-                            )}
-                            {user && user.id !== userId && (
-                                handleFollowButton(),
-                                <button
-                                onClick={() => following ? handleUnFollow() : handleFollow()}
-                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                                >   
-                                {following ? 'Unfollow' : 'Follow'}
-                                </button>
-                            )}
-                            
-                        </div>
+                        <h1 className="text-xl font-medium">
+                            {userProfile.full_name ? userProfile.full_name : userProfile.username}
+                        </h1>
+                    </div>
     
-                        <div className="text-gray-500 text-sm mb-4">
-                        {userProfile.full_name && userProfile.username ? userProfile.username : ''}
+                    {/* Blocked user message (only addition) */}
+                    {viewerIsBlocked && (
+                        <div className="text-center p-4">
+                            <p className="text-gray-500">You are blocked from viewing this profile</p>
                         </div>
-                        
-                        {userProfile.website && (
-                            <div className="text-sm mb-4">
-                                <a 
-                                    href={userProfile.website} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer" 
-                                    className="text-blue-500 hover:text-blue-600 break-all"
-                                >
-                                    {userProfile.website}
-                                </a>
-                            </div>
-                        )}
-
-                        <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
-
-                        {/* Display followers and following counts*/}
-                        <div className="flex space-x-10 mb-6">
-                            <button onClick={() => setIsFollowingOpen(true)} className="btn">
-                                <p className="text-sm text-gray-500 mr-2">Following</p>
-                                <p className="text-sm font-medium">{followingCount}</p>
-                            </button>
-                            <FollowingPopup isOpen={isFollowingOpen} setIsOpen={setIsFollowingOpen} />
-                            <button onClick={() => setIsFollowerOpen(true)} className="btn">
-                                <p className="text-sm text-gray-500 mr-2">
-                                    {followersCount <= 1 ? "Follower" : "Followers"}
-                                </p>
-                                <p className="text-sm font-medium">{followersCount}</p>
-                            </button>
-                            <FollowerPopup isOpen={isFollowerOpen} setIsOpen={setIsFollowerOpen} />
-                        </div>
-                    </div>
-                    <div>
-                        <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
-                                {user && user.id === userId && (
-                                    postButtons.map((category) => (
+                    )}
+    
+                    {/* Your exact original content wrapped in !viewerIsBlocked */}
+                    {!viewerIsBlocked && (
+                        <>
+                            <div className="flex flex-col items-center">
+                                <div className="flex items-center gap-3 mb-2">
+                                    {user && user.id === userId && (
                                         <button
-                                            key={category}
-                                            type="button"
-                                            onClick={() => handleCategoryClick(category, userId)}
-                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
-                                        >
-                                        {category}
+                                            onClick={() => router.push('/account/edit-profile')}
+                                            className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                                        >   
+                                            Edit Profile
                                         </button>
-                                    ))
-                                )}
-                                {user && user.id !== userId && (
-                                    postButtons_others.map((category) => (
-                                        <button
-                                            key={category}
-                                            type="button"
-                                            onClick={() => handleCategoryClick(category, userId)}
-                                            className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
-                                        >
-                                        {category}
-                                        </button>
-                                            ))
-                                )}
-                            {/* <div className="flex">
-                                {user && user.id === userId && (
-                                    <button
-                                    key="more"
-                                    type="button"
-                                    onClick={toggleDropdown}
-                                    className={`px-3 py-3 rounded-full text-sm min-w-max ${isOpen ? 'bg-gray-300' : 'bg-white'}`}
-                                >
-                                ...
-                                </button>
-                                )}
-                                
-                                {isOpen && user && user.id === userId && !isMobile() && (
-                                    <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
-                                        <ul className="py-1">
-                                            <li
-                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                            onClick={() => handleCategoryClick('Drafts', userId)}
+                                    )}
+                                    {user && user.id !== userId && (
+                                        <div className="flex gap-3 pt-2 pb-2">
+                                            <button
+                                                onClick={() => following ? handleUnFollow() : handleFollow()}
+                                                className="px-3 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                                            >   
+                                                {following ? 'Unfollow' : 'Follow'}
+                                            </button>
+                                            <button
+                                                onClick={() => setShowMenu(!showMenu)}
                                             >
-                                            Drafts
-                                            </li>
-                                        </ul>
-                                    </div>)}
-                            </div> */}
-                            
-                        </div>
-                        {/* {isOpen && user && user.id === userId && isMobile() && (
-                            <div className=" right-0 mt-2 w-48 bg-white rounded-md shadow-lg border" style={{margin: "5px"}}>
-                                <ul className="py-1">
-                                    <li
-                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                    onClick={() => handleCategoryClick('Drafts', userId)}
-                                    >
-                                    Drafts
-                                    </li>
-                                </ul>
-                            </div>)} */}
-                    </div>
-                    <div className="border-b border-gray-300 mb-5"></div>
-                    
-                    <div className={styles.container}>
-                        {posts.length === 0 ? (
-                            <p className="text-center">No posts found :) </p>
-                        ) : (
-                            <div>
-                                {deletePost && (
-                                    <DeletePopup posts={posts} postStatus={managePostData.postAction} postId={managePostData.id} resetPosts={resetPosts} togglePopup={toggleDeletePopUp}/>
+                                                &#x22EE; {/* Unicode for vertical ellipsis */}
+                                            </button>
+
+                                            {/* Dropdown menu */}
+                                            {showMenu && (
+                                                <div className="absolute right-20 bg-white border border-gray-300 rounded shadow-lg">
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowMenu(false);
+                                                            blocked ? handleUnblock() : setShowBlockConfirm(true);
+                                                        }}
+                                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                                    >
+                                                        {blocked ? 'Unblock' : 'Block'}
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {showBlockConfirm && (
+                                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                                    <div className="bg-white p-6 rounded-lg max-w-sm w-full">
+                                                        <h3 className="font-medium text-lg mb-4">Confirm Block</h3>
+                                                        <p className="mb-6">
+                                                            Are you sure you want to block this user? 
+                                                            They won&apos;t be able to follow you or see your profile.
+                                                        </p>
+                                                        <div className="flex justify-end gap-3">
+                                                            <button
+                                                                onClick={() => setShowBlockConfirm(false)}
+                                                                className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded"
+                                                            >
+                                                                Cancel
+                                                            </button>
+                                                            <button
+                                                                onClick={async () => {
+                                                                    await handleBlock();
+                                                                    setShowBlockConfirm(false);
+                                                                }}
+                                                                className="px-4 py-2 text-sm bg-red-500 text-white hover:bg-red-600 rounded"
+                                                            >
+                                                                Block User
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+            
+                                <div className="text-gray-500 text-sm mb-4">
+                                {userProfile.full_name && userProfile.username ? userProfile.username : ''}
+                                </div>
+                                
+                                {userProfile.website && (
+                                    <div className="text-sm mb-4">
+                                        <a 
+                                            href={userProfile.website} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer" 
+                                            className="text-blue-500 hover:text-blue-600 break-all"
+                                        >
+                                            {userProfile.website}
+                                        </a>
+                                    </div>
                                 )}
-                                <MasonryGrid posts={posts} managePost={managePost}/>
+    
+                                <p className="text-gray-600 text-sm mb-6">{userProfile.bio || 'No bio yet'}</p>
+    
+                                <div className="flex space-x-10 mb-6">
+                                    <button onClick={() => setIsFollowingOpen(true)} className="btn">
+                                        <p className="text-sm text-gray-500 mr-2">Following</p>
+                                        <p className="text-sm font-medium">{followingCount}</p>
+                                    </button>
+                                    <FollowingPopup isOpen={isFollowingOpen} setIsOpen={setIsFollowingOpen} />
+                                    <button onClick={() => setIsFollowerOpen(true)} className="btn">
+                                        <p className="text-sm text-gray-500 mr-2">
+                                            {followersCount <= 1 ? "Follower" : "Followers"}
+                                        </p>
+                                        <p className="text-sm font-medium">{followersCount}</p>
+                                    </button>
+                                    <FollowerPopup isOpen={isFollowerOpen} setIsOpen={setIsFollowerOpen} />
+                                    {user && user.id === userId && (
+                                        <button 
+                                            onClick={() => setIsBlockingOpen(true)}
+                                            className="btn"
+                                        >
+                                            <p className="text-sm text-gray-500 mr-2">Blocking</p>
+                                            <p className="text-sm font-medium">{blockedCount}</p>
+                                        </button>
+                                    )}
+                                    <BlockingPopup 
+                                        isOpen={isBlockingOpen} 
+                                        setIsOpen={setIsBlockingOpen}
+                                        blockedCount={blockedCount}
+                                        setBlockedCount={setBlockedCount}
+                                    />
+                                </div>
                             </div>
-                        )}
-                    </div>
+                            <div>
+                                <div className="flex m-2 xl:justify-center hide-scrollbar mb-6">
+                                        {user && user.id === userId && (
+                                            postButtons.map((category) => (
+                                                <button
+                                                    key={category}
+                                                    type="button"
+                                                    onClick={() => handleCategoryClick(category, userId)}
+                                                    className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                                >
+                                                {category}
+                                                </button>
+                                            ))
+                                        )}
+                                        {user && user.id !== userId && (
+                                            postButtons_others.map((category) => (
+                                                <button
+                                                    key={category}
+                                                    type="button"
+                                                    onClick={() => handleCategoryClick(category, userId)}
+                                                    className={`px-3 py-3 rounded-full text-sm min-w-max ${displayCAtagory === category || (displayCAtagory === 'myPosts' && category === 'myPosts') ? 'bg-gray-300' : 'bg-white'}`}
+                                                >
+                                                {category}
+                                                </button>
+                                                    ))
+                                        )}
+                                </div>
+                            </div>
+                            <div className="border-b border-gray-300 mb-5"></div>
+                            
+                            <div className={styles.container}>
+                                {posts.length === 0 ? (
+                                    <p className="text-center">No posts found :) </p>
+                                ) : (
+                                    <div>
+                                        {deletePost && (
+                                            <DeletePopup posts={posts} postStatus={managePostData.postAction} postId={managePostData.id} resetPosts={resetPosts} togglePopup={toggleDeletePopUp}/>
+                                        )}
+                                        <MasonryGrid posts={posts} managePost={managePost}/>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             ) : (
                 <div className="flex justify-center items-center h-screen">
@@ -440,9 +581,5 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                 </div>
             )}
         </div>
-    );
-}
-
-function order(arg0: string, arg1: { ascending: boolean; }) {
-    throw new Error('Function not implemented.');
+    );    
 }

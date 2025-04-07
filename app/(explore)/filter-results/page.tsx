@@ -7,6 +7,7 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
 import {handleFilter} from '../../lib/filterUtils'
 import styles from '@/components/page.module.css'
+import {useAuth} from 'app/context/AuthContext';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -19,6 +20,7 @@ const Filter = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     document.title = selectedOption ? `${selectedOption} - Citale` : 'Citale';
@@ -31,7 +33,7 @@ const Filter = () => {
     const fetchData = async () => {
       if (selectedOption || selectedLocation || selectedPrice) {
         setLoading(true);
-        const data = await handleFilter(selectedOption, selectedLocation, selectedPrice);
+        const data = await handleFilter(selectedOption, selectedLocation, selectedPrice, user?.id);
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);
@@ -71,7 +73,7 @@ const Filter = () => {
 
 const FilterResult = () => {
   return (
-    <Suspense fallback={<div>Loading search parameters...</div>}>
+    <Suspense fallback={<div></div>}>
       <Filter />
     </Suspense>
   );
