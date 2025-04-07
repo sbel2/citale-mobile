@@ -44,6 +44,8 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
     const [isBlockingOpen, setIsBlockingOpen] = useState(false);
     const [blockedCount, setBlockedCount] = useState(0);
     const [viewerIsBlocked, setViewerIsBlocked] = useState(false);
+
+    const [showMenu, setShowMenu] = useState(false);
     // blocks n stuff idk anymore
 
     // Fetch user profile data from Supabase
@@ -420,19 +422,33 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                                         </button>
                                     )}
                                     {user && user.id !== userId && (
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-3 pt-2 pb-2">
                                             <button
                                                 onClick={() => following ? handleUnFollow() : handleFollow()}
-                                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                                                className="px-3 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
                                             >   
                                                 {following ? 'Unfollow' : 'Follow'}
                                             </button>
                                             <button
-                                                onClick={() => blocked ? handleUnblock() : setShowBlockConfirm(true)}
-                                                className="px-2 py-1.5 text-xs border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                                            >   
-                                                {blocked ? 'Unblock' : 'Block'}
+                                                onClick={() => setShowMenu(!showMenu)}
+                                            >
+                                                &#x22EE; {/* Unicode for vertical ellipsis */}
                                             </button>
+
+                                            {/* Dropdown menu */}
+                                            {showMenu && (
+                                                <div className="absolute right-20 bg-white border border-gray-300 rounded shadow-lg">
+                                                    <button
+                                                        onClick={() => {
+                                                            setShowMenu(false);
+                                                            blocked ? handleUnblock() : setShowBlockConfirm(true);
+                                                        }}
+                                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                                    >
+                                                        {blocked ? 'Unblock' : 'Block'}
+                                                    </button>
+                                                </div>
+                                            )}
                                             {showBlockConfirm && (
                                                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                                                     <div className="bg-white p-6 rounded-lg max-w-sm w-full">
@@ -566,8 +582,4 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
             )}
         </div>
     );    
-}
-
-function order(arg0: string, arg1: { ascending: boolean; }) {
-    throw new Error('Function not implemented.');
 }

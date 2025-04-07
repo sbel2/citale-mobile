@@ -3,35 +3,48 @@ import { Post } from './types';
 
 const supabase = createClient();
 
-export async function handleFilter(option: string, location: string, price: string): Promise<Post[] | null> {
+export async function handleFilter(
+  option: string,
+  location: string,
+  price: string,
+  currentUserId?: string
+): Promise<Post[]> {
   try {
-    let query = supabase.from('posts').select('*').or('endDate.is.null,endDate.gte.' + new Date().toISOString().split('T')[0]);
+    // Get users who have blocked the current user
+    let blockedByUsers: string[] = [];
+    if (currentUserId) {
+      const { data: blockers, error } = await supabase
+        .from('blocks')
+        .select('user_id')
+        .eq('blocked_id', currentUserId);
 
-    // Apply filters dynamically
-    if (option !== 'All') {
-      query = query.ilike('category', `%${option}%`);
-    }
-    if (location !== 'All') {
-      query = query.ilike('location', `%${location}%`);
-    }
-    if (price !== 'All') {
-      query = query.eq('price',price);
-    }
-
-    // Apply ordering
-    query = query.order('created_at', { ascending: false });
-
-    // Fetch data
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching posts:', error);
-      return null;
+      if (!error) {
+        blockedByUsers = blockers?.map(b => b.user_id) || [];
+      }
     }
 
-    return data || [];
+    // Build main query
+    let query = supabase
+      .from('posts')
+      .select('*')
+      .or(`endDate.is.null,endDate.gte.${new Date().toISOString().split('T')[0]}`);
+
+    // Apply filters
+    if (option !== 'All') query = query.ilike('category', `%${option}%`);
+    if (location !== 'All') query = query.ilike('location', `%${location}%`);
+    if (price !== 'All') query = query.eq('price', price);
+
+    // Exclude blocked users' content
+    if (blockedByUsers.length > 0) {
+      query = query.not('user_id', 'in', `(${blockedByUsers.join(',')})`);
+    }
+
+    // Execute final query
+    const { data, error } = await query.order('created_at', { ascending: false });
+
+    return error ? [] : data || [];
   } catch (error) {
-    console.error('Unexpected error:', error);
-    return null;
+    console.error('Filter error:', error);
+    return [];
   }
 }

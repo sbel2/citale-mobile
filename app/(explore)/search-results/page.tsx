@@ -7,6 +7,7 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 import { Post } from '../../lib/types';
 import {handleSearch} from '../../lib/searchUtils'
 import styles from '@/components/page.module.css'
+import {useAuth} from 'app/context/AuthContext';
 
 // Dynamically import other components with Suspense handling
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
@@ -18,6 +19,7 @@ const Search = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     document.title = query ? `${query} - Citale Search` : 'Citale Search';
@@ -30,7 +32,7 @@ const Search = () => {
     const fetchData = async () => {
       if (query) {
         setLoading(true);
-        const data = await handleSearch(query);
+        const data = await handleSearch(query, user?.id);
         setPosts(data || []); // Fallback to an empty array if data is null
         setError(data ? null : 'Failed to load posts'); // Set error if data is null
         setLoading(false);

@@ -7,6 +7,7 @@ import SkeletonCardRow from '@/components/SkeletonPost';
 import { PostgrestError } from '@supabase/supabase-js';
 import { Post } from '../lib/types';
 import styles from '@/components/page.module.css';
+import {useAuth} from 'app/context/AuthContext';
 
 const MasonryGrid = dynamic(() => import('@/components/MasonryGrid'), { ssr: false });
 
@@ -14,27 +15,49 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[] | null>(null); 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchPosts = async () => {
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .or('endDate.is.null,endDate.gte.' + new Date().toISOString().split('T')[0])
-        .order('created_at', { ascending: false });
+      try {
+        // Get list of users who blocked the current user
+        let blockedByUsers: string[] = [];
+        if (user?.id) {
+          const { data: blockers } = await supabase
+            .from('blocks')
+            .select('user_id')
+            .eq('blocked_id', user.id);
+          
+          blockedByUsers = blockers?.map(b => b.user_id) || [];
+        }
 
-      if (error) {
-        setError((error as PostgrestError).message);
+        // Build main query
+        let query = supabase
+          .from('posts')
+          .select('*')
+          .or('endDate.is.null,endDate.gte.' + new Date().toISOString().split('T')[0])
+          .order('created_at', { ascending: false });
+
+        // Add block filter if user is logged in
+        if (user?.id && blockedByUsers.length > 0) {
+          query = query.not('user_id', 'in', `(${blockedByUsers.join(',')})`);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+        setPosts(data);
+      } catch (err) {
+        setError((err as PostgrestError).message);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setPosts(data);
-      setLoading(false);
     };
+
     fetchPosts();
-  }, []);
+  }, [user?.id]); // Re-fetch when user changes
+
 
   if (loading) {
     return (

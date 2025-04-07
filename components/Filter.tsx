@@ -57,38 +57,42 @@ const FilterButton: React.FC<FilterProps> = ({ onFilter }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data: activitiesData, error: activitiesError } = await supabase.from('posts').select('category');
-        const { data: locationsData, error: locationsError } = await supabase.from('posts').select('location');
-        const { data: priceData, error: priceError } = await supabase.from('posts').select('price');
-
-        if (activitiesError || locationsError || priceError) {
-          console.error('Error fetching categories:', activitiesError || locationsError || priceError);
-          return;
-        }
-
+        const { data: activitiesData } = await supabase.from('posts').select('category');
+        const { data: locationsData } = await supabase.from('posts').select('location');
+        const { data: priceData } = await supabase.from('posts').select('price');
+    
         setCategories({
           Activity: activitiesData 
-          ? ["All",...new Set(
-              activitiesData
-                  .map(item => item.category)
-                  .filter(Boolean)
-                  .flatMap(category => category.split(',').map((cat: string) => cat.trim()))
-          )].sort()
-          : ["All"],
-          Location: locationsData ? ["All",...new Set(locationsData.map((item) => item.location).filter(Boolean))].sort() : ["All"],
-          Price: priceData
-            ? ["All",...new Set(priceData.map((item) => item.price).filter(Boolean))].sort((a, b) => (a === "All" ? -1 : 
-              b === "All" ? 1 : 
-              a === "Free" ? -1 : 
-              b === "Free" ? 1 : 
-              a.localeCompare(b)))
+            ? ["All",...new Set(
+                activitiesData
+                    .map(item => item.category)
+                    .filter(Boolean)
+                    .flatMap(category => 
+                      category.split(',')
+                        .map((cat: string) => cat.trim())
+                        .filter(Boolean) // Remove empty strings
+                    )
+                )].sort()
             : ["All"],
+          Location: locationsData 
+            ? ["All",...new Set(
+                locationsData
+                  .map(item => item.location)
+                  .filter(loc => loc && loc.trim() !== '') // Extra safety
+                )].sort() 
+            : ["All"],
+          Price: priceData
+            ? ["All",...new Set(
+                priceData
+                  .map(item => item.price)
+                  .filter(price => price && price.trim() !== '')
+                )].sort()
+            : ["All"]
         });
       } catch (error) {
-        console.error('Unexpected error:', error);
+        console.error('Error:', error);
       }
-    };
-
+    };    
     fetchCategories();
   }, []);
 
