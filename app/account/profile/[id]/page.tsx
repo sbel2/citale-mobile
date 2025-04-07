@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef} from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';
 import { supabase } from '@/app/lib/definitions';
@@ -47,6 +47,26 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
     const [showMenu, setShowMenu] = useState(false);
     // blocks n stuff idk anymore
+
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
+        }
+    };
+
+    if (showMenu) {
+        document.addEventListener('mousedown', handleClickOutside);
+    } else {
+        document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+    };
+    }, [showMenu]);
 
     // Fetch user profile data from Supabase
     useEffect(() => {
@@ -437,17 +457,20 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
                                             {/* Dropdown menu */}
                                             {showMenu && (
-                                                <div className="absolute right-20 bg-white border border-gray-300 rounded shadow-lg">
-                                                    <button
-                                                        onClick={() => {
-                                                            setShowMenu(false);
-                                                            blocked ? handleUnblock() : setShowBlockConfirm(true);
-                                                        }}
-                                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                                                    >
-                                                        {blocked ? 'Unblock' : 'Block'}
-                                                    </button>
-                                                </div>
+                                            <div 
+                                                className="absolute right-20 bg-white border border-gray-300 rounded shadow-lg z-10"
+                                                ref={menuRef} // Add this ref
+                                            >
+                                                <button
+                                                onClick={() => {
+                                                    setShowMenu(false);
+                                                    blocked ? handleUnblock() : setShowBlockConfirm(true);
+                                                }}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                                                >
+                                                {blocked ? 'Unblock' : 'Block'}
+                                                </button>
+                                            </div>
                                             )}
                                             {showBlockConfirm && (
                                                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
