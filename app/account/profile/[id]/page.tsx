@@ -562,7 +562,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                             
                             <div className={styles.container}>
                                 {posts.length === 0 ? (
-                                    <p className="text-center">No posts found :) </p>
+                                    <p className="text-center">No posts found &#39;) </p>
                                 ) : (
                                     <div>
                                         {deletePost && (
