@@ -28,7 +28,7 @@ export default function Inbox() {
           <h1 className="text-xl font-bold">Inbox</h1>
         </div>
       </header>
-      <div className="mt-14 overflow-y-auto">
+      <div className="mt-14 pb-[calc(env(safe-area-inset-top)+56px)] overflow-y-auto">
         <InboxPreview userId={user.id} />
       </div>
     </div>

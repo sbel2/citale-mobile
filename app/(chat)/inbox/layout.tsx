@@ -24,7 +24,9 @@ export default function ChatLayout({
       {/* Main content area */}
       <main className="flex-1 flex justify-center">
         {/* Center content on the right side of the screen */}
-        <div className="w-full">{children}</div>
+        <div className="w-full" style={{ height: '100%', overflow: 'hidden' }}>
+          {children}
+        </div>
       </main>
     </div>
   );
