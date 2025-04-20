@@ -25,7 +25,19 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [submit, setSubmit] = useState(false);
   const previousMessagesRef = useRef<ChatMessage[]>([]);
+  const [isBlocked, setIsBlocked] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkBlocked = async () => {
+      const { data, error } = await supabase
+        .from('blocks')
+        .select('user_id, blocked_id')
+        .or(`and(user_id.eq.${user?.id},blocked_id.eq.${userId}),and(user_id.eq.${userId},blocked_id.eq.${user?.id})`);
+      setIsBlocked(Boolean(data && data.length > 0));
+    };
+    checkBlocked();
+  }, [userId, user?.id]);
 
   const fetchChatMessages = async () => {
     if (user) {
@@ -152,7 +164,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+    <div className="flex flex-col h-[100d vh] bg-white overflow-hidden">
       {/* Header (Fixed at the top) */}
       <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
@@ -173,58 +185,61 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
           </Link>
         </div>
       </header>
-
-      {/* Chat Messages Container (Scrollable) */}
-      <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
-        {user &&
-          messages.length > 0 &&
-          messages.map((m, index) => (
-            <div
-              key={index}
-              className={`flex gap-3 max-w-3xl mx-auto ${
-                m.sender_id === user.id ? "justify-end" : "justify-start"
-              }`}
-            >
-              {/* Display sender/receiver avatar */}
-              {m.sender_id !== user.id && (
-                <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-purple-600">
-                  <button onClick={() => router.push(`/account/profile/${userId}`)}>
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${avatarUrl}`}
-                      alt="Profile Icon"
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                  </button>
-                </div>
-              )}
-
-              {/* Message content */}
-              <div className="flex flex-col w-fit max-w-[70%]">
-                <div className="font-medium mb-1">
-                  {m.sender_id === user.id ? "You" : username}
-                </div>
+      {isBlocked && (
+        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+          <p>No user found</p>
+        </div>
+      )}
+      {!isBlocked && (
+        <>
+          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+            {user &&
+              messages.length > 0 &&
+              messages.map((m, index) => (
                 <div
-                  className={`p-3 rounded-lg ${
-                    m.sender_id === user.id
-                      ? "bg-blue-100 text-blue-900"
-                      : "bg-gray-100 text-gray-900"
+                  key={index}
+                  className={`flex gap-3 max-w-3xl mx-auto ${
+                    m.sender_id === user.id ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div className="prose prose-base dark:prose-invert max-w-none">
-                    {m.content}
+                  {m.sender_id !== user.id && (
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-purple-600">
+                      <button onClick={() => router.push(`/account/profile/${userId}`)}>
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${avatarUrl}`}
+                          alt="Profile Icon"
+                          width={40}
+                          height={40}
+                          className="rounded-full"
+                        />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex flex-col w-fit max-w-[70%]">
+                    <div className="font-medium mb-1">
+                      {m.sender_id === user.id ? "You" : username}
+                    </div>
+                    <div
+                      className={`p-3 rounded-lg ${
+                        m.sender_id === user.id
+                          ? "bg-blue-100 text-blue-900"
+                          : "bg-gray-100 text-gray-900"
+                      }`}
+                    >
+                      <div className="prose prose-base dark:prose-invert max-w-none">
+                        {m.content}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
-      </div>
+              ))}
+          </div>
 
-      {/* Chat Input Box (Fixed at the bottom) */}
-      <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 bg-white border-t border-gray-200">
-        <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+          <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 bg-white border-t border-gray-200">
+            <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+          </div>
+        </>
+      )}
       </div>
-    </div>
   );
 }

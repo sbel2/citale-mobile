@@ -28,7 +28,15 @@ const InboxPreview: React.FC<InboxPreviewProps> = ({ userId }) => {
   const router = useRouter();
   const [messengerDetails, setMessengerDetails] = useState<UserDetails[]>([]);
 
-// get the latest message
+  const checkBlocked = async (otherUserId: string) => {
+    const { data } = await supabase
+      .from('blocks')
+      .select('user_id, blocked_id')
+      .or(`and(user_id.eq.${userId},blocked_id.eq.${otherUserId}),and(user_id.eq.${otherUserId},blocked_id.eq.${userId})`);
+    return data && data.length > 0;
+  };
+
+  // get the latest message
   const handleDisplayMessage = async () => {
     setMessengerDetails([]);
     const { data, error } = await supabase
@@ -50,32 +58,30 @@ const InboxPreview: React.FC<InboxPreviewProps> = ({ userId }) => {
           acc[otherUserId] = message;
         }
         return acc;
-      }, {} as Record<string, ChatMessage>);
+      }, {});
 
-      const latestMessagesArray = Object.values(latestMessages);
+      // Fetch user details for each conversation
+      const userDetailsPromises = Object.entries(latestMessages).map(async ([otherUserId, message]) => {
+        const isBlocked = await checkBlocked(otherUserId);
+        if (isBlocked) return null;
 
-      // get user profile
-      const userDetailsPromises = latestMessagesArray.map(async (message) => {
-        const otherUserId = message.sender_id === userId ? message.receiver_id : message.sender_id;
-        const { data: userData, error: userError } = await supabase
+        const { data: userData } = await supabase
           .from('profiles')
-          .select('id, username, avatar_url')
+          .select('username, avatar_url')
           .eq('id', otherUserId)
           .single();
 
-        if (userError) {
-          console.error('Error fetching user:', userError.message);
-          return null;
-        }
-
         return {
-          ...userData,
+          id: otherUserId,
+          username: userData?.username || 'Unknown',
+          avatar_url: userData?.avatar_url || 'avatar.png',
           message: message.content,
-        } as UserDetails;
+          unread_count: 0 // This will be updated by handleUnreadMessages
+        };
       });
 
-      const userDetails = await Promise.all(userDetailsPromises);
-      setMessengerDetails(userDetails.filter(Boolean) as UserDetails[]); 
+      const userDetails = (await Promise.all(userDetailsPromises)).filter(Boolean) as UserDetails[];
+      setMessengerDetails(userDetails);
     } else {
       console.log('No messages found.');
     }
