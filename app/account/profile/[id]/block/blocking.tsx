@@ -72,6 +72,14 @@ const BlockingPopup: React.FC<BlockingPopupProps> = ({ isOpen, setIsOpen, blocke
         }
     };
 
+    const handleUnblock = async (userId: string) => {
+        const { error } = await supabase
+            .from('blocks')
+            .delete()
+            .eq('user_id', user?.id)
+            .eq('blocked_id', userId);
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContentForFollow className="w-full max-w-xs h-64 overflow-y-auto rounded-lg">
@@ -83,19 +91,15 @@ const BlockingPopup: React.FC<BlockingPopupProps> = ({ isOpen, setIsOpen, blocke
                     <ul className="mt-4 space-y-4">
                         {blockedDetails.map((user, index) => (
                             <li key={`${index}-${user.id}`} className="flex items-center space-x-2">
-                                <button 
-                                    className="flex items-center space-x-2" 
-                                    onClick={() => router.push(`/account/profile/${user.id}`)}
-                                >
-                                    <img
-                                        src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${user.avatar_url_small}`}
-                                        alt="profile"
-                                        width={25}
-                                        height={25}
-                                        className="rounded-full"
-                                    />
-                                    <p>{user.username}</p>
-                                </button>
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_IMAGE_CDN}/profile-pic/${user.avatar_url_small}`}
+                                    alt="profile"
+                                    width={25}
+                                    height={25}
+                                    className="rounded-full"
+                                />
+                                <p>{user.username}</p>
+                                <button className="bg-red-500 text-white px-2 py-1 rounded w-20" onClick={() => handleUnblock(user.id)}>Unblock</button>
                             </li>
                         ))}
                     </ul>
@@ -103,6 +107,6 @@ const BlockingPopup: React.FC<BlockingPopupProps> = ({ isOpen, setIsOpen, blocke
             </DialogContentForFollow>
         </Dialog>
     );
-}
+};
 
 export default BlockingPopup;
