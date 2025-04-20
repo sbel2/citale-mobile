@@ -1,9 +1,10 @@
 import { createClient } from '@/supabase/client';
-import { Post } from './types';
+import { Post, UserProfile } from './types';
+import { validate as isUUID } from 'uuid'; 
 
 const supabase = createClient();
 
-export async function handleSearch(
+export async function handlePostSearch(
   query: string,
   currentUserId?: string
 ): Promise<Post[]> {
@@ -29,6 +30,43 @@ export async function handleSearch(
     return [];
   }
 }
+
+export async function handleUserSearch(
+  query: string,
+  currentUserId?: string
+): Promise<UserProfile[]> {
+  try {
+
+    const blockedByUsers = currentUserId 
+      ? await getBlockers(currentUserId)
+      : [];
+
+    const conditions = [
+      `username.ilike.%${query}%`,
+      `full_name.ilike.%${query}%`,
+      `bio.ilike.%${query}%`,
+    ];
+    if (isUUID(query)) {
+      conditions.push(`id.eq.${query}`);
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url, full_name, bio')
+      .or(conditions.join(','))
+      .not('id', 'in', blockedByUsers.length > 0 ? `(${blockedByUsers.join(',')})` : '()');
+
+    if (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+    return data || [];
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return [];
+  }
+}
+
 
 // Helper function to get blockers
 async function getBlockers(userId: string): Promise<string[]> {
