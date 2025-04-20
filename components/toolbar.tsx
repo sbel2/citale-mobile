@@ -6,6 +6,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';
+import { RealtimeChannel } from '@supabase/supabase-js';
+
 
 const Toolbar: React.FC = () => { 
   const { user, logout } = useAuth(); 
@@ -14,6 +16,7 @@ const Toolbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const { push } = useRouter(); 
   const pathname = usePathname();   
+  const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);   
 
@@ -83,7 +86,45 @@ const Toolbar: React.FC = () => {
     } else {       
       push("/"); // Navigate to home page if on a different page     
     }   
-  };     
+  };    
+  
+  useEffect(() => {
+    console.log('Checking for unread messages...');
+    const checkUnreadMessages = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('chats')
+          .select('is_read')
+          .eq('receiver_id', user.id)
+          .eq('is_read', false)
+        if (error) {
+          console.error('Error fetching unread messages:', error.message);
+          return;
+        }
+        if (data && data.length > 0) {
+        setHasUnreadMessage(true);
+        }
+        else{
+          setHasUnreadMessage(false);
+        }
+      }
+    };
+    checkUnreadMessages();
+
+    if (user) {
+      // Fetch messages immediately
+      checkUnreadMessages();
+
+      // Set up polling every 2 seconds
+      const interval = setInterval(checkUnreadMessages, 2000);
+
+      // Clean up the interval on unmount
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [user]); // Add user as a dependency to re-run when user changes
+
 
   return (     
     <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>       
@@ -100,13 +141,18 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Home</span>       
       </button>        
 
-      {/* Talebot Button */}
+      {/* Chat Button */}
       <button
-        onClick={() => push('/talebot')}
-        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/talebot' ? 'font-semibold' : ''}`}
+        onClick={() => push(user ? '/inbox' : '/log-in')}
+        className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/inbox' ? 'font-semibold' : ''}`}
       >
-        <Image src={pathname === '/talebot' ? "/robot_s.svg" : "/robot.svg"} alt="Robot Icon" width={25} height={25} priority />
-        <span className="ml-5 hidden md:inline">Talebot</span>
+        <div className="relative">
+          <Image src={pathname === '/inbox' ? "/chat_s.svg" : "/chat.svg"} alt="Chat Icon" width={25} height={25} priority />
+          {hasUnreadMessage && (
+          <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+          )}
+        </div>
+        <span className="ml-5 hidden md:inline">Message</span>
       </button>
 
       <button onClick={() => {user ? push('/upload') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
