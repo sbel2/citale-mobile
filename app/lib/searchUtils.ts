@@ -67,19 +67,24 @@ export async function handleUserSearch(
   }
 }
 
+export const getBlockers = async (userId: string) => {
+  // Get users who blocked me
+  const { data: blockedByMe } = await supabase
+    .from('blocks')
+    .select('blocked_id')
+    .eq('user_id', userId);
 
-// Helper function to get blockers
-async function getBlockers(userId: string): Promise<string[]> {
-  try {
-    const { data, error } = await supabase
-      .from('blocks')
-      .select('user_id')
-      .eq('blocked_id', userId);
+  // Get users I blocked
+  const { data: blockedMe } = await supabase
+    .from('blocks')
+    .select('user_id')
+    .eq('blocked_id', userId);
 
-    if (error) throw error;
-    return data?.map(b => b.user_id) || [];
-  } catch (error) {
-    console.error('Block check error:', error);
-    return [];
-  }
-}
+  // Combine both sets of IDs
+  const blockedIds = new Set([
+    ...(blockedByMe?.map(b => b.blocked_id) || []),
+    ...(blockedMe?.map(b => b.user_id) || [])
+  ]);
+
+  return Array.from(blockedIds);
+};
