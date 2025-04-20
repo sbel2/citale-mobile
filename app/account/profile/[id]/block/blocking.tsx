@@ -98,8 +98,8 @@ const BlockingPopup: React.FC<BlockingPopupProps> = ({ isOpen, setIsOpen, blocke
                                     height={25}
                                     className="rounded-full"
                                 />
-                                <p>{user.username}</p>
-                                <button className="bg-red-500 text-white px-2 py-1 rounded w-20" onClick={() => handleUnblock(user.id)}>Unblock</button>
+                                <p className="mr-8">{user.username}</p>
+                                <button className="bg-red-500 text-white px-2 py-1 rounded w-16 ml-auto text-sm flex items-center justify-center" onClick={() => handleUnblock(user.id)}>Unblock</button>
                             </li>
                         ))}
                     </ul>
