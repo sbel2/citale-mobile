@@ -175,7 +175,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
       </header>
 
       {/* Chat Messages Container (Scrollable) */}
-      <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+11rem+env(safe-area-inset-bottom))] overflow-y-auto">
+      <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
         {user &&
           messages.length > 0 &&
           messages.map((m, index) => (
