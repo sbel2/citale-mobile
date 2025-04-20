@@ -143,17 +143,18 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   // Auto-scroll to the bottom when messages change
   useEffect(() => {
     if (chatContainerRef.current && messages.length > 0) {
-      console.log("Scroll Height:", chatContainerRef.current.scrollHeight);
-      console.log("Scroll Top Before:", chatContainerRef.current.scrollTop);
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-      console.log("Scroll Top After:", chatContainerRef.current.scrollTop);
+      const container = chatContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages]);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
       {/* Header (Fixed at the top) */}
-      <header className="shrink-0 border-b border-gray-200 bg-white overflow-hidden">
+      <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
           <a href="/inbox" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
             &#x2190; Inbox
@@ -174,7 +175,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
       </header>
 
       {/* Chat Messages Container (Scrollable) */}
-      <div ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4 p-4 md:p-12">
+      <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+11rem+env(safe-area-inset-bottom))] overflow-y-auto">
         {user &&
           messages.length > 0 &&
           messages.map((m, index) => (
@@ -221,7 +222,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
       </div>
 
       {/* Chat Input Box (Fixed at the bottom) */}
-      <div className="shrink-0 bg-white border-gray-200 pb-[56px] md:pb-0">
+      <div className="fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 bg-white border-t border-gray-200">
         <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
       </div>
     </div>

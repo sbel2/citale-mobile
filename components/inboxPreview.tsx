@@ -123,7 +123,7 @@ const InboxPreview: React.FC<InboxPreviewProps> = ({ userId }) => {
   }, [userId]);
 
   return (
-    <div className="border-t bg-white">
+    <div className="bg-white">
       <div className="space-y-0">
         {messengerDetails.map((user) => (
           console.log(user),

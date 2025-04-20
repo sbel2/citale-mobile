@@ -15,20 +15,22 @@ export default function Inbox() {
   }
 
   return (
-    <div className="h-[100dvh] bg-white">
-    <header className="shrink-0 border-b border-gray-200 bg-white overflow-hidden p-2">
-      <div className="mx-auto px-4 py-2 flex justify-center relative">
-        <a
-          href="/"
-          aria-label="Go back home"
-          className="text-gray-800 dark:text-white absolute left-4"
-        >
-          &#x2190; Home
-        </a>
-        <h1 className="text-xl font-bold">Inbox</h1>
+    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+      <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
+        <div className="mx-auto px-4 py-2 flex justify-center relative">
+          <a
+            href="/"
+            aria-label="Go back home"
+            className="text-gray-800 dark:text-white absolute left-4"
+          >
+            &#x2190; Home
+          </a>
+          <h1 className="text-xl font-bold">Inbox</h1>
+        </div>
+      </header>
+      <div className="mt-14">
+        <InboxPreview userId={user.id} />
       </div>
-    </header>
-      <InboxPreview userId={user.id} />
     </div>
   );
 }
