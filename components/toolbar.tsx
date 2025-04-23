@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import { supabase } from "@/app/lib/definitions";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';
+import { RealtimeChannel } from '@supabase/supabase-js';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
 
@@ -14,6 +15,7 @@ const Toolbar: React.FC = () => {
   const [userAvatar, setUserAvatar] = useState<string>('avatar.png'); // Default placeholder 
   const [loading, setLoading] = useState<boolean>(true); // Track loading state 
   const [isMenuOpen, setIsMenuOpen] = useState(false); 
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const { push } = useRouter(); 
   const pathname = usePathname();   
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
@@ -86,6 +88,128 @@ const Toolbar: React.FC = () => {
     } else {       
       push("/"); // Navigate to home page if on a different page     
     }   
+  };
+  
+  // In Toolbar component
+  useEffect(() => {
+    if (!user) {
+      setHasUnreadNotifications(false);
+      return;
+    }
+
+  const checkUnreadNotifications = async () => {
+    try {
+      // Get user's post IDs
+      const { data: userPosts } = await supabase
+        .from("posts")
+        .select("post_id")
+        .eq("user_id", user.id);
+      const postIds = userPosts?.map(p => p.post_id) || [];
+
+      // Get user's comment IDs
+      const { data: userComments } = await supabase
+        .from("comments")
+        .select("id")
+        .eq("user_id", user.id);
+      const commentIds = userComments?.map(c => c.id) || [];
+
+      // Check for unread comments on user's posts
+      const { count: unreadCommentsCount } = await supabase
+        .from("comments")
+        .select("*", { count: 'exact', head: true })
+        .in("post_id", postIds)
+        .eq("is_read", false)
+        .neq("user_id", user.id);
+
+      // Check for unread likes on user's posts
+      const { count: unreadLikesCount } = await supabase
+        .from("likes")
+        .select("*", { count: 'exact', head: true })
+        .in("post_id", postIds)
+        .eq("is_read", false)
+        .neq("user_id", user.id);
+
+      // Check for unread comment likes on user's comments
+      const { count: unreadCommentLikesCount } = await supabase
+        .from("comment_likes")
+        .select("*", { count: 'exact', head: true })
+        .in("comment_id", commentIds)
+        .eq("is_read", false)
+        .neq("user_id", user.id);
+
+      setHasUnreadNotifications(
+        (unreadCommentsCount || 0) > 0 ||
+        (unreadLikesCount || 0) > 0 ||
+        (unreadCommentLikesCount || 0) > 0
+      );
+    } catch (error) {
+      console.error('Error checking unread notifications:', error);
+      setHasUnreadNotifications(false);
+    }
+  };
+
+  // Check initially
+  checkUnreadNotifications();
+
+  // Set up real-time subscriptions
+  let dbChannel: RealtimeChannel;
+  let updatesChannel: RealtimeChannel;
+  
+  if (user) {
+    // Channel for database changes
+    dbChannel = supabase
+      .channel('notification-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'comments',
+          filter: `is_read=eq.false`
+        },
+        () => checkUnreadNotifications()
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'likes',
+          filter: `is_read=eq.false`
+        },
+        () => checkUnreadNotifications()
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'comment_likes',
+          filter: `is_read=eq.false`
+        },
+        () => checkUnreadNotifications()
+      )
+      .subscribe();
+
+    // Channel for component updates
+    updatesChannel = supabase.channel('notification-updates')
+      .on(
+        'broadcast',
+        { event: 'notifications-updated' },
+        () => checkUnreadNotifications()
+      )
+      .subscribe();
+  }
+
+  // Set up an interval to check periodically (every 5 minutes)
+  const interval = setInterval(checkUnreadNotifications, 300000);
+  
+  return () => {
+    clearInterval(interval);
+    if (dbChannel) supabase.removeChannel(dbChannel);
+    if (updatesChannel) supabase.removeChannel(updatesChannel);
+  };
+}, [user]);
   };    
   
   useEffect(() => {
@@ -166,6 +290,33 @@ const Toolbar: React.FC = () => {
         <span className="ml-5 hidden md:inline">Post</span>
       </button>
 
+            {/* Notifications Button */}
+            {user ? (
+  <button
+    onClick={() => push('/notifications')}
+    className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/notifications' ? 'font-semibold' : ''}`}
+  >
+    <div className="relative">
+      <Image
+        src={pathname === '/notifications' ? "/bell_s.svg" : "/bell.svg"}
+        alt="Notifications Icon"
+        width={25}
+        height={25}
+        priority
+      />
+      {hasUnreadNotifications && (
+        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+      )}
+    </div>
+    <span className="ml-5 hidden md:inline">Notifications</span>
+  </button>
+) : (
+  <Link href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center">
+    <Image src="/bell.svg" alt="Notifications Icon" width={25} height={25} priority />
+    <span className="ml-5 hidden md:inline">Notifications</span>
+  </Link>
+)}
+
       {/* Profile Button */}       
       {user ? (         
         <Link href={`/account/profile/${user.id}`} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/account/profile' ? 'font-semibold' : ''}`}>           
@@ -197,8 +348,15 @@ const Toolbar: React.FC = () => {
         </Link>       
       )}        
 
-      {/* Menu Button */}       
-      <div className="md:mt-auto w-full relative">         
+      {/* Menu Button */}         
+        <button           
+          onClick={toggleMenu}           
+          className="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-full shadow-md"         
+        >           
+          <Image src="/menu.svg" alt="Menu Icon" width={25} height={25} priority />           
+          <span className="ml-5 hidden md:inline">Menu</span>         
+        </button>  
+        <div className="hidden md:block md:mt-auto w-full relative">   
         {isMenuOpen && (           
           <div className="absolute bottom-full mb-2 right-0 bg-white shadow-md rounded-lg w-full min-w-[200px] md:w-64 md:left-0">         
             {user ? (               
@@ -206,8 +364,6 @@ const Toolbar: React.FC = () => {
             ) : (               
               <Link href="/log-in" className="block p-4 hover:bg-gray-200 text-black-600">Log in</Link>             
             )}
-
-            {/* Help Button - Aligned to the left without any extra margin */}
 
             <Link
               href="https://forms.gle/kfWJA5HCBMne8dND7" // Replace with your Google Form link
@@ -218,7 +374,7 @@ const Toolbar: React.FC = () => {
             </Link>
 
             <Link
-              href="https://www.citaleco.com/support" // Replace with your Google Form link
+              href="/support" // Replace with your Google Form link
               className="block p-4 hover:bg-gray-200 text-black-600"
               target="_blank" 
               >
@@ -226,24 +382,17 @@ const Toolbar: React.FC = () => {
             </Link>
 
             <Link
-              href="https://www.citaleco.com/privacy-policy"
+              href="/privacy-policy"
               className="block p-4 hover:bg-gray-200 text-black"
               target="_blank" 
             >
               Privacy Policy
             </Link> 
-            <Link href="https://www.citaleco.com/terms" className="block p-4 hover:bg-gray-200 text-black" target="_blank"  >Terms of Use</Link>             
-          </div>         
-        )}         
-        <button           
-          onClick={toggleMenu}           
-          className="p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all"         
-        >           
-          <Image src="/menu.svg" alt="Menu Icon" width={25} height={25} priority />           
-          <span className="ml-5 hidden md:inline">Menu</span>         
-        </button>       
+            <Link href="/terms" className="block p-4 hover:bg-gray-200 text-black" target="_blank"  >Terms of Use</Link>             
+          </div> 
+        )}     
       </div>     
-    </nav>   
+    </nav>  
   ); 
 };  
 
