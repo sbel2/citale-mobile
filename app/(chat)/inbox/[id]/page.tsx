@@ -166,7 +166,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   return (
     <div className="flex flex-col h-[100d vh] bg-white overflow-hidden">
       {/* Header (Fixed at the top) */}
-      <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
+      <header className="fixed top-[calc(env(safe-area-inset-top)+55px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
           <a href="/inbox" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
             &#x2190; Inbox
