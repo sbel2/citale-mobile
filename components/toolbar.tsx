@@ -7,8 +7,6 @@ import Link from "next/link";
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from 'app/context/AuthContext';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { RealtimeChannel } from '@supabase/supabase-js';
-
 
 const Toolbar: React.FC = () => { 
   const { user, logout } = useAuth(); 
@@ -203,6 +201,9 @@ const Toolbar: React.FC = () => {
 
   // Set up an interval to check periodically (every 5 minutes)
   const interval = setInterval(checkUnreadNotifications, 300000);
+
+  // Capture the current value of user
+  const currentUser = user;
   
   return () => {
     clearInterval(interval);
@@ -210,7 +211,6 @@ const Toolbar: React.FC = () => {
     if (updatesChannel) supabase.removeChannel(updatesChannel);
   };
 }, [user]);
-  };    
   
   useEffect(() => {
     console.log('Checking for unread messages...');
@@ -226,7 +226,7 @@ const Toolbar: React.FC = () => {
           return;
         }
         if (data && data.length > 0) {
-        setHasUnreadMessage(true);
+          setHasUnreadMessage(true);
         }
         else{
           setHasUnreadMessage(false);
