@@ -1,9 +1,10 @@
 import { createClient } from '@/supabase/client';
-import { Post } from './types';
+import { Post, UserProfile } from './types';
+import { validate as isUUID } from 'uuid'; 
 
 const supabase = createClient();
 
-export async function handleSearch(
+export async function handlePostSearch(
   query: string,
   currentUserId?: string
 ): Promise<Post[]> {
@@ -30,18 +31,60 @@ export async function handleSearch(
   }
 }
 
-// Helper function to get blockers
-async function getBlockers(userId: string): Promise<string[]> {
+export async function handleUserSearch(
+  query: string,
+  currentUserId?: string
+): Promise<UserProfile[]> {
   try {
-    const { data, error } = await supabase
-      .from('blocks')
-      .select('user_id')
-      .eq('blocked_id', userId);
 
-    if (error) throw error;
-    return data?.map(b => b.user_id) || [];
+    const blockedByUsers = currentUserId 
+      ? await getBlockers(currentUserId)
+      : [];
+
+    const conditions = [
+      `username.ilike.%${query}%`,
+      `full_name.ilike.%${query}%`,
+      `bio.ilike.%${query}%`,
+    ];
+    if (isUUID(query)) {
+      conditions.push(`id.eq.${query}`);
+    }
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url, full_name, bio')
+      .or(conditions.join(','))
+      .not('id', 'in', blockedByUsers.length > 0 ? `(${blockedByUsers.join(',')})` : '()');
+
+    if (error) {
+      console.error('Error fetching users:', error);
+      return [];
+    }
+    return data || [];
   } catch (error) {
-    console.error('Block check error:', error);
+    console.error('Unexpected error:', error);
     return [];
   }
 }
+
+export const getBlockers = async (userId: string) => {
+  // Get users who blocked me
+  const { data: blockedByMe } = await supabase
+    .from('blocks')
+    .select('blocked_id')
+    .eq('user_id', userId);
+
+  // Get users I blocked
+  const { data: blockedMe } = await supabase
+    .from('blocks')
+    .select('user_id')
+    .eq('blocked_id', userId);
+
+  // Combine both sets of IDs
+  const blockedIds = new Set([
+    ...(blockedByMe?.map(b => b.blocked_id) || []),
+    ...(blockedMe?.map(b => b.user_id) || [])
+  ]);
+
+  return Array.from(blockedIds);
+};

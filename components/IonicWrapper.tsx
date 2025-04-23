@@ -3,7 +3,12 @@
 import React from "react";
 import { IonApp, IonContent, IonHeader, IonToolbar } from "@ionic/react";
 
-export default function IonicWrapper({ children }: { children: React.ReactNode }) {
+interface IonicWrapperProps {
+  children: React.ReactNode;
+  disableScroll?: boolean;
+}
+
+export default function IonicWrapper({ children, disableScroll = false }: IonicWrapperProps) {
   return (
     <IonApp>
       {/* Header respects iOS status bar (safe area inset top) */}
@@ -25,6 +30,8 @@ export default function IonicWrapper({ children }: { children: React.ReactNode }
           paddingTop: "calc(env(safe-area-inset-top) + 56px)",
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
+        scrollY={!disableScroll}
+        forceOverscroll={!disableScroll}
       >
         {children}
       </IonContent>
