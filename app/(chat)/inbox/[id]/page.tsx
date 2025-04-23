@@ -164,7 +164,7 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-[100d vh] bg-white overflow-hidden">
+    <div className="flex flex-col h-[100dvh-56px] bg-white overflow-hidden">
       {/* Header (Fixed at the top) */}
       <header className="fixed top-[calc(env(safe-area-inset-top)+55px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
@@ -186,13 +186,13 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
         </div>
       </header>
       {isBlocked && (
-        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))]">
+        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
           <p>No user found</p>
         </div>
       )}
       {!isBlocked && (
         <>
-          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))]">
+          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
             {user &&
               messages.length > 0 &&
               messages.map((m, index) => (

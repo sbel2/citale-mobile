@@ -15,7 +15,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${inter.className} bg-gray-100 flex h-[calc(100vh-56px)] overflow-hidden`}>
+    <div className={`${inter.className} bg-gray-100 flex`}>
       {/* Toolbar - hidden on small screens, visible on large screens */}
       <div className="lg:w-64">
         <Toolbar />
@@ -24,7 +24,7 @@ export default function ChatLayout({
       {/* Main content area */}
       <main className="flex-1 flex justify-center">
         {/* Center content on the right side of the screen */}
-        <div className="w-full" style={{ height: '100%', overflow: 'hidden' }}>
+        <div className="w-full">
           {children}
         </div>
       </main>
