@@ -15,7 +15,7 @@ export default function Inbox() {
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-white overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-56px)] bg-white overflow-hidden">
       <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-center relative">
           <a
