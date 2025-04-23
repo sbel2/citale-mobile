@@ -186,13 +186,13 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
         </div>
       </header>
       {isBlocked && (
-        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))]">
           <p>No user found</p>
         </div>
       )}
       {!isBlocked && (
         <>
-          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))]">
             {user &&
               messages.length > 0 &&
               messages.map((m, index) => (
