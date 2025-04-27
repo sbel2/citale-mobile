@@ -11,16 +11,25 @@ export async function handleFilter(
 ): Promise<Post[]> {
   try {
     // Get users who have blocked the current user
-    let blockedByUsers: string[] = [];
+    let blockedUsers: string[] = [];
     if (currentUserId) {
-      const { data: blockers, error } = await supabase
+      // Users who blocked me
+      const { data: blockers } = await supabase
         .from('blocks')
         .select('user_id')
         .eq('blocked_id', currentUserId);
-
-      if (!error) {
-        blockedByUsers = blockers?.map(b => b.user_id) || [];
-      }
+      
+      // Users I blocked
+      const { data: blocked } = await supabase
+        .from('blocks')
+        .select('blocked_id')
+        .eq('user_id', currentUserId);
+      
+      // Combine both sets
+      blockedUsers = [
+        ...(blockers?.map(b => b.user_id) || []),
+        ...(blocked?.map(b => b.blocked_id) || [])
+      ];
     }
 
     // Build main query
@@ -35,8 +44,8 @@ export async function handleFilter(
     if (price !== 'All') query = query.eq('price', price);
 
     // Exclude blocked users' content
-    if (blockedByUsers.length > 0) {
-      query = query.not('user_id', 'in', `(${blockedByUsers.join(',')})`);
+    if (blockedUsers.length > 0) {
+      query = query.not('user_id', 'in', `(${blockedUsers.join(',')})`);
     }
 
     // Execute final query

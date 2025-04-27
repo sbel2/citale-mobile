@@ -23,6 +23,7 @@ export default function Home() {
       try {
         // Get list of users who blocked the current user
         let blockedByUsers: string[] = [];
+        let blockedUsers: string[] = [];
         if (user?.id) {
           const { data: blockers } = await supabase
             .from('blocks')
@@ -30,7 +31,14 @@ export default function Home() {
             .eq('blocked_id', user.id);
           
           blockedByUsers = blockers?.map(b => b.user_id) || [];
-        }
+
+          const { data: blocked } = await supabase
+          .from('blocks')
+          .select('blocked_id')
+          .eq('user_id', user.id);
+        
+        blockedUsers = blocked?.map(b => b.blocked_id) || [];
+      }
 
         // Build main query
         let query = supabase
@@ -42,6 +50,10 @@ export default function Home() {
         // Add block filter if user is logged in
         if (user?.id && blockedByUsers.length > 0) {
           query = query.not('user_id', 'in', `(${blockedByUsers.join(',')})`);
+        }
+        
+        if (blockedUsers.length > 0) {
+          query = query.not('user_id', 'in', `(${blockedUsers.join(',')})`);
         }
 
         const { data, error } = await query;
