@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import PostComponent from "@/components/postComponent"; 
 import styles from "./card.module.css";
 import Image from "next/image";
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Post } from "@/app/lib/types";
 import { supabase } from "@/app/lib/definitions";
 import { useAuth } from 'app/context/AuthContext';
@@ -95,6 +94,11 @@ const Card: React.FC<{ post: Post, managePost?: (manageType: string, postId: num
       <div className={styles["card-container"]}>
             <div className="cursor-pointer">
               <div onClick={handleClick} className={styles["image-container"]}>
+              {post.is_deal && (
+                  <div className="absolute top-3 right-3 bg-[#fd0000] text-white text-sm font-bold px-3 py-1 rounded-lg shadow-lg z-10">
+                  DEAL
+                  </div>
+                )}
                 {post.is_video ? (
                   <>
                     <video
