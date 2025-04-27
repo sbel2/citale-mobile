@@ -57,8 +57,6 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
         .eq('sender_id', userId)
         .order('sent_at', { ascending: false });
 
-      console.log('Receiver ID:', user.id);
-      console.log('Sender ID:', userId);
       // set as read after fetching
       const { error: readError } = await supabase
         .from('chats')
@@ -156,17 +154,20 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (chatContainerRef.current && messages.length > 0) {
       const container = chatContainerRef.current;
+      console.log('Container:', container);
+      console.log("Current scroll height:", container.scrollHeight);
       container.scrollTo({
         top: container.scrollHeight,
         behavior: 'smooth'
       });
+      console.log("New scroll height:", container);
     }
   }, [messages]);
 
   return (
     <div className="flex flex-col h-[100dvh-56px] bg-white overflow-hidden">
       {/* Header (Fixed at the top) */}
-      <header className="fixed top-[calc(env(safe-area-inset-top)+55px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
+      <header className="fixed top-[calc(env(safe-area-inset-top)+56px)] left-0 right-0 z-10 border-b border-gray-200 bg-white">
         <div className="mx-auto px-4 py-2 flex justify-between items-center">
           <a href="/inbox" aria-label="Go back home" className="text-gray-800 dark:text-white ml-1">
             &#x2190; Inbox
@@ -186,13 +187,13 @@ export default function PrivateChat({ params }: { params: { id: string } }) {
         </div>
       </header>
       {isBlocked && (
-        <div className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+        <div className="mt-14 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
           <p>No user found</p>
         </div>
       )}
       {!isBlocked && (
         <>
-          <div ref={chatContainerRef} className="mt-14 flex-1 space-y-4 p-4 pb-[calc(4rem+7rem+env(safe-area-inset-bottom))] overflow-y-auto">
+          <div ref={chatContainerRef} className="mt-14 h-[calc(100vh-14rem)] space-y-4 p-4 overflow-y-scroll pb-[calc(4rem+env(safe-area-inset-bottom))]">
             {user &&
               messages.length > 0 &&
               messages.map((m, index) => (
