@@ -384,14 +384,17 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
 
         const checkIfBlocked = async () => {
             if (user && user.id !== userId) {
-                const { data, error } = await supabase
+                const { data: blockedData, error } = await supabase
                     .from('blocks')
                     .select('*')
-                    .eq('user_id', userId)
-                    .eq('blocked_id', user.id)
-                    .single();
-    
-                if (data) {
+                    .or(`and(user_id.eq.${userId},blocked_id.eq.${user.id}),and(user_id.eq.${user.id},blocked_id.eq.${userId})`);
+        
+                if (error) {
+                    console.error('Error checking block status:', error);
+                    return;
+                }
+        
+                if (blockedData && blockedData.length > 0) {
                     setViewerIsBlocked(true);
                 }
             }
@@ -424,7 +427,7 @@ export default function ProfilePage({ params }: { params: { id: string } }) {
                     {/* Blocked user message (only addition) */}
                     {viewerIsBlocked && (
                         <div className="text-center p-4">
-                            <p className="text-gray-500">You are blocked from viewing this profile</p>
+                            <p className="text-gray-500">This profile cannot be viewed.</p>
                         </div>
                     )}
     
