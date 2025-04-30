@@ -146,7 +146,7 @@ export default function SharePage() {
     }
 
     return (
-        <div className="flex flex-col h-[100dvh] bg-white">
+        <div className="flex flex-col h-[100dvh-56px] bg-white">
         
             <header className="shrink-0 border-b border-gray-200 bg-white lg:hidden">
                 <div className="mx-auto px-4 py-2 flex justify-between items-center">
