@@ -69,46 +69,46 @@ export default function UploadMedia() {
     
 
     return (
-        <div className="flex flex-col items-center justify-center overflow-hidden mt-48 md:mt-36">
-            {/* 📌 Logo at the Top */}
-            <Link href="/" aria-label="Home" className="inline-block mb-20">
-                <Image
-                    src="/citale_header.svg"
-                    alt="Citale Logo"
-                    width={150}
-                    height={30}
-                    priority
-                />
-            </Link>
-
-            {/* 📌 Drag-and-Drop Box */}
-            <div
-                className={`w-full max-w-3xl h-96 flex flex-col items-center justify-center border-2 
-                border-dashed rounded-lg transition-all cursor-pointer bg-gray-100 
-                ${isDragging ? "border-blue-500 bg-blue-100" : "border-gray-300 hover:border-blue-500"}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-            >
-                <FiUpload className="text-gray-600 text-5xl mb-4" />
-                <p className="text-gray-600 text-md mt-4">
-                    {isDragging ? "Drop files here..." : "Drag files or click to upload"}
-                </p>
-            </div>
-
-            <input
-                type="file"
-                multiple
-                accept=".jpg,.jpeg,.png,.gif,.mp4,.mov"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
+        <div className="h-[calc(100dvh-100px)] flex flex-col items-center justify-center overflow-hidden">
+          {/* 📌 Logo at the Top */}
+          <Link href="/" aria-label="Home" className="mb-5">
+            <Image
+              src="/citale_header.svg"
+              alt="Citale Logo"
+              width={150}
+              height={30}
+              priority
             />
-
-            {/* 📌 Error Messages */}
-            {videoError && <p className="text-red-500 mt-4">{videoError}</p>}
+          </Link>
+      
+          {/* 📌 Drag-and-Drop Box */}
+          <div
+            className={`w-full max-w-3xl h-96 flex flex-col items-center justify-center border-2 
+            border-dashed rounded-lg transition-all cursor-pointer bg-gray-100 mb-10
+            ${isDragging ? "border-blue-500 bg-blue-100" : "border-gray-300 hover:border-blue-500"}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <FiUpload className="text-gray-600 text-5xl mb-4" />
+            <p className="text-gray-600 text-md mt-4">
+              {isDragging ? "Drop files here..." : "Drag files or click to upload"}
+            </p>
+          </div>
+      
+          <input
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.gif,.mp4,.mov"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+      
+          {/* 📌 Error Messages */}
+          {videoError && <p className="text-red-500 mt-4">{videoError}</p>}
         </div>
-
-    );
+      );
+      
 }
