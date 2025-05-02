@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Post } from "@/app/lib/types";
 import styles from "@/components/postComponent.module.css";
@@ -10,10 +10,10 @@ interface PostMediaProps {
 
 const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // We’ll keep track if the user touched a button, so we skip swipe
   const isTouchOnButton = useRef(false);
-
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
@@ -30,37 +30,24 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
   };
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    // If the user’s finger started on a button, bail out
-    if ((e.target as HTMLElement).closest(`button`)) {
+    if ((e.target as HTMLElement).closest("button")) {
       isTouchOnButton.current = true;
       return;
-    } else {
-      isTouchOnButton.current = false;
     }
-
+    isTouchOnButton.current = false;
     touchStartX.current = e.changedTouches[0].screenX;
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    // If touch started on a button, skip
     if (isTouchOnButton.current) return;
-
     touchEndX.current = e.changedTouches[0].screenX;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    // If touch started on a button, skip
+  const handleTouchEnd = () => {
     if (isTouchOnButton.current) return;
-
     const distance = touchStartX.current - touchEndX.current;
-
-    if (distance > 50) {
-      // Swipe left => next
-      handleNext();
-    } else if (distance < -50) {
-      // Swipe right => previous
-      handlePrevious();
-    }
+    if (distance > 50) handleNext();
+    else if (distance < -50) handlePrevious();
   };
 
   const postBucket =
@@ -70,9 +57,27 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
       ? "drafts"
       : "";
 
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = `${process.env.NEXT_PUBLIC_IMAGE_CDN}/${postBucket}/images/${post.mediaUrl[currentImageIndex]}`;
+    img.onload = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const aspectRatio = img.height / img.width;
+        const calculatedHeight = containerWidth * aspectRatio;
+        setDimensions({
+          width: containerWidth,
+          height: calculatedHeight,
+        });
+      }
+    };
+  }, [currentImageIndex, post.mediaUrl, postBucket]);
+
   return (
     <div
+      ref={containerRef}
       className={post.is_video ? styles.videocontainer : styles.imagecontainer}
+      style={!post.is_video ? { height: `${dimensions.height}px` } : {}}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -92,6 +97,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
           alt={post.title}
           fill
           style={{ objectFit: "contain" }}
+          sizes="100vw"
         />
       )}
 
@@ -115,7 +121,7 @@ const PostMedia: React.FC<PostMediaProps> = ({ post }) => {
       )}
 
       {!post.is_video && (
-        <span className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+        <span className="absolute top-4 right-4 bg-black/50 text-white px-2 py-1 rounded text-xs">
           {`${currentImageIndex + 1}/${post.mediaUrl.length}`}
         </span>
       )}
