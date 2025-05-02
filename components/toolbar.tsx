@@ -12,13 +12,10 @@ const Toolbar: React.FC = () => {
   const { user, logout } = useAuth(); 
   const [userAvatar, setUserAvatar] = useState<string>('avatar.png'); // Default placeholder 
   const [loading, setLoading] = useState<boolean>(true); // Track loading state 
-  const [isMenuOpen, setIsMenuOpen] = useState(false); 
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const { push } = useRouter(); 
   const pathname = usePathname();   
   const [hasUnreadMessage, setHasUnreadMessage] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);   
 
   // Fetch and set user avatar
   const fetchUserAvatar = async (userId: string) => {
@@ -87,13 +84,52 @@ const Toolbar: React.FC = () => {
       push("/"); // Navigate to home page if on a different page     
     }   
   };
-  
-  // In Toolbar component
+
   useEffect(() => {
-    if (!user) {
-      setHasUnreadNotifications(false);
-      return;
+    console.log('Checking for unread messages...');
+    const checkUnreadMessages = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('chats')
+          .select('is_read')
+          .eq('receiver_id', user.id)
+          .eq('is_read', false)
+        if (error) {
+          console.error('Error fetching unread messages:', error.message);
+          return;
+        }
+        if (data && data.length > 0) {
+        setHasUnreadMessage(true);
+        }
+        else{
+          setHasUnreadMessage(false);
+        }
+      }
+    };
+    checkUnreadMessages();
+
+    if (user) {
+      // Fetch messages immediately
+      checkUnreadMessages();
+
+      // Set up polling every 2 seconds
+      const interval = setInterval(checkUnreadMessages, 2000);
+
+      // Clean up the interval on unmount
+      return () => {
+        clearInterval(interval);
+      };
     }
+  }, [user]); // Add user as a dependency to re-run when user changes
+
+
+  // In your Toolbar component
+// In Toolbar component
+useEffect(() => {
+  if (!user) {
+    setHasUnreadNotifications(false);
+    return;
+  }
 
   const checkUnreadNotifications = async () => {
     try {
@@ -201,9 +237,6 @@ const Toolbar: React.FC = () => {
 
   // Set up an interval to check periodically (every 5 minutes)
   const interval = setInterval(checkUnreadNotifications, 300000);
-
-  // Capture the current value of user
-  const currentUser = user;
   
   return () => {
     clearInterval(interval);
@@ -211,58 +244,16 @@ const Toolbar: React.FC = () => {
     if (updatesChannel) supabase.removeChannel(updatesChannel);
   };
 }, [user]);
-  
-  useEffect(() => {
-    console.log('Checking for unread messages...');
-    const checkUnreadMessages = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('chats')
-          .select('is_read')
-          .eq('receiver_id', user.id)
-          .eq('is_read', false)
-        if (error) {
-          console.error('Error fetching unread messages:', error.message);
-          return;
-        }
-        if (data && data.length > 0) {
-          setHasUnreadMessage(true);
-        }
-        else{
-          setHasUnreadMessage(false);
-        }
-      }
-    };
-    checkUnreadMessages();
-
-    if (user) {
-      // Fetch messages immediately
-      checkUnreadMessages();
-
-      // Set up polling every 2 seconds
-      const interval = setInterval(checkUnreadMessages, 2000);
-
-      // Clean up the interval on unmount
-      return () => {
-        clearInterval(interval);
-      };
-    }
-  }, [user]); // Add user as a dependency to re-run when user changes
-
 
   return (     
-    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>       
-      <Link href="/" aria-label="Home" className="pt-10 pl-8 pb-10 hidden md:inline">         
-        <Image src="/citale_header.svg" alt="Citale Logo" width={90} height={30} priority />       
-      </Link>        
+    <nav className="bg-white text-black fixed md:top-0 md:left-0 md:h-full md:w-64 w-full bottom-0 h-16 flex md:flex-col items-start md:items-stretch shadow-md z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>    
 
       {/* Home Button */}       
       <button         
         onClick={() => push('/')}         
         className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/' ? 'font-semibold' : ''}`}       
       >         
-        <Image src={pathname === '/' ? "/home_s.svg" : "/home.svg"} alt="Home Icon" width={25} height={25} priority />         
-        <span className="ml-5 hidden md:inline">Home</span>       
+        <Image src={pathname === '/' ? "/home_s.svg" : "/home.svg"} alt="Home Icon" width={25} height={25} priority />             
       </button>        
 
       {/* Chat Button */}
@@ -276,9 +267,9 @@ const Toolbar: React.FC = () => {
           <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
           )}
         </div>
-        <span className="ml-5 hidden md:inline">Message</span>
       </button>
 
+      {/* Post Button */}
       <button onClick={() => {user ? push('/upload') : push('/log-in')}} className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/createpost' ? 'text-bold fill-black' : ''}`}>
           <Image
             src={["/upload", "/posting"].includes(pathname) ? "/plus_s.svg" : "/plus.svg"}
@@ -287,35 +278,33 @@ const Toolbar: React.FC = () => {
             height={25}
             priority
           />
-        <span className="ml-5 hidden md:inline">Post</span>
       </button>
 
-            {/* Notifications Button */}
-            {user ? (
-  <button
-    onClick={() => push('/notifications')}
-    className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/notifications' ? 'font-semibold' : ''}`}
-  >
-    <div className="relative">
-      <Image
-        src={pathname === '/notifications' ? "/bell_s.svg" : "/bell.svg"}
-        alt="Notifications Icon"
-        width={25}
-        height={25}
-        priority
-      />
-      {hasUnreadNotifications && (
-        <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+      {/* Notifications Button */}
+      {user ? (
+        <button
+          onClick={() => push('/notifications')}
+          className={`p-4 w-full flex justify-center md:justify-start items-center md:hover:bg-gray-200 focus:outline-none md:focus:ring-2 md:focus:ring-blue-500 transition-all ${pathname === '/notifications' ? 'font-semibold' : ''}`}
+        >
+          <div className="relative">
+            <Image
+              src={pathname === '/notifications' ? "/bell_s.svg" : "/bell.svg"}
+              alt="Notifications Icon"
+              width={25}
+              height={25}
+              priority
+            />
+            {hasUnreadNotifications && (
+              <div className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></div>
+            )}
+          </div>
+        </button>
+      ) : (
+        <Link href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center">
+          <Image src="/bell.svg" alt="Notifications Icon" width={25} height={25} priority />
+        </Link>
       )}
-    </div>
-    <span className="ml-5 hidden md:inline">Notifications</span>
-  </button>
-) : (
-  <Link href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center">
-    <Image src="/bell.svg" alt="Notifications Icon" width={25} height={25} priority />
-    <span className="ml-5 hidden md:inline">Notifications</span>
-  </Link>
-)}
+
 
       {/* Profile Button */}       
       {user ? (         
@@ -328,71 +317,14 @@ const Toolbar: React.FC = () => {
             className="rounded-full"             
             priority             
             onError={() => setUserAvatar('avatar.png')} // Fallback if image fails to load           
-          />           
-          <span className="ml-5 hidden md:inline">Profile</span>         
+          />                
         </Link>       
       ) : (         
         <Link href="/log-in" className="p-4 w-full flex justify-center md:justify-start items-center">           
-          <Image src="/account.svg" alt="Profile Icon" width={25} height={25} priority />           
-          <span className="ml-5 hidden md:inline">Profile</span>         
+          <Image src="/account.svg" alt="Profile Icon" width={25} height={25} priority />            
         </Link>       
-      )}        
-
-      {/* Log in Button */}       
-      {!loading && !user && (         
-        <Link           
-          href="/log-in"           
-          className="p-3 w-[88%] text-center bg-[#fd0000] text-white rounded-full hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all mx-auto mt-4 hidden md:block"         
-        >           
-          Log in         
-        </Link>       
-      )}        
-
-      {/* Menu Button */}         
-        <button           
-          onClick={toggleMenu}           
-          className="md:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-full shadow-md"         
-        >           
-          <Image src="/menu.svg" alt="Menu Icon" width={25} height={25} priority />           
-          <span className="ml-5 hidden md:inline">Menu</span>         
-        </button>  
-        <div className="hidden md:block md:mt-auto w-full relative">   
-        {isMenuOpen && (           
-          <div className="absolute bottom-full mb-2 right-0 bg-white shadow-md rounded-lg w-full min-w-[200px] md:w-64 md:left-0">         
-            {user ? (               
-              <a href="#" onClick={handleLogout} className="block p-4 hover:bg-gray-200 text-red-600">Log out</a>             
-            ) : (               
-              <Link href="/log-in" className="block p-4 hover:bg-gray-200 text-black-600">Log in</Link>             
-            )}
-
-            <Link
-              href="https://forms.gle/kfWJA5HCBMne8dND7" // Replace with your Google Form link
-              className="block p-4 hover:bg-gray-200 text-black-600"
-              target="_blank" 
-              >
-              Report Content/User
-            </Link>
-
-            <Link
-              href="/support" // Replace with your Google Form link
-              className="block p-4 hover:bg-gray-200 text-black-600"
-              target="_blank" 
-              >
-              Customer Support
-            </Link>
-
-            <Link
-              href="/privacy-policy"
-              className="block p-4 hover:bg-gray-200 text-black"
-              target="_blank" 
-            >
-              Privacy Policy
-            </Link> 
-            <Link href="/terms" className="block p-4 hover:bg-gray-200 text-black" target="_blank"  >Terms of Use</Link>             
-          </div> 
-        )}     
-      </div>     
-    </nav>  
+      )}           
+    </nav>   
   ); 
 };  
 
